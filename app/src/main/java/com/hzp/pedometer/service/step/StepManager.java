@@ -1,6 +1,7 @@
 package com.hzp.pedometer.service.step;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 
@@ -19,7 +20,12 @@ import wavelet.utils.Wavelet;
  */
 public class StepManager implements StepDetector.OnStepCountListener{
 
+    public static final String ACTION_STEP_COUNT = "step_count";
+    private static final String KEY_STEP_COUNT = "STEP_COUNT";
+
     private static StepManager instance;
+    private Context context;
+
     private int windowSize;
     private int length = 0;
 
@@ -29,7 +35,10 @@ public class StepManager implements StepDetector.OnStepCountListener{
     private List<Double> accelerationList;
     private List<Long> timeList;
 
+    private boolean broadcastEnable = true;//是否开启步数广播
+
     private StepManager(Context context) {
+        this.context = context;
         windowSize = StepConfig.getInstance(context).getFilterWindowSize();
         executorService = Executors.newSingleThreadExecutor();
         stepDetector = new StepDetector();
@@ -95,8 +104,22 @@ public class StepManager implements StepDetector.OnStepCountListener{
 
     @Override
     public void onStepCounted(int count) {
-        //TODO
+        //发送包含步数数据的广播
+        if(broadcastEnable){
+            Intent intent = new Intent();
+            intent.setAction(ACTION_STEP_COUNT);
+            intent.putExtra(KEY_STEP_COUNT,count);
+            context.sendBroadcast(intent);
+        }
     }
+
+    /**
+     * 开关步数广播
+     */
+    public void setBroadcastEnable(boolean enable){
+        broadcastEnable = enable;
+    }
+
 
     class ProcessThread implements Runnable {
         private double[] data;
