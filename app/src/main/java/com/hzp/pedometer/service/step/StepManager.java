@@ -88,7 +88,7 @@ public class StepManager implements StepDetector.OnStepCountListener{
         }
     }
 
-    protected void inputPoints(List<Double> aList, List<Long> timeList) {
+    public void inputPoints(List<Double> aList, List<Long> timeList) {
         for (int i = 0; i < aList.size(); i++) {
             inputPoint(aList.get(i), timeList.get(i));
         }
@@ -122,7 +122,6 @@ public class StepManager implements StepDetector.OnStepCountListener{
     public void setBroadcastEnable(boolean enable){
         broadcastEnable = enable;
     }
-
 
     class ProcessThread implements Runnable {
         private double[] data;
