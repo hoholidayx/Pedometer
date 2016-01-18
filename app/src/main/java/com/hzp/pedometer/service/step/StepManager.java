@@ -17,7 +17,7 @@ import wavelet.utils.Wavelet;
  * @author 何志鹏 on 2016/1/18.
  * @email hoholiday@hotmail.com
  */
-public class StepManager {
+public class StepManager implements StepDetector.OnStepCountListener{
 
     private static StepManager instance;
     private int windowSize;
@@ -93,6 +93,11 @@ public class StepManager {
         executorService.submit(new ProcessThread());
     }
 
+    @Override
+    public void onStepCounted(int count) {
+        //TODO
+    }
+
     class ProcessThread implements Runnable {
         private double[] data;
         private long[] time;
@@ -115,7 +120,6 @@ public class StepManager {
 
             //计步计算
             for (int i = 0; i < windowSize; i++) {
-                //TODO 结果监听
                 stepDetector.stepDetection(result[i], time[i]);
             }
         }
