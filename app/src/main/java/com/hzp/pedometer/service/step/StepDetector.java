@@ -48,7 +48,7 @@ public class StepDetector {
     private double mjuV, sigmaV;
 
     //当前记录的步数
-    private int count;
+    public int stepCount;
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -90,7 +90,7 @@ public class StepDetector {
         mjuP = sigmaP = 0;
         mjuV = sigmaV = 0;
 
-        count = 0;
+        stepCount = 0;
     }
 
     /**
@@ -235,10 +235,10 @@ public class StepDetector {
                 S = WaveState.VALLEY;
                 updateValley();
 
-                count++;
+                stepCount++;
 
                 if (listener != null) {
-                    listener.onStepCounted(count);
+                    listener.onStepCounted(stepCount);
                 }
 
             } else if (S == WaveState.VALLEY && n - nv <= Thv && an <= av) {

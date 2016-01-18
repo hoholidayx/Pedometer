@@ -62,7 +62,8 @@ public class StepManager {
 
     /**
      * 读入加速度和时间点数据
-     * @param a 加速度
+     *
+     * @param a    加速度
      * @param time 时间戳
      */
     public void inputPoint(double a, long time) {
@@ -79,6 +80,13 @@ public class StepManager {
         for (int i = 0; i < aList.size(); i++) {
             inputPoint(aList.get(i), timeList.get(i));
         }
+    }
+
+    /**
+     * 获取当前计算的总步数
+     */
+    public int getStepCount() {
+        return stepDetector.stepCount;
     }
 
     private void processData() {
@@ -102,13 +110,13 @@ public class StepManager {
             //预处理和小波变换
             double[] result =
                     Wavelet.waveletFilter(
-                            Wavelet.medianFilter(data,windowSize)
-                            ,windowSize);
+                            Wavelet.medianFilter(data, windowSize)
+                            , windowSize);
 
             //计步计算
-            for(int i =0;i<windowSize;i++){
+            for (int i = 0; i < windowSize; i++) {
                 //TODO 结果监听
-                stepDetector.stepDetection(result[i],time[i]);
+                stepDetector.stepDetection(result[i], time[i]);
             }
         }
     }
