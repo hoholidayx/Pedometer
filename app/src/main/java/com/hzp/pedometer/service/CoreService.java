@@ -10,12 +10,18 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 
+import com.hzp.pedometer.persistance.sp.StepConfig;
 import com.hzp.pedometer.service.step.StepDetector;
+import com.hzp.pedometer.service.step.StepManager;
+
+import java.math.BigDecimal;
+
+import math.utils.BaseMath;
 
 /**
  * 核心工作服务
  */
-public class CoreService extends Service implements SensorEventListener{
+public class CoreService extends Service implements SensorEventListener {
 
     private CoreBinder binder;
 
@@ -54,7 +60,7 @@ public class CoreService extends Service implements SensorEventListener{
     /**
      * 传感器初始化
      */
-    private void initSensors(){
+    private void initSensors() {
         //初始化重力传感器
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
@@ -63,7 +69,25 @@ public class CoreService extends Service implements SensorEventListener{
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        //合加速度
+        double a = Math.sqrt(
+                Math.pow(event.values[0], 2) +
+                        Math.pow(event.values[1], 2) +
+                        Math.pow(event.values[2], 2));
 
+        //保留两位小数
+        BigDecimal bd = new BigDecimal(a);
+        a = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+
+        switch (mode) {
+            case NORMAL: {
+                break;
+            }
+            case REAL_TIME: {
+                processRealTimeMode(a,System.currentTimeMillis());
+                break;
+            }
+        }
     }
 
     @Override
@@ -71,34 +95,54 @@ public class CoreService extends Service implements SensorEventListener{
         //empty
     }
 
+    /**
+     * 处理实时计步模式数据
+     * @param a 加速度
+     * @param n 时间
+     */
+    private void processRealTimeMode(double a,long n){
+        StepManager.getInstance(this).inputPoint(a,n);
+    }
 
     /**
      * 开始计步
+     *
      * @param mode 计步模式
      */
-    public void startStepCount(Mode mode){
+    public void startStepCount(Mode mode) {
         this.mode = mode;
-        switch (mode){
-            case NORMAL:{
-                break;
-            }
-            case REAL_TIME:{
-                break;
-            }
-        }
+        sensorManager.registerListener(this, sensor
+                , (1 / StepConfig.getInstance(this).getSamplingRate()) * 1000 * 1000);
+
+//        switch (mode){
+//            case NORMAL:{
+//                break;
+//            }
+//            case REAL_TIME:{
+//                break;
+//            }
+//        }
     }
 
-    public boolean isWorking(){
+    /**
+     * 停止计步
+     */
+    public void stopStepCount() {
+        WORKING = false;
+        StepManager.getInstance(this).resetData();
+    }
+
+    public boolean isWorking() {
         return WORKING;
     }
 
-    public Mode getMode(){
+    public Mode getMode() {
         return mode;
     }
 
 
-    public class CoreBinder extends Binder{
-       public CoreService getService(){
+    public class CoreBinder extends Binder {
+        public CoreService getService() {
             return CoreService.this;
         }
     }

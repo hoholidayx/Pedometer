@@ -68,6 +68,8 @@ public class StepManager implements StepDetector.OnStepCountListener{
         }
         accelerationList.clear();
         timeList.clear();
+        length = 0;
+        stepDetector.reset();
     }
 
     /**
@@ -86,7 +88,7 @@ public class StepManager implements StepDetector.OnStepCountListener{
         }
     }
 
-    public void inputPoints(List<Double> aList, List<Long> timeList) {
+    protected void inputPoints(List<Double> aList, List<Long> timeList) {
         for (int i = 0; i < aList.size(); i++) {
             inputPoint(aList.get(i), timeList.get(i));
         }

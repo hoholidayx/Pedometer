@@ -12,11 +12,12 @@ public class StepConfig extends BaseSp{
 
     private static final String FILE_NAME = "StepConfig";
 
-    private static final String KEY_ALPHA = "key_alpha";
-    private static final String KEY_BETA = "key_beta";
-    private static final String KEY_K_NUMBER = "key_k_number";
-    private static final String KEY_M_NUMBER = "key_m_number";
-    private static final String KEY_FILTER_WINDOW_SIZE = "key_filter_window_size";
+    private static final String KEY_ALPHA = "alpha";
+    private static final String KEY_BETA = "beta";
+    private static final String KEY_K_NUMBER = "k_number";
+    private static final String KEY_M_NUMBER = "m_number";
+    private static final String KEY_FILTER_WINDOW_SIZE = "filter_window_size";
+    private static final String KEY_SAMPLING_RATE = "SAMPLING_RATE";
 
     public static final double DEFAULT_ALPHA = 2.5;
     public static final double DEFAULT_BETA = -3.0;
@@ -25,6 +26,7 @@ public class StepConfig extends BaseSp{
     public static final int DEFAULT_STEP_INTERVAL_MIN = 200;//ms
     public static final int DEFAULT_STEP_INTERVAL_MAX = 2000;
     public static final int DEFAULT_FILTER_WINDOW_SIZE = 200;//过滤模块默认窗口大小
+    public static final int DEFAULT_SAMPLING_RATE = 50;//默认采样率Hz
     //默认重力加速度
     public static final double DEFAULT_GRAVITY = 9.8;
 
@@ -84,5 +86,13 @@ public class StepConfig extends BaseSp{
 
     public void setFilterWindowSize(int size){
         putInt(KEY_FILTER_WINDOW_SIZE,size);
+    }
+
+    public int getSamplingRate(){
+        return getInt(KEY_SAMPLING_RATE,DEFAULT_SAMPLING_RATE);
+    }
+
+    public void setSamplingRate(int rate){
+        putInt(KEY_SAMPLING_RATE,rate);
     }
 }

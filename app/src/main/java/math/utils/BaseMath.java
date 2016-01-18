@@ -17,11 +17,7 @@ public class BaseMath {
         double temp = x < y ? x : y;
         return temp < z ? temp : z;
     }
-
-    public static double sqrt(double x, double y, double z) {
-        return Math.sqrt(x * x + y * y + z * z);
-    }
-
+    
     public static Object avg(List data,Class<? extends Number> clazz) {
 
         String name = clazz.getName();
