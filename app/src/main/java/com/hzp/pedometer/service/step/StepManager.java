@@ -42,6 +42,7 @@ public class StepManager implements StepDetector.OnStepCountListener{
         windowSize = StepConfig.getInstance(context).getFilterWindowSize();
         executorService = Executors.newSingleThreadExecutor();
         stepDetector = new StepDetector();
+        stepDetector.setStepCountListener(this);
         resetData();
     }
 
