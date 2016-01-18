@@ -70,6 +70,7 @@ public class StepManager implements StepDetector.OnStepCountListener{
         timeList.clear();
         length = 0;
         stepDetector.reset();
+        executorService.shutdown();
     }
 
     /**
