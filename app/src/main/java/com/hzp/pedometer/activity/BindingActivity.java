@@ -1,6 +1,6 @@
 package com.hzp.pedometer.activity;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +15,7 @@ import com.hzp.pedometer.service.CoreService;
  *
  * 带服务绑定的基类
  */
-public class BindingActivity extends Activity{
+public class BindingActivity extends AppCompatActivity{
 
     protected CoreService mService;
     protected boolean mBound = false;
