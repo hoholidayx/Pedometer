@@ -23,6 +23,8 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         handler = new Handler();
+
+        startMainActivity();
     }
 
     /**
@@ -32,8 +34,7 @@ public class SplashActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                // TODO: 2016/1/18 完成主界面跳转
-                Intent intent = new Intent(SplashActivity.this,);
+                Intent intent = new Intent(SplashActivity.this,MainActivity.class);
                 startActivity(intent);
             }
         },waitTime);
