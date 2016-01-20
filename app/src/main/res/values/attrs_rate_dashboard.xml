@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="RateDashboard">
+        <attr name="board_radius" format="dimension"/>
+        <attr name="board_value" format="float"/>
+    </declare-styleable>
+</resources>
