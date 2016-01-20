@@ -5,9 +5,10 @@
     android:background="@drawable/img_rate_dashboard_background">
 
     <ImageView
+        android:id="@+id/rate_dashboard_pointer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerInside"
-        android:src="@drawable/img_rate_dashboard_arrow"/>
+        android:src="@drawable/img_rate_dashboard_pointer"/>
 
 </RelativeLayout>
