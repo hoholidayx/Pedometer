@@ -2,6 +2,7 @@ package com.hzp.pedometer.service.step;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 
@@ -17,7 +18,7 @@ import wavelet.utils.Wavelet;
  * @author 何志鹏 on 2016/1/18.
  * @email hoholiday@hotmail.com
  */
-public class StepManager implements StepDetector.OnStepCountListener{
+public class StepManager implements StepDetector.OnStepCountListener {
 
     public static final String ACTION_STEP_COUNT = "step_count";
     private static final String KEY_STEP_COUNT = "STEP_COUNT";
@@ -26,7 +27,6 @@ public class StepManager implements StepDetector.OnStepCountListener{
     private Context context;
 
     private int windowSize;
-    private int length = 0;
 
     private StepDetector stepDetector;//算法模块
     private ExecutorService executorService;
@@ -35,15 +35,15 @@ public class StepManager implements StepDetector.OnStepCountListener{
     private List<Double> accelerationList;
     private List<Long> timeList;
 
-    private boolean broadcastEnable = false;//是否开启步数广播
+    private boolean broadcastEnable = true;//是否开启步数广播
     private boolean Working = false;
 
-    private int stepPerMin;//步数每分钟
-    private long timeSpendPerWindow;//填充满一个窗口需要的时间 (秒)
+    private double stepPerMin;//步数每分钟
+    private long timeSpendPerWindow;//填充满一个窗口需要的时间 (ms)
     private int stepCountLastProcess;//上次处理数据时记录的步数
 
     //载入native库
-    static{
+    static {
         System.loadLibrary("wavelet");
     }
 
@@ -51,7 +51,7 @@ public class StepManager implements StepDetector.OnStepCountListener{
         this.context = context;
         samplingRate = StepConfig.getInstance(context).getSamplingRate();
         windowSize = StepConfig.getInstance(context).getFilterWindowSize();
-        timeSpendPerWindow = (1/samplingRate)*windowSize;
+        timeSpendPerWindow = (long) ((1.0/samplingRate)*windowSize*1000);
 
         executorService = Executors.newSingleThreadExecutor();
         stepDetector = new StepDetector(context);
@@ -82,7 +82,6 @@ public class StepManager implements StepDetector.OnStepCountListener{
         }
         accelerationList.clear();
         timeList.clear();
-        length = 0;
         stepCountLastProcess = 0;
         stepDetector.reset();
         //TODO 线程池关闭后不能再打开？
@@ -100,9 +99,7 @@ public class StepManager implements StepDetector.OnStepCountListener{
 
         accelerationList.add(a);
         timeList.add(time);
-        length++;
-        if (length >= windowSize) {
-            length = 0;
+        if (accelerationList.size() >= windowSize) {
             processData();
         }
     }
@@ -122,9 +119,10 @@ public class StepManager implements StepDetector.OnStepCountListener{
 
     /**
      * 获取每分钟的步数
+     *
      * @return 步数/分
      */
-    public int getStepPerMin(){
+    public double getStepPerMin() {
         return stepPerMin;
     }
 
@@ -136,35 +134,42 @@ public class StepManager implements StepDetector.OnStepCountListener{
      * 窗口满时进行数据处理
      */
     private void processData() {
+        calculateStepPerMin(getStepCount());
         executorService.submit(new ProcessThread());
     }
 
     /**
      * 计算步数每分钟
+     *
      * @param count 步数每分钟
      */
-    private void calculateStepPerMin(int count){
-        int increment = count - stepCountLastProcess;
+    private void calculateStepPerMin(int count) {
+        double increment = count - stepCountLastProcess;
         stepCountLastProcess = count;
-        stepPerMin = (int) ((increment/timeSpendPerWindow)*60);
+        stepPerMin = ((increment / timeSpendPerWindow) * 60 * 1000);
+    }
+
+    /**
+     * 发送包含步数数据的广播
+     */
+    private void sendStepBroadcast() {
+        if (broadcastEnable) {
+            Intent intent = new Intent();
+            intent.setAction(ACTION_STEP_COUNT);
+            intent.putExtra(KEY_STEP_COUNT, getStepCount());
+            context.sendBroadcast(intent);
+        }
     }
 
     @Override
     public void onStepCounted(int count) {
-        calculateStepPerMin(count);
-        //发送包含步数数据的广播
-        if(broadcastEnable){
-            Intent intent = new Intent();
-            intent.setAction(ACTION_STEP_COUNT);
-            intent.putExtra(KEY_STEP_COUNT,count);
-            context.sendBroadcast(intent);
-        }
+        //empty
     }
 
     /**
      * 开关步数广播
      */
-    public void setBroadcastEnable(boolean enable){
+    public void setBroadcastEnable(boolean enable) {
         broadcastEnable = enable;
     }
 
@@ -192,6 +197,8 @@ public class StepManager implements StepDetector.OnStepCountListener{
             for (int i = 0; i < windowSize; i++) {
                 stepDetector.stepDetection(result[i], time[i]);
             }
+
+            sendStepBroadcast();
         }
     }
 

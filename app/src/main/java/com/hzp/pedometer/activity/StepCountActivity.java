@@ -1,6 +1,10 @@
 package com.hzp.pedometer.activity;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -25,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 public class StepCountActivity extends BindingActivity {
 
     private RateDashboard rateDashboard;
-Timer timer;
     private Handler handler;
 
     @Override
@@ -49,24 +52,25 @@ Timer timer;
         CoreService d = getService();
         d.startStepCount(Mode.REAL_TIME);
 
-        timer =new Timer();
+        reciver = new MyReciver();
+        registerReceiver(reciver, new IntentFilter(StepManager.ACTION_STEP_COUNT));
+    }
+    private MyReciver reciver;
+    class MyReciver extends BroadcastReceiver {
 
-        timer.scheduleAtFixedRate(new TimerTask() {
-
-            @Override
-            public void run() {
-                final int count = StepManager.getInstance(getApplicationContext()).getStepCount();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        rateDashboard.setDashboardValue((double)count / 300.0);
-                    }
-                });
-                Log.e("步数", String.valueOf(count));
-
-            }
-        }, 0, 2000);
-
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int count = StepManager.getInstance(getApplicationContext()).getStepCount();
+            final double count2 = StepManager.getInstance(getApplicationContext()).getStepPerMin();
+            rateDashboard.post(new Runnable() {
+                @Override
+                public void run() {
+                    rateDashboard.setDashboardValue(count2 / 300.0);
+                }
+            });
+            //TODO
+            Log.e("步数", "步数：" + count + "步频：" + count2);
+        }
     }
 
 
@@ -75,7 +79,7 @@ Timer timer;
         rateDashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                timer.cancel();
+                unregisterReceiver(reciver);
                 getService().stopStepCount();
             }
         });

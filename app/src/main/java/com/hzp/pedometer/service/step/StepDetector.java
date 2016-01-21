@@ -1,6 +1,7 @@
 package com.hzp.pedometer.service.step;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 
@@ -130,7 +131,7 @@ public class StepDetector {
      *
      * @param anp1 当前读入的加速度
      */
-    private void detectCanditate(double anp1) {
+    private void detectCandidate(double anp1) {
         Sc = WaveState.INTMD;
 
         ThAp = mjuA + sigmaA / ALPHA;
@@ -214,7 +215,7 @@ public class StepDetector {
 
         n = np1;
 
-        detectCanditate(anp1);
+        detectCandidate(anp1);
 
         if (Sc == WaveState.PEAK) {
 
@@ -226,7 +227,7 @@ public class StepDetector {
                 S = WaveState.PEAK;
                 updatePeak();
 
-            } else if (S == WaveState.PEAK && n - np <= Thp && an >= ap) {
+            } else if (S == WaveState.PEAK && n - np < Thp && an >= ap) {
                 updatePeak();
 
             }
@@ -242,12 +243,13 @@ public class StepDetector {
                     listener.onStepCounted(stepCount);
                 }
 
-            } else if (S == WaveState.VALLEY && n - nv <= Thv && an <= av) {
+            } else if (S == WaveState.VALLEY && n - nv < Thv && an <= av) {
                 updateValley();
 
             }
         }
         updateSigmaA(anp1);
+
     }
 
     public void setStepCountListener(OnStepCountListener listener){

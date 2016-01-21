@@ -9,6 +9,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.SystemClock;
+import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 import com.hzp.pedometer.service.step.StepManager;
@@ -61,7 +63,6 @@ public class CoreService extends Service implements SensorEventListener {
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
-
     @Override
     public void onSensorChanged(SensorEvent event) {
         //合加速度
@@ -75,10 +76,11 @@ public class CoreService extends Service implements SensorEventListener {
                 break;
             }
             case REAL_TIME: {
-                processRealTimeMode(a,System.currentTimeMillis());
+                processRealTimeMode(a, System.currentTimeMillis());
                 break;
             }
         }
+
     }
 
     @Override
@@ -103,7 +105,7 @@ public class CoreService extends Service implements SensorEventListener {
     public void startStepCount(Mode mode) {
         this.mode = mode;
         sensorManager.registerListener(this, sensor,
-                (1/StepConfig.getInstance(this).getSamplingRate())*1000*1000 );//微秒
+                (int) ((1.0/StepConfig.getInstance(this).getSamplingRate())*1000*1000));//微秒
         Working = true;
 
 //        switch (mode){
