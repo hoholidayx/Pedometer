@@ -5,7 +5,6 @@ import android.content.Intent;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,12 +29,18 @@ public class StepManager implements StepDetector.OnStepCountListener{
     private int length = 0;
 
     private StepDetector stepDetector;//算法模块
-    ExecutorService executorService;
+    private ExecutorService executorService;
+    private int samplingRate; //数据采样率
 
     private List<Double> accelerationList;
     private List<Long> timeList;
 
-    private boolean broadcastEnable = true;//是否开启步数广播
+    private boolean broadcastEnable = false;//是否开启步数广播
+    private boolean Working = false;
+
+    private int stepPerMin;//步数每分钟
+    private long timeSpendPerWindow;//填充满一个窗口需要的时间 (秒)
+    private int stepCountLastProcess;//上次处理数据时记录的步数
 
     //载入native库
     static{
@@ -44,7 +49,10 @@ public class StepManager implements StepDetector.OnStepCountListener{
 
     private StepManager(Context context) {
         this.context = context;
+        samplingRate = StepConfig.getInstance(context).getSamplingRate();
         windowSize = StepConfig.getInstance(context).getFilterWindowSize();
+        timeSpendPerWindow = (1/samplingRate)*windowSize;
+
         executorService = Executors.newSingleThreadExecutor();
         stepDetector = new StepDetector(context);
         stepDetector.setStepCountListener(this);
@@ -63,6 +71,7 @@ public class StepManager implements StepDetector.OnStepCountListener{
     }
 
     public void resetData() {
+        Working = false;
         if (accelerationList == null) {
             accelerationList = Collections.synchronizedList(
                     new LinkedList<Double>());
@@ -74,6 +83,7 @@ public class StepManager implements StepDetector.OnStepCountListener{
         accelerationList.clear();
         timeList.clear();
         length = 0;
+        stepCountLastProcess = 0;
         stepDetector.reset();
         //TODO 线程池关闭后不能再打开？
 //        executorService.shutdown();
@@ -86,6 +96,8 @@ public class StepManager implements StepDetector.OnStepCountListener{
      * @param time 时间戳
      */
     public void inputPoint(double a, long time) {
+        Working = true;
+
         accelerationList.add(a);
         timeList.add(time);
         length++;
@@ -108,12 +120,38 @@ public class StepManager implements StepDetector.OnStepCountListener{
         return stepDetector.stepCount;
     }
 
+    /**
+     * 获取每分钟的步数
+     * @return 步数/分
+     */
+    public int getStepPerMin(){
+        return stepPerMin;
+    }
+
+    public boolean isWorking() {
+        return Working;
+    }
+
+    /**
+     * 窗口满时进行数据处理
+     */
     private void processData() {
         executorService.submit(new ProcessThread());
     }
 
+    /**
+     * 计算步数每分钟
+     * @param count 步数每分钟
+     */
+    private void calculateStepPerMin(int count){
+        int increament = count - stepCountLastProcess;
+        stepCountLastProcess = count;
+        stepPerMin = (int) ((increament/timeSpendPerWindow)*60);
+    }
+
     @Override
     public void onStepCounted(int count) {
+        calculateStepPerMin(count);
         //发送包含步数数据的广播
         if(broadcastEnable){
             Intent intent = new Intent();

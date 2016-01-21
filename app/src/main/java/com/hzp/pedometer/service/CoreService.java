@@ -9,15 +9,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
-import com.hzp.pedometer.service.step.StepDetector;
 import com.hzp.pedometer.service.step.StepManager;
-
-import java.math.BigDecimal;
-
-import math.utils.BaseMath;
 
 /**
  * 核心工作服务
@@ -30,7 +24,7 @@ public class CoreService extends Service implements SensorEventListener {
     private Sensor sensor;
 
     private Mode mode = Mode.NORMAL;//当前的计步模式
-    private boolean WORKING = false;//算法运行标识
+    private boolean Working = false;//算法运行标识
 
     public CoreService() {
         binder = new CoreBinder();
@@ -71,15 +65,10 @@ public class CoreService extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         //合加速度
-//        double a = Math.sqrt(
-//                Math.pow(event.values[0], 2) +
-//                        Math.pow(event.values[1], 2) +
-//                        Math.pow(event.values[2], 2));
-        //TODO 修改
-        double x= event.values[0];
-        double y= event.values[1];
-        double z= event.values[2];
-        double a = Math.sqrt(x*x+y*y+z*z);
+        double a = Math.sqrt(
+                Math.pow(event.values[0], 2) +
+                        Math.pow(event.values[1], 2) +
+                        Math.pow(event.values[2], 2));
 
         switch (mode) {
             case NORMAL: {
@@ -115,7 +104,7 @@ public class CoreService extends Service implements SensorEventListener {
         this.mode = mode;
         sensorManager.registerListener(this, sensor,
                 (1/StepConfig.getInstance(this).getSamplingRate())*1000*1000 );//微秒
-        WORKING = true;
+        Working = true;
 
 //        switch (mode){
 //            case NORMAL:{
@@ -131,15 +120,15 @@ public class CoreService extends Service implements SensorEventListener {
      * 停止计步
      */
     public void stopStepCount() {
-        if(WORKING){
-            WORKING = false;
+        if(Working){
+            Working = false;
             StepManager.getInstance(this).resetData();
             sensorManager.unregisterListener(this);
         }
     }
 
     public boolean isWorking() {
-        return WORKING;
+        return Working;
     }
 
     public Mode getMode() {
