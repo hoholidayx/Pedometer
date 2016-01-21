@@ -144,9 +144,9 @@ public class StepManager implements StepDetector.OnStepCountListener{
      * @param count 步数每分钟
      */
     private void calculateStepPerMin(int count){
-        int increament = count - stepCountLastProcess;
+        int increment = count - stepCountLastProcess;
         stepCountLastProcess = count;
-        stepPerMin = (int) ((increament/timeSpendPerWindow)*60);
+        stepPerMin = (int) ((increment/timeSpendPerWindow)*60);
     }
 
     @Override
