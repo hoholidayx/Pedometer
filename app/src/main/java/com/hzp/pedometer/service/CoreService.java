@@ -9,6 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 import com.hzp.pedometer.service.step.StepDetector;
@@ -63,21 +64,22 @@ public class CoreService extends Service implements SensorEventListener {
     private void initSensors() {
         //初始化重力传感器
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         //合加速度
-        double a = Math.sqrt(
-                Math.pow(event.values[0], 2) +
-                        Math.pow(event.values[1], 2) +
-                        Math.pow(event.values[2], 2));
-
-        //保留两位小数
-        BigDecimal bd = new BigDecimal(a);
-        a = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+//        double a = Math.sqrt(
+//                Math.pow(event.values[0], 2) +
+//                        Math.pow(event.values[1], 2) +
+//                        Math.pow(event.values[2], 2));
+        //TODO 修改
+        double x= event.values[0];
+        double y= event.values[1];
+        double z= event.values[2];
+        double a = Math.sqrt(x*x+y*y+z*z);
 
         switch (mode) {
             case NORMAL: {
@@ -111,8 +113,9 @@ public class CoreService extends Service implements SensorEventListener {
      */
     public void startStepCount(Mode mode) {
         this.mode = mode;
-        sensorManager.registerListener(this, sensor
-                , (1 / StepConfig.getInstance(this).getSamplingRate()) * 1000 * 1000);
+        sensorManager.registerListener(this, sensor,
+                (1/StepConfig.getInstance(this).getSamplingRate())*1000*1000 );//微秒
+        WORKING = true;
 
 //        switch (mode){
 //            case NORMAL:{
@@ -128,8 +131,11 @@ public class CoreService extends Service implements SensorEventListener {
      * 停止计步
      */
     public void stopStepCount() {
-        WORKING = false;
-        StepManager.getInstance(this).resetData();
+        if(WORKING){
+            WORKING = false;
+            StepManager.getInstance(this).resetData();
+            sensorManager.unregisterListener(this);
+        }
     }
 
     public boolean isWorking() {

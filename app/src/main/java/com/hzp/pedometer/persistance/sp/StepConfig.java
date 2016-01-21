@@ -21,8 +21,8 @@ public class StepConfig extends BaseSp{
 
     public static final double DEFAULT_ALPHA = 2.5;
     public static final double DEFAULT_BETA = -3.0;
-    public static final int DEFAULT_K_NUMBER = 100;
-    public static final int DEFAULT_M_NUMBER = 50;
+    public static final int DEFAULT_K_NUMBER = 25;
+    public static final int DEFAULT_M_NUMBER = 10;
     public static final int DEFAULT_STEP_INTERVAL_MIN = 200;//ms
     public static final int DEFAULT_STEP_INTERVAL_MAX = 2000;
     public static final int DEFAULT_FILTER_WINDOW_SIZE = 200;//过滤模块默认窗口大小
@@ -39,7 +39,7 @@ public class StepConfig extends BaseSp{
 
     public static StepConfig getInstance(Context context) {
         if(instance == null){
-            synchronized(instance){
+            synchronized(StepConfig.class){
                 if(instance == null){
                     instance = new StepConfig(context);
                 }

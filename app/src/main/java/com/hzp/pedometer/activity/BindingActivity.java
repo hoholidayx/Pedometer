@@ -1,5 +1,6 @@
 package com.hzp.pedometer.activity;
 
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -21,14 +22,16 @@ public class BindingActivity extends AppCompatActivity{
     protected boolean mBound = false;
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
         Intent intent = new Intent(this, CoreService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        if(mBound){
-            onServiceBind();
-        }
     }
 
     @Override
@@ -36,8 +39,7 @@ public class BindingActivity extends AppCompatActivity{
         super.onStop();
         if(mBound){
             unbindService(connection);
-            mBound = false;
-            onServiceUnbind();
+            mBound = false;;
         }
     }
 
@@ -55,11 +57,13 @@ public class BindingActivity extends AppCompatActivity{
             CoreService.CoreBinder binder= (CoreService.CoreBinder)service;
             mService = binder.getService();
             mBound = true;
+            onServiceBind();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mBound = false;
+            onServiceUnbind();
         }
     };
 }

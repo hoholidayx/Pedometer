@@ -44,8 +44,8 @@ public class StepDetector {
     private long Thp, Thv;
 
     private double mjuA, sigmaA;
-    private double mjuP, sigmaP;
-    private double mjuV, sigmaV;
+    private long mjuP,mjuV;
+    private double sigmaP,sigmaV;
 
     //当前记录的步数
     public int stepCount;
@@ -62,7 +62,8 @@ public class StepDetector {
     private OnStepCountListener listener;
 
 
-    public StepDetector() {
+    public StepDetector(Context context) {
+        this.context = context;
         reset();
     }
 
@@ -87,8 +88,8 @@ public class StepDetector {
 
         mjuA = StepConfig.DEFAULT_GRAVITY;
         sigmaA = 0;
-        mjuP = sigmaP = 0;
-        mjuV = sigmaV = 0;
+        mjuP = mjuV =0;
+        sigmaP = sigmaV = 0;
 
         stepCount = 0;
     }
@@ -162,8 +163,8 @@ public class StepDetector {
 
         peakList.add(n - np);
 
-        mjuP = (double) BaseMath.avg(peakList, Double.class);
-        sigmaP = BaseMath.stdev(peakList, mjuP);
+        mjuP = (long) BaseMath.avg(peakList, Long.class);
+        sigmaP = (double) BaseMath.stdev(peakList, mjuP,Long.class);
 
 
         Thp = (long) (mjuP + sigmaP / BETA);
@@ -181,8 +182,8 @@ public class StepDetector {
 
         valleyList.add(n - nv);
 
-        mjuV = (double) BaseMath.avg(valleyList, Double.class);
-        sigmaV = BaseMath.stdev(valleyList, mjuV);
+        mjuV = (long) BaseMath.avg(valleyList, Long.class);
+        sigmaV = (double) BaseMath.stdev(valleyList, mjuV,Long.class);
 
         Thv = (long) (mjuV + sigmaV / BETA);
         //固定阈值上下限
@@ -196,7 +197,7 @@ public class StepDetector {
         if (aList.size() >= K)
             aList.remove(0);
         aList.add(anp1);
-        sigmaA = BaseMath.stdev(aList);
+        sigmaA = (double) BaseMath.stdev(aList,Double.class);
 
         // TODO: 2016/1/17  测试固定上下限
         if (sigmaA < 0.3f) {
@@ -209,9 +210,9 @@ public class StepDetector {
     public void stepDetection(double anp1, long np1) {
 
         anm1 = aList.get(aList.size() - 3);
+        an = aList.get(aList.size() - 2);
 
         n = np1;
-        an = aList.get(aList.size() - 2);
 
         detectCanditate(anp1);
 

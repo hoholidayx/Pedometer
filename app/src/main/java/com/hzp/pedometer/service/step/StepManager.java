@@ -37,18 +37,23 @@ public class StepManager implements StepDetector.OnStepCountListener{
 
     private boolean broadcastEnable = true;//是否开启步数广播
 
+    //载入native库
+    static{
+        System.loadLibrary("wavelet");
+    }
+
     private StepManager(Context context) {
         this.context = context;
         windowSize = StepConfig.getInstance(context).getFilterWindowSize();
         executorService = Executors.newSingleThreadExecutor();
-        stepDetector = new StepDetector();
+        stepDetector = new StepDetector(context);
         stepDetector.setStepCountListener(this);
         resetData();
     }
 
     public static StepManager getInstance(Context context) {
         if (instance == null) {
-            synchronized (instance) {
+            synchronized (StepManager.class) {
                 if (instance == null) {
                     instance = new StepManager(context);
                 }
@@ -70,7 +75,8 @@ public class StepManager implements StepDetector.OnStepCountListener{
         timeList.clear();
         length = 0;
         stepDetector.reset();
-        executorService.shutdown();
+        //TODO 线程池关闭后不能再打开？
+//        executorService.shutdown();
     }
 
     /**

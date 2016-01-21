@@ -21,15 +21,16 @@ public class BaseMath {
     public static Object avg(List data,Class<? extends Number> clazz) {
 
         String name = clazz.getName();
-
-        if(name.equals(Double.class.getName())){
+        String name2 = Double.class.getName();
+        String name3 = Long.class.getName();
+        if(name.equals(name2)){
             double sum = 0.0;
             for(Object num : data){
                 sum+= (double)num;
             }
             return sum/data.size();
         }
-        else if(name.equals(Long.class.getName())){
+        else if(name.equals(name3)){
             long sum = 0;
             for(Object num : data){
                 sum+= (long)num;
@@ -44,11 +45,6 @@ public class BaseMath {
     }
 
 
-
-    public static double stdev(List data){
-        return (double) stdev(data, Double.class);
-    }
-
     /**
      * 计算标准差
      *
@@ -58,10 +54,6 @@ public class BaseMath {
      */
     public static Object stdev(List data,Class<? extends Number> clazz){
         return stdev(data,avg(data,clazz), clazz);
-    }
-
-    public static double stdev(List data, double avg){
-        return (double) stdev(data,avg,Double.class);
     }
 
     /**
