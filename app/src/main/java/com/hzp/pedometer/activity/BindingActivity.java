@@ -24,22 +24,27 @@ public class BindingActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
+        //绑定服务
         Intent intent = new Intent(this, CoreService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         if(mBound){
             unbindService(connection);
-            mBound = false;;
+            mBound = false;
         }
     }
 

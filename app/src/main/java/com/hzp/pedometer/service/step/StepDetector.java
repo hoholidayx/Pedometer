@@ -42,11 +42,11 @@ public class StepDetector {
     //当前的时间、上一次波峰的时间、上一次波谷的时间
     private double n, np, nv;
     //波峰和波谷的时间阈值
-    public double Thp, Thv;
+    private double Thp, Thv;
 
     private double mjuA, sigmaA;
-    public double mjuP, mjuV;
-    public double sigmaP, sigmaV;
+    private double mjuP, mjuV;
+    private double sigmaP, sigmaV;
 
     //当前记录的步数
     public int stepCount;
@@ -54,7 +54,6 @@ public class StepDetector {
     ///////////////////////////////////////////////////////////////////////////
     //
     ///////////////////////////////////////////////////////////////////////////
-    private Context context;
     //加速度列表
     private List<Double> aList;
     //波峰波谷时间间隔列表
@@ -63,8 +62,7 @@ public class StepDetector {
     private OnStepCountListener listener;
 
 
-    public StepDetector(Context context) {
-        this.context = context;
+    public StepDetector() {
         reset();
     }
 

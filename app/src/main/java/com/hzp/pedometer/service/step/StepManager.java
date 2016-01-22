@@ -66,7 +66,7 @@ public class StepManager implements StepDetector.OnStepCountListener {
         timeSpendPerWindow =  (1.0/samplingRate)*windowSize*1000;
 
         executorService = Executors.newSingleThreadExecutor();
-        stepDetector = new StepDetector(context);
+        stepDetector = new StepDetector();
         stepDetector.setStepCountListener(this);
 
         resetData();
