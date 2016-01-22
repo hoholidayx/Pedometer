@@ -1,18 +1,16 @@
 package com.hzp.pedometer.components;
 
 import android.content.Context;
-import android.os.Handler;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.hzp.pedometer.R;
-
-import java.util.Random;
 
 /**
  * @author 何志鹏 on 2016/1/19.
@@ -24,8 +22,11 @@ public class RateDashboard extends FrameLayout {
     public static final int DEFAULT_SAMPLING_INTERVAL = 1000;//ms
 
     private ImageView pointer;
+    private TextView stepPerMin;
+
     private int startAngle;
     private int samplingInterval;//面板采集数据时间间隔
+
 
     public RateDashboard(Context context) {
         this(context, null);
@@ -39,6 +40,13 @@ public class RateDashboard extends FrameLayout {
         super(context, attrs, defStyle);
         LayoutInflater.from(context).inflate(R.layout.ui_rate_dashboard, this);
         pointer = (ImageView) findViewById(R.id.rate_dashboard_pointer);
+        stepPerMin = (TextView) findViewById(R.id.rate_dashboard_step_per_min);
+
+        Typeface typeface = ComponentsUtil.getDefaultTypeface(context);
+        if (typeface != null) {
+            stepPerMin.setTypeface(typeface);
+            ((TextView) findViewById(R.id.rate_dashboard_step_per_min_info)).setTypeface(typeface);
+        }
 
         reset();
     }
@@ -46,9 +54,9 @@ public class RateDashboard extends FrameLayout {
     public void setDashboardValue(double percentage) {
         int rotateToAngle;
         if (percentage >= 0.5) {
-            rotateToAngle = (int) (((percentage-0.5)/0.5) * MAX_ANGLE);
+            rotateToAngle = (int) (((percentage - 0.5) / 0.5) * MAX_ANGLE);
         } else {
-            rotateToAngle = (int) ((1 - percentage/0.5) * MIN_ANGLE);
+            rotateToAngle = (int) ((1 - percentage / 0.5) * MIN_ANGLE);
         }
 
         Animation rotateAnimation = new

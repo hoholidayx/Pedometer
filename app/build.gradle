@@ -22,7 +22,7 @@ android {
         main {
             jniLibs.srcDir "jniLibs"
             jni.srcDirs "src/main/jni"
-            assets.srcDirs = ['src/main/assets']
+            assets.srcDirs "src/main/assets"
         }
     }
 
