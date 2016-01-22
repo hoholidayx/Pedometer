@@ -11,7 +11,10 @@ public class BaseSp {
 
     private SharedPreferences preferences;
 
-    public BaseSp(Context context,String fileName){
+    public BaseSp(){
+    }
+
+    public void init(Context context,String fileName){
         preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 

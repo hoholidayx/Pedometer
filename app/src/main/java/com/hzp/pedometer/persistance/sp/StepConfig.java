@@ -10,7 +10,7 @@ import android.content.Context;
  */
 public class StepConfig extends BaseSp{
 
-    private static final String FILE_NAME = "StepConfig";
+    public static final String FILE_NAME = "StepConfig";
 
     private static final String KEY_ALPHA = "alpha";
     private static final String KEY_BETA = "beta";
@@ -23,29 +23,33 @@ public class StepConfig extends BaseSp{
     public static final double DEFAULT_BETA = -3.0;
     public static final int DEFAULT_K_NUMBER = 25;
     public static final int DEFAULT_M_NUMBER = 10;
-    public static final int DEFAULT_STEP_INTERVAL_MIN = 200;//ms
-    public static final int DEFAULT_STEP_INTERVAL_MAX = 2000;
+    public static final int DEFAULT_STEP_INTERVAL_MAX = 2000;//ms
+    public static final int DEFAULT_STEP_INTERVAL_MIN = 0;//ms
     public static final int DEFAULT_FILTER_WINDOW_SIZE = 200;//过滤模块默认窗口大小
-    public static final int DEFAULT_SAMPLING_RATE = 50;//默认采样率Hz
+    public static final double DEFAULT_SAMPLING_RATE = 100;//默认采样率Hz
     //默认重力加速度
     public static final double DEFAULT_GRAVITY = 9.8;
 
     private static StepConfig instance;
 
 
-    private StepConfig(Context context){
-        super(context,FILE_NAME);
+    private StepConfig(){
     }
 
-    public static StepConfig getInstance(Context context) {
+    public static StepConfig getInstance() {
         if(instance == null){
             synchronized(StepConfig.class){
                 if(instance == null){
-                    instance = new StepConfig(context);
+                    instance = new StepConfig();
                 }
             }
         }
         return instance;
+    }
+
+    @Override
+    public void init(Context context,String fileName){
+        super.init(context, fileName);
     }
 
     public double getAlpha(){
@@ -88,8 +92,8 @@ public class StepConfig extends BaseSp{
         putInt(KEY_FILTER_WINDOW_SIZE,size);
     }
 
-    public int getSamplingRate(){
-        return getInt(KEY_SAMPLING_RATE,DEFAULT_SAMPLING_RATE);
+    public double getSamplingRate(){
+        return getDouble(KEY_SAMPLING_RATE,DEFAULT_SAMPLING_RATE);
     }
 
     public void setSamplingRate(int rate){

@@ -9,8 +9,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.SystemClock;
-import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 import com.hzp.pedometer.service.step.StepManager;
@@ -94,7 +92,7 @@ public class CoreService extends Service implements SensorEventListener {
      * @param n 时间
      */
     private void processRealTimeMode(double a,long n){
-        StepManager.getInstance(this).inputPoint(a,n);
+        StepManager.getInstance().inputPoint(a,n);
     }
 
     /**
@@ -103,10 +101,12 @@ public class CoreService extends Service implements SensorEventListener {
      * @param mode 计步模式
      */
     public void startStepCount(Mode mode) {
-        this.mode = mode;
-        sensorManager.registerListener(this, sensor,
-                (int) ((1.0/StepConfig.getInstance(this).getSamplingRate())*1000*1000));//微秒
-        Working = true;
+        if(!isWorking()){
+            this.mode = mode;
+            sensorManager.registerListener(this, sensor,
+                    (int) (1.0/StepConfig.getInstance().getSamplingRate())*1000*1000);//微秒
+            Working = true;
+        }
 
 //        switch (mode){
 //            case NORMAL:{
@@ -124,7 +124,7 @@ public class CoreService extends Service implements SensorEventListener {
     public void stopStepCount() {
         if(Working){
             Working = false;
-            StepManager.getInstance(this).resetData();
+            StepManager.getInstance().resetData();
             sensorManager.unregisterListener(this);
         }
     }

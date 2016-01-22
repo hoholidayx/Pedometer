@@ -5,10 +5,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.components.RateDashboard;
@@ -16,29 +17,26 @@ import com.hzp.pedometer.service.CoreService;
 import com.hzp.pedometer.service.Mode;
 import com.hzp.pedometer.service.step.StepManager;
 
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 /**
  * 计步器工作页面
  */
 public class StepCountActivity extends BindingActivity {
 
     private RateDashboard rateDashboard;
-    private Handler handler;
+    private TextView textView;
 
+    private SensorManager sensorManager;
+    private Sensor sensor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_count);
 
-        handler = new Handler();
         initViews();
 
+        //初始化重力传感器
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     @Override
@@ -60,22 +58,31 @@ public class StepCountActivity extends BindingActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            int count = StepManager.getInstance(getApplicationContext()).getStepCount();
-            final double count2 = StepManager.getInstance(getApplicationContext()).getStepPerMin();
+            final int count = StepManager.getInstance().getStepCount();
+            final double count2 = StepManager.getInstance().getStepPerMin();
             rateDashboard.post(new Runnable() {
                 @Override
                 public void run() {
                     rateDashboard.setDashboardValue(count2 / 300.0);
                 }
             });
-            //TODO
-            Log.e("步数", "步数：" + count + "步频：" + count2);
+            textView.post(new Runnable() {
+                @Override
+                public void run() {
+                    textView.setText(count+":"+ StepManager.getInstance().stepDetector.mjuP+" "
+                    +StepManager.getInstance().stepDetector.mjuV+" "
+                    +StepManager.getInstance().stepDetector.sigmaP+" "
+                    +StepManager.getInstance().stepDetector.sigmaV);
+                }
+            });
         }
     }
 
 
     private void initViews() {
         rateDashboard = (RateDashboard) findViewById(R.id.step_rate_dashboard_view);
+        textView = (TextView) findViewById(R.id.step_test);
+
         rateDashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,4 +91,6 @@ public class StepCountActivity extends BindingActivity {
             }
         });
     }
+
+
 }

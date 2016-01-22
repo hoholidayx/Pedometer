@@ -2,7 +2,6 @@ package com.hzp.pedometer.service.step;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 
@@ -28,18 +27,17 @@ public class StepManager implements StepDetector.OnStepCountListener {
 
     private int windowSize;
 
-    private StepDetector stepDetector;//算法模块
+    public StepDetector stepDetector;//算法模块
     private ExecutorService executorService;
-    private int samplingRate; //数据采样率
+    private double samplingRate; //数据采样率
 
     private List<Double> accelerationList;
     private List<Long> timeList;
 
     private boolean broadcastEnable = true;//是否开启步数广播
-    private boolean Working = false;
 
     private double stepPerMin;//步数每分钟
-    private long timeSpendPerWindow;//填充满一个窗口需要的时间 (ms)
+    private double timeSpendPerWindow;//填充满一个窗口需要的时间 (ms)
     private int stepCountLastProcess;//上次处理数据时记录的步数
 
     //载入native库
@@ -47,31 +45,34 @@ public class StepManager implements StepDetector.OnStepCountListener {
         System.loadLibrary("wavelet");
     }
 
-    private StepManager(Context context) {
-        this.context = context;
-        samplingRate = StepConfig.getInstance(context).getSamplingRate();
-        windowSize = StepConfig.getInstance(context).getFilterWindowSize();
-        timeSpendPerWindow = (long) ((1.0/samplingRate)*windowSize*1000);
+    private StepManager() {}
 
-        executorService = Executors.newSingleThreadExecutor();
-        stepDetector = new StepDetector(context);
-        stepDetector.setStepCountListener(this);
-        resetData();
-    }
-
-    public static StepManager getInstance(Context context) {
+    public static StepManager getInstance() {
         if (instance == null) {
             synchronized (StepManager.class) {
                 if (instance == null) {
-                    instance = new StepManager(context);
+                    instance = new StepManager();
                 }
             }
         }
         return instance;
     }
 
+    public void init(Context context){
+        this.context = context;
+
+        samplingRate = StepConfig.getInstance().getSamplingRate();
+        windowSize = StepConfig.getInstance().getFilterWindowSize();
+        timeSpendPerWindow =  (1.0/samplingRate)*windowSize*1000;
+
+        executorService = Executors.newSingleThreadExecutor();
+        stepDetector = new StepDetector(context);
+        stepDetector.setStepCountListener(this);
+
+        resetData();
+    }
+
     public void resetData() {
-        Working = false;
         if (accelerationList == null) {
             accelerationList = Collections.synchronizedList(
                     new LinkedList<Double>());
@@ -95,8 +96,6 @@ public class StepManager implements StepDetector.OnStepCountListener {
      * @param time 时间戳
      */
     public void inputPoint(double a, long time) {
-        Working = true;
-
         accelerationList.add(a);
         timeList.add(time);
         if (accelerationList.size() >= windowSize) {
@@ -124,10 +123,6 @@ public class StepManager implements StepDetector.OnStepCountListener {
      */
     public double getStepPerMin() {
         return stepPerMin;
-    }
-
-    public boolean isWorking() {
-        return Working;
     }
 
     /**

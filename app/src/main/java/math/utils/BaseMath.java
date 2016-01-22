@@ -1,5 +1,7 @@
 package math.utils;
 
+import android.util.Log;
+
 import java.util.List;
 
 /**
@@ -18,30 +20,12 @@ public class BaseMath {
         return temp < z ? temp : z;
     }
     
-    public static Object avg(List data,Class<? extends Number> clazz) {
-
-        String name = clazz.getName();
-        String name2 = Double.class.getName();
-        String name3 = Long.class.getName();
-        if(name.equals(name2)){
-            double sum = 0.0;
-            for(Object num : data){
-                sum+= (double)num;
-            }
-            return sum/data.size();
+    public static double avg(List<Double> data) {
+        double sum = 0.0;
+        for(Double num:data){
+            sum+= num;
         }
-        else if(name.equals(name3)){
-            long sum = 0;
-            for(Object num : data){
-                sum+= (long)num;
-            }
-            return sum/data.size();
-        }
-        else{
-            //异常数字类型
-           return 0;
-        }
-
+        return sum/data.size();
     }
 
 
@@ -49,11 +33,10 @@ public class BaseMath {
      * 计算标准差
      *
      * @param data   数据
-     * @param clazz  数字类
      * @return 标准差
      */
-    public static Object stdev(List data,Class<? extends Number> clazz){
-        return stdev(data,avg(data,clazz), clazz);
+    public static double stdev(List<Double> data){
+        return stdev(data,avg(data));
     }
 
     /**
@@ -61,31 +44,14 @@ public class BaseMath {
      *
      * @param data   数据
      * @param avg    平均值
-     * @param clazz  数字类
      * @return 标准差
      */
-    public static Object stdev(List data, Object avg,Class<? extends Number> clazz){
-
-        String name = clazz.getName();
-
-        if(name.equals(Double.class.getName())){
-            double S = 0;
-            for (int i = 0; i < data.size(); i++) {
-                S += Math.pow(((double)(data.get(i)) - (double)avg),2);
-            }
-            return Math.sqrt(S / data.size());
+    public static double stdev(List<Double> data, double avg){
+        double S = 0;
+        for(Double num:data){
+            S += Math.pow((num - avg),2);
         }
-        else if(name.equals(Long.class.getName())){
-            long S = 0;
-            for (int i = 0; i < data.size(); i++) {
-                S += Math.pow(((long)(data.get(i)) - (long)avg),2);
-            }
-            return Math.sqrt(S / data.size());
-        }
-        else{
-            //异常数字类型
-            return 0;
-        }
+        return Math.sqrt(S / data.size());
     }
 
 }

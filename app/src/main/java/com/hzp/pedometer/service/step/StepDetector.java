@@ -13,7 +13,7 @@ import math.utils.BaseMath;
 /**
  * @author 何志鹏 on 2016/1/17.
  * @email hoholiday@hotmail.com
- * <p/>
+ * <p>
  * 计步算法模块
  */
 public class StepDetector {
@@ -40,13 +40,13 @@ public class StepDetector {
     //波峰波谷的加速度阈值
     private double ThAp, ThAv;
     //当前的时间、上一次波峰的时间、上一次波谷的时间
-    private long n, np, nv;
+    private double n, np, nv;
     //波峰和波谷的时间阈值
-    private long Thp, Thv;
+    public double Thp, Thv;
 
     private double mjuA, sigmaA;
-    private long mjuP,mjuV;
-    private double sigmaP,sigmaV;
+    public double mjuP, mjuV;
+    public double sigmaP, sigmaV;
 
     //当前记录的步数
     public int stepCount;
@@ -58,7 +58,7 @@ public class StepDetector {
     //加速度列表
     private List<Double> aList;
     //波峰波谷时间间隔列表
-    private List<Long> peakList, valleyList;
+    private List<Double> peakList, valleyList;
 
     private OnStepCountListener listener;
 
@@ -72,7 +72,7 @@ public class StepDetector {
      * 初始化参数
      */
     private void initConfig() {
-        StepConfig config = StepConfig.getInstance(context);
+        StepConfig config = StepConfig.getInstance();
         ALPHA = config.getAlpha();
         BETA = config.getBeta();
         K = config.getKNumber();
@@ -84,12 +84,14 @@ public class StepDetector {
         ap = av = StepConfig.DEFAULT_GRAVITY;
         ThAp = ThAv = 0;
 
-        n = np = nv = 0;
+        n = 0;
+        np = nv =0;
+
         Thp = Thv = 0;
 
         mjuA = StepConfig.DEFAULT_GRAVITY;
         sigmaA = 0;
-        mjuP = mjuV =0;
+        mjuP = mjuV = 0;
         sigmaP = sigmaV = 0;
 
         stepCount = 0;
@@ -162,18 +164,20 @@ public class StepDetector {
         if (peakList.size() >= M)
             peakList.remove(0);
 
-        peakList.add(n - np);
+        double interval = n - np;
+        if(interval > StepConfig.DEFAULT_STEP_INTERVAL_MAX){
+            interval = StepConfig.DEFAULT_STEP_INTERVAL_MAX;
+        }
+        if(interval < StepConfig.DEFAULT_STEP_INTERVAL_MIN){
+            interval = StepConfig.DEFAULT_STEP_INTERVAL_MIN;
+        }
+        peakList.add(interval);
 
-        mjuP = (long) BaseMath.avg(peakList, Long.class);
-        sigmaP = (double) BaseMath.stdev(peakList, mjuP,Long.class);
+        mjuP = BaseMath.avg(peakList);
+        sigmaP = BaseMath.stdev(peakList, mjuP);
 
 
-        Thp = (long) (mjuP + sigmaP / BETA);
-        //固定阈值上下限
-        Thp = Thp > StepConfig.DEFAULT_STEP_INTERVAL_MAX ?
-                StepConfig.DEFAULT_STEP_INTERVAL_MAX : Thp;
-        Thp = Thp < StepConfig.DEFAULT_STEP_INTERVAL_MIN ?
-                StepConfig.DEFAULT_STEP_INTERVAL_MIN : Thp;
+        Thp =Math.abs(mjuP + sigmaP / BETA);
     }
 
     private void updateMjvVandSigmaV() {
@@ -181,24 +185,26 @@ public class StepDetector {
         if (valleyList.size() >= M)
             valleyList.remove(0);
 
-        valleyList.add(n - nv);
+        double interval = n - nv;
+        if(interval > StepConfig.DEFAULT_STEP_INTERVAL_MAX){
+            interval = StepConfig.DEFAULT_STEP_INTERVAL_MAX;
+        }
+        if(interval < StepConfig.DEFAULT_STEP_INTERVAL_MIN){
+            interval = StepConfig.DEFAULT_STEP_INTERVAL_MIN;
+        }
+        valleyList.add(interval);
 
-        mjuV = (long) BaseMath.avg(valleyList, Long.class);
-        sigmaV = (double) BaseMath.stdev(valleyList, mjuV,Long.class);
+        mjuV = BaseMath.avg(valleyList);
+        sigmaV = BaseMath.stdev(valleyList, mjuV);
 
-        Thv = (long) (mjuV + sigmaV / BETA);
-        //固定阈值上下限
-        Thv = Thv > StepConfig.DEFAULT_STEP_INTERVAL_MAX ?
-                StepConfig.DEFAULT_STEP_INTERVAL_MAX : Thv;
-        Thv = Thv < StepConfig.DEFAULT_STEP_INTERVAL_MIN ?
-                StepConfig.DEFAULT_STEP_INTERVAL_MIN : Thv;
+        Thv =Math.abs(mjuV + sigmaV / BETA);
     }
 
     private void updateSigmaA(double anp1) {
         if (aList.size() >= K)
             aList.remove(0);
         aList.add(anp1);
-        sigmaA = (double) BaseMath.stdev(aList,Double.class);
+        sigmaA = BaseMath.stdev(aList);
 
         // TODO: 2016/1/17  测试固定上下限
         if (sigmaA < 0.3f) {
@@ -223,17 +229,17 @@ public class StepDetector {
                 S = WaveState.PEAK;
                 updatePeak();
 
-            } else if (S == WaveState.VALLEY && n - np >= Thp) {
+            } else if (S == WaveState.VALLEY && n - np > Thp) {
                 S = WaveState.PEAK;
                 updatePeak();
 
-            } else if (S == WaveState.PEAK && n - np < Thp && an >= ap) {
+            } else if (S == WaveState.PEAK && n - np <= Thp && an > ap) {
                 updatePeak();
 
             }
         } else if (Sc == WaveState.VALLEY) {
 
-            if (S == WaveState.PEAK && n - nv >= Thv) {
+            if (S == WaveState.PEAK && n - nv > Thv) {
                 S = WaveState.VALLEY;
                 updateValley();
 
@@ -243,7 +249,7 @@ public class StepDetector {
                     listener.onStepCounted(stepCount);
                 }
 
-            } else if (S == WaveState.VALLEY && n - nv < Thv && an <= av) {
+            } else if (S == WaveState.VALLEY && n - nv <= Thv && an < av) {
                 updateValley();
 
             }
@@ -252,17 +258,18 @@ public class StepDetector {
 
     }
 
-    public void setStepCountListener(OnStepCountListener listener){
+    public void setStepCountListener(OnStepCountListener listener) {
         this.listener = listener;
     }
 
-    public void removeStepCountListener(){
+    public void removeStepCountListener() {
         listener = null;
     }
 
-    public interface OnStepCountListener{
+    public interface OnStepCountListener {
         /**
          * 步数增加后回调
+         *
          * @param count 总步数
          */
         void onStepCounted(int count);
