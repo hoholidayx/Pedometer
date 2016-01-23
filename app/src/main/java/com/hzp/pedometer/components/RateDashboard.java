@@ -51,7 +51,7 @@ public class RateDashboard extends FrameLayout {
         reset();
     }
 
-    public void setDashboardValue(double percentage) {
+    public void setDashboardPercentage(double percentage) {
         int rotateToAngle;
         if (percentage >= 0.5) {
             rotateToAngle = (int) (((percentage - 0.5) / 0.5) * MAX_ANGLE);
@@ -75,6 +75,10 @@ public class RateDashboard extends FrameLayout {
         this.samplingInterval = samplingInterval;
     }
 
+    public void setDashboardValue(int value){
+        stepPerMin.setText(String.valueOf(value));
+    }
+
     public int getSamplingInterval() {
         return samplingInterval;
     }
@@ -83,14 +87,8 @@ public class RateDashboard extends FrameLayout {
         startAngle = MIN_ANGLE;
         samplingInterval = DEFAULT_SAMPLING_INTERVAL;
 
-        Animation rotateAnimation = new
-                RotateAnimation(0, startAngle
-                , Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        rotateAnimation.setDuration(samplingInterval);
-        rotateAnimation.setFillEnabled(true);
-        rotateAnimation.setFillAfter(true);
-
-        pointer.startAnimation(rotateAnimation);
+        setDashboardPercentage(0);
+        setDashboardValue(0);
     }
 
 }

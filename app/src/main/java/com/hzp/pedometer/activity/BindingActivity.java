@@ -44,7 +44,6 @@ public class BindingActivity extends AppCompatActivity{
         super.onDestroy();
         if(mBound){
             unbindService(connection);
-            mBound = false;
         }
     }
 
