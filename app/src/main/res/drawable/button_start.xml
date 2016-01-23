@@ -3,7 +3,7 @@
     <item android:state_pressed="true"
         android:drawable="@drawable/ic_button_start_pressed" /> <!-- pressed -->
     <!--<item android:state_focused="true"-->
-        <!--android:drawable="@drawable/button_focused" /> &lt;!&ndash; focused &ndash;&gt;-->
+        <!--android:drawable="@drawable/ic_button_start_pressed" /> &lt;!&ndash; focused &ndash;&gt;-->
     <!--<item android:state_hovered="true"-->
         <!--android:drawable="@drawable/button_focused" /> &lt;!&ndash; hovered &ndash;&gt;-->
     <item android:drawable="@drawable/ic_button_start_normal" /> <!-- default -->

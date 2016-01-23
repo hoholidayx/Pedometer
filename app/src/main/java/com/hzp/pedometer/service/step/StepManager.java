@@ -9,6 +9,7 @@ import com.hzp.pedometer.persistance.sp.StepConfig;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,7 +22,9 @@ import wavelet.utils.Wavelet;
 public class StepManager implements StepDetector.OnStepCountListener {
 
     public static final String ACTION_STEP_COUNT = "step_count";
-    private static final String KEY_STEP_COUNT = "STEP_COUNT";
+    public static final String KEY_STEP_COUNT = "STEP_COUNT";
+    public static final String KEY_STEP_PER_MIN = "STEP_PER_MIN";
+
 
     private static StepManager instance;
     private Context context;
@@ -30,7 +33,6 @@ public class StepManager implements StepDetector.OnStepCountListener {
 
     public StepDetector stepDetector;//算法模块
     private ExecutorService executorService;
-    private double samplingRate; //数据采样率
 
     private List<Double> accelerationList;
     private List<Long> timeList;
@@ -38,15 +40,16 @@ public class StepManager implements StepDetector.OnStepCountListener {
     private boolean broadcastEnable = true;//是否开启步数广播
 
     private double stepPerMin;//步数每分钟
-    private double timeSpendPerWindow;//填充满一个窗口需要的时间 (ms)
-    private int stepCountLastProcess;//上次处理数据时记录的步数
+    private int lastStep;
+    private long lastTime;
 
     //载入native库
     static {
         System.loadLibrary("wavelet");
     }
 
-    private StepManager() {}
+    private StepManager() {
+    }
 
     public static StepManager getInstance() {
         if (instance == null) {
@@ -59,12 +62,10 @@ public class StepManager implements StepDetector.OnStepCountListener {
         return instance;
     }
 
-    public void init(Context context){
+    public void init(Context context) {
         this.context = context;
 
-        samplingRate = StepConfig.getInstance().getSamplingRate();
         windowSize = StepConfig.getInstance().getFilterWindowSize();
-        timeSpendPerWindow =  (1.0/samplingRate)*windowSize*1000;
 
         executorService = Executors.newSingleThreadExecutor();
         stepDetector = new StepDetector();
@@ -82,9 +83,12 @@ public class StepManager implements StepDetector.OnStepCountListener {
             timeList = Collections.synchronizedList(
                     new LinkedList<Long>());
         }
+        stepPerMin = 0;
+        lastStep = 0;
+        lastTime = 0;
+
         accelerationList.clear();
         timeList.clear();
-        stepCountLastProcess = 0;
         stepDetector.reset();
         //TODO 线程池关闭后不能再打开？
 //        executorService.shutdown();
@@ -111,38 +115,20 @@ public class StepManager implements StepDetector.OnStepCountListener {
     }
 
     /**
-     * 获取当前计算的总步数
-     */
-    public int getStepCount() {
-        return stepDetector.stepCount;
-    }
-
-    /**
-     * 获取每分钟的步数
-     *
-     * @return 步数/分
-     */
-    public double getStepPerMin() {
-        return stepPerMin;
-    }
-
-    /**
      * 窗口满时进行数据处理
      */
     private void processData() {
-        calculateStepPerMin(getStepCount());
+        calcStepPerMin();
         executorService.submit(new ProcessThread());
     }
 
     /**
      * 计算步数每分钟
-     *
-     * @param count 步数每分钟
      */
-    private void calculateStepPerMin(int count) {
-        double increment = count - stepCountLastProcess;
-        stepCountLastProcess = count;
-        stepPerMin = ((increment / timeSpendPerWindow) * 60 * 1000);
+    private void calcStepPerMin(){
+        stepPerMin = ((double)(getStepCount() - lastStep)/(timeList.get(0) - lastTime))*60*1000;
+        lastStep = getStepCount();
+        lastTime = timeList.get(0);
     }
 
     /**
@@ -153,14 +139,29 @@ public class StepManager implements StepDetector.OnStepCountListener {
             Intent intent = new Intent();
             intent.setAction(ACTION_STEP_COUNT);
             intent.putExtra(KEY_STEP_COUNT, getStepCount());
+            intent.putExtra(KEY_STEP_PER_MIN, getStepPerMin());
             context.sendBroadcast(intent);
-            Log.e("Bushu",String.valueOf(getStepCount()));
         }
     }
 
     @Override
     public void onStepCounted(int count) {
         //empty
+    }
+
+    /**
+     * 获取当前计算的总步数
+     */
+    public int getStepCount() {
+        return stepDetector.stepCount;
+    }
+
+    /**
+     * 获得每分钟的步行速率
+     * @return 步数每分钟
+     */
+    public double getStepPerMin() {
+        return stepPerMin;
     }
 
     /**
@@ -194,9 +195,10 @@ public class StepManager implements StepDetector.OnStepCountListener {
             for (int i = 0; i < windowSize; i++) {
                 stepDetector.stepDetection(result[i], time[i]);
             }
-
+            //发送计步结果广播
             sendStepBroadcast();
         }
     }
+
 
 }
