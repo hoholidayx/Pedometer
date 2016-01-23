@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_bottom_start_normal"
+        android:src="@drawable/button_start"
         android:background="@android:color/transparent"/>
 
 </LinearLayout>
