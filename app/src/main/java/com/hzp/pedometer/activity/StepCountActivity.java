@@ -43,11 +43,17 @@ public class StepCountActivity extends BindingActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(stepReceiver);
     }
 
     @Override
     protected void onServiceBind() {
-        toggleStartButton(getService().isWorking());
+        //恢复现场
+        if(getService().isWorking()){
+            toggleStartButton(true);
+            registerReceiver(stepReceiver, intentFilter);
+        }
+
     }
 
     private void initViews() {
