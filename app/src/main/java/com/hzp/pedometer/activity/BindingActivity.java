@@ -55,6 +55,10 @@ public class BindingActivity extends AppCompatActivity{
         return mService;
     }
 
+    public boolean isServiceBinded(){
+        return mBound;
+    }
+
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {

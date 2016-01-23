@@ -2,6 +2,7 @@ package com.hzp.pedometer.service.step;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 
@@ -153,6 +154,7 @@ public class StepManager implements StepDetector.OnStepCountListener {
             intent.setAction(ACTION_STEP_COUNT);
             intent.putExtra(KEY_STEP_COUNT, getStepCount());
             context.sendBroadcast(intent);
+            Log.e("Bushu",String.valueOf(getStepCount()));
         }
     }
 
