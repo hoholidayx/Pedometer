@@ -26,11 +26,12 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleType="fitXY"
+        android:scaleType="centerInside"
         android:src="@drawable/ic_calendar"
-        android:layout_alignParentTop="true"
+        android:id="@+id/navigation_calendar"
+        android:layout_alignTop="@+id/navigation_back"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:id="@+id/navigation_calendar"/>
+        android:layout_alignBottom="@+id/navigation_back" />
 
 </RelativeLayout>
