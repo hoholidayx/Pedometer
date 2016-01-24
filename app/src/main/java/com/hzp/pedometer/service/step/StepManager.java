@@ -40,8 +40,8 @@ public class StepManager implements StepDetector.OnStepCountListener {
     private boolean broadcastEnable = true;//是否开启步数广播
 
     private int stepPerMin;//步数每分钟
-    private int lastStep;
-    private long lastTime;
+    private int lastStep;//上一次记录的步数
+    private int calcRate;//每分钟步数计算间隔 ms
 
     //载入native库
     static {
@@ -67,6 +67,9 @@ public class StepManager implements StepDetector.OnStepCountListener {
 
         windowSize = StepConfig.getInstance().getFilterWindowSize();
 
+        lastStep = 0;
+        calcRate = (int) ((1000.0/StepConfig.getInstance().getSamplingRate())*windowSize);
+
         executorService = Executors.newSingleThreadExecutor();
         stepDetector = new StepDetector();
         stepDetector.setStepCountListener(this);
@@ -85,7 +88,6 @@ public class StepManager implements StepDetector.OnStepCountListener {
         }
         stepPerMin = 0;
         lastStep = 0;
-        lastTime = 0;
 
         accelerationList.clear();
         timeList.clear();
@@ -126,9 +128,8 @@ public class StepManager implements StepDetector.OnStepCountListener {
      * 计算步数每分钟
      */
     private void calcStepPerMin(){
-        stepPerMin = (int) (((double)(getStepCount() - lastStep)/(timeList.get(0) - lastTime))*60*1000);
+        stepPerMin = (getStepCount() - lastStep)*60*1000/calcRate;
         lastStep = getStepCount();
-        lastTime = timeList.get(0);
     }
 
     /**
