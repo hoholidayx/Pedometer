@@ -51,7 +51,6 @@
         android:layout_gravity="center_horizontal"
         android:scaleType="centerInside"
         android:src="@drawable/button_start"
-        android:background="@android:color/transparent"
-        android:checked="false" />
+        android:background="@android:color/transparent" />
 
 </LinearLayout>

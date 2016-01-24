@@ -91,12 +91,12 @@ public class StepCountActivity extends BindingActivity {
         buttonStart.post(new Runnable() {
             @Override
             public void run() {
-                if(state){
-                    buttonStart.setImageResource(R.drawable.ic_button_start_pressed);
-                }else{
-                    buttonStart.setImageResource(R.drawable.ic_button_start_normal);
-                }
-//                 buttonStart.setPressed(state);// FIXME: 2016/1/23 按虚拟键盘会导致button的press状态改变
+//                if(state){
+//                    buttonStart.setImageResource(R.drawable.ic_button_start_pressed);
+//                }else{
+//                    buttonStart.setImageResource(R.drawable.ic_button_start_normal);
+//                }
+                 buttonStart.setPressed(state);// FIXME: 2016/1/23 按虚拟键盘会导致button的press状态改变
             }
         });
     }
