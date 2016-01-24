@@ -5,9 +5,9 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scaleType="fitXY"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:scaleType="centerInside"
         android:src="@drawable/ic_arrow_back"
         android:id="@+id/navigation_back"
         android:layout_centerVertical="true"
