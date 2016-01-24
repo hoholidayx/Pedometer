@@ -111,7 +111,7 @@ public class StepCountActivity extends BindingActivity {
         }
     }
 
-    private void setStepPerMin(final double stepPerMin){
+    private void setStepPerMin(final int stepPerMin){
         if(rateDashboard!=null){
             rateDashboard.post(new Runnable() {
                 @Override
@@ -143,7 +143,7 @@ public class StepCountActivity extends BindingActivity {
         public void onReceive(Context context, Intent intent) {
             if(intent !=null){
                 int stepCount = intent.getIntExtra(StepManager.KEY_STEP_COUNT,0);
-                double stepPerMin = intent.getDoubleExtra(StepManager.KEY_STEP_PER_MIN,0);
+                int stepPerMin = intent.getIntExtra(StepManager.KEY_STEP_PER_MIN, 0);
 
                 setStepCount(stepCount);
                 setStepPerMin(stepPerMin);

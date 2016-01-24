@@ -39,7 +39,7 @@ public class StepManager implements StepDetector.OnStepCountListener {
 
     private boolean broadcastEnable = true;//是否开启步数广播
 
-    private double stepPerMin;//步数每分钟
+    private int stepPerMin;//步数每分钟
     private int lastStep;
     private long lastTime;
 
@@ -126,7 +126,7 @@ public class StepManager implements StepDetector.OnStepCountListener {
      * 计算步数每分钟
      */
     private void calcStepPerMin(){
-        stepPerMin = ((double)(getStepCount() - lastStep)/(timeList.get(0) - lastTime))*60*1000;
+        stepPerMin = (int) (((double)(getStepCount() - lastStep)/(timeList.get(0) - lastTime))*60*1000);
         lastStep = getStepCount();
         lastTime = timeList.get(0);
     }
