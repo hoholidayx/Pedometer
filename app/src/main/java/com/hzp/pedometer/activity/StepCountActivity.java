@@ -30,6 +30,8 @@ public class StepCountActivity extends BindingActivity {
     private StepReceiver stepReceiver;
     private IntentFilter intentFilter = new IntentFilter(StepManager.ACTION_STEP_COUNT);
 
+    private boolean registerBroadcast = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +45,7 @@ public class StepCountActivity extends BindingActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(stepReceiver);
+        stopStepCount();
     }
 
     @Override
@@ -51,9 +53,8 @@ public class StepCountActivity extends BindingActivity {
         //恢复现场
         if(getService().isWorking()){
             toggleStartButton(true);
-            registerReceiver(stepReceiver, intentFilter);
+            registerBroadcast();
         }
-
     }
 
     private void initViews() {
@@ -116,8 +117,8 @@ public class StepCountActivity extends BindingActivity {
             rateDashboard.post(new Runnable() {
                 @Override
                 public void run() {
-                    rateDashboard.setDashboardValue((int) stepPerMin);
-                    rateDashboard.setDashboardPercentage(stepPerMin/300);
+                    rateDashboard.setDashboardValue(stepPerMin);
+                    rateDashboard.setDashboardPercentage(stepPerMin / 300.0);
                 }
             });
         }
@@ -128,13 +129,27 @@ public class StepCountActivity extends BindingActivity {
         setStepPerMin(0);
         getService().startStepCount(Mode.REAL_TIME);
 
-        registerReceiver(stepReceiver, intentFilter);
+        registerBroadcast();
+
     }
 
     private void stopStepCount() {
         getService().stopStepCount();
+        unregisterBroadcast();
+    }
 
-        unregisterReceiver(stepReceiver);
+    private void registerBroadcast(){
+        if(!registerBroadcast){
+            registerReceiver(stepReceiver,intentFilter);
+            registerBroadcast = true;
+        }
+    }
+
+    private void unregisterBroadcast(){
+        if(registerBroadcast){
+            unregisterReceiver(stepReceiver);
+            registerBroadcast = false;
+        }
     }
 
     class StepReceiver extends BroadcastReceiver{
