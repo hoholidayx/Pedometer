@@ -160,7 +160,7 @@ public class StepManager implements StepDetector.OnStepCountListener {
      * 获得每分钟的步行速率
      * @return 步数每分钟
      */
-    public double getStepPerMin() {
+    public int getStepPerMin() {
         return stepPerMin;
     }
 
