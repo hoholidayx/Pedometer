@@ -1,6 +1,8 @@
 package com.hzp.pedometer.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,10 +19,14 @@ public class MainActivity extends BindingActivity {
     private NavigationView navigationView;
     private ActionBar actionBar;
 
+    private Handler handler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        handler = new Handler();
 
         initViews();
     }
@@ -49,14 +55,40 @@ public class MainActivity extends BindingActivity {
 
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        //TODO items 事件
-                        Toast.makeText(MainActivity.this, menuItem.getTitle() + "点击了", Toast.LENGTH_SHORT).show();
+                        //items 事件
+                        menuFragmentsSwitch(menuItem);
 
                         menuItem.setChecked(true);
                         drawerLayout.closeDrawers();
                         return true;
                     }
                 });
+    }
+
+    private void menuFragmentsSwitch(final MenuItem menuItem){
+        switch (menuItem.getItemId()){
+            case R.id.menu_drawer_home:
+                actionBar.setTitle("");
+                break;
+            case R.id.menu_drawer_statistic:
+                actionBar.setTitle(menuItem.getTitle());
+                break;
+            case R.id.menu_drawer_goal:
+                actionBar.setTitle(menuItem.getTitle());
+                break;
+            case R.id.menu_drawer_step_count:
+                //TODO 等待当前工作停止，弹出waiting框
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(new Intent(getApplicationContext(), StepCountActivity.class));
+                    }
+                }, 1000);
+                break;
+            case R.id.menu_drawer_settings:
+                actionBar.setTitle(menuItem.getTitle());
+                break;
+        }
     }
 
 

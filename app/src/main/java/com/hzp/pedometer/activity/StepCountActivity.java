@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -22,6 +23,8 @@ import com.hzp.pedometer.service.step.StepManager;
  * 计步器工作页面
  */
 public class StepCountActivity extends BindingActivity {
+
+    private ImageView backButton;
 
     private RateDashboard rateDashboard;
     private TextView stepCountText;
@@ -61,6 +64,14 @@ public class StepCountActivity extends BindingActivity {
         rateDashboard = (RateDashboard) findViewById(R.id.step_rate_dashboard_view);
         stepCountText = (TextView) findViewById(R.id.step_count_textView);
         buttonStart = (ImageButton) findViewById(R.id.step_count_start_button);
+        backButton = (ImageView) findViewById(R.id.navigation_back);
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override

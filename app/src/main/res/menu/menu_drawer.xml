@@ -17,6 +17,7 @@
         <item
             android:id="@+id/menu_drawer_step_count"
             android:icon="@drawable/ic_action_time"
+            android:checkable="false"
             android:title="实时计步"/>
         <item
             android:id="@+id/menu_drawer_settings"
