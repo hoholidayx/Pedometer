@@ -24,12 +24,12 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/AppTheme"/>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/activity_main_content">
 
-        </FrameLayout>
+        <!--<FrameLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:id="@+id/activity_main_content">-->
+        <!--</FrameLayout>-->
 
     </RelativeLayout>
     <!-- The navigation drawer -->

@@ -15,6 +15,7 @@
     <com.hzp.pedometer.components.RateDashboard
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:layout_gravity="center_horizontal"
         android:id="@+id/step_rate_dashboard_view" />
 
