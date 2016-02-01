@@ -18,7 +18,6 @@ public class PedometerApplication extends Application{
 
         StepConfig.getInstance().init(this, StepConfig.FILE_NAME);
         StepManager.getInstance().init(this);
-
         //开启服务
         startService(new Intent(this, com.hzp.pedometer.service.CoreService.class));
     }

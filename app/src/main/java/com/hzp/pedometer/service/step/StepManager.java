@@ -147,7 +147,7 @@ public class StepManager implements StepDetector.OnStepCountListener {
 
     @Override
     public void onStepCounted(int count) {
-        //empty
+        /*empty*/
     }
 
     /**
