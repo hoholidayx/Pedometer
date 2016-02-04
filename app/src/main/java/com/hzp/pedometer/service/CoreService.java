@@ -1,14 +1,18 @@
 package com.hzp.pedometer.service;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.util.Log;
 
 import com.hzp.pedometer.AppConstants;
 import com.hzp.pedometer.persistance.file.StepDataStorage;
@@ -30,6 +34,9 @@ public class CoreService extends Service implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor sensor;
 
+    private ScreenReceiver screenReceiver;//监听屏幕关闭系统睡眠
+    private PowerManager.WakeLock wakeLock;
+
     private Mode mode = Mode.NORMAL;//当前的计步模式
     private boolean Working = false;//运行标识
 
@@ -38,13 +45,15 @@ public class CoreService extends Service implements SensorEventListener {
 
     public CoreService() {
         binder = new CoreBinder();
-        stepDataStorage = new StepDataStorage(this);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        stepDataStorage = new StepDataStorage(this);
+        wakeLock = ServiceUtil.getWakeLock(this);
 
+        registerScreenReceiver();
         initSensors();
     }
 
@@ -61,6 +70,9 @@ public class CoreService extends Service implements SensorEventListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(screenReceiver);
+        //解除cpu锁定省电
+        wakeLock.release();
     }
 
     /**
@@ -70,6 +82,13 @@ public class CoreService extends Service implements SensorEventListener {
         //初始化重力传感器
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    }
+
+    private void registerScreenReceiver(){
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        screenReceiver = new ScreenReceiver();
+        registerReceiver(screenReceiver,filter);
     }
 
     @Override
@@ -213,6 +232,24 @@ public class CoreService extends Service implements SensorEventListener {
         return mode;
     }
 
+    private class ScreenReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()){
+                case Intent.ACTION_SCREEN_ON:
+                    //解除唤醒
+                    wakeLock.release();
+                    break;
+                case Intent.ACTION_SCREEN_OFF:
+                    //唤醒cpu
+                    if(isWorking()){
+                        wakeLock.acquire();
+                    }
+                    break;
+            }
+        }
+    }
 
     public class CoreBinder extends Binder {
         public CoreService getService() {

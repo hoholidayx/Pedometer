@@ -16,10 +16,10 @@ public class PedometerApplication extends Application{
     public void onCreate() {
         super.onCreate();
 
-        StepConfig.getInstance().init(this, StepConfig.FILE_NAME);
-        StepManager.getInstance().init(this);
+        StepConfig.getInstance().init(getApplicationContext(), StepConfig.FILE_NAME);
+        StepManager.getInstance().init(getApplicationContext());
         //开启服务
-        startService(new Intent(this, com.hzp.pedometer.service.CoreService.class));
+        startService(new Intent(getApplicationContext(), com.hzp.pedometer.service.CoreService.class));
     }
 
     @Override
