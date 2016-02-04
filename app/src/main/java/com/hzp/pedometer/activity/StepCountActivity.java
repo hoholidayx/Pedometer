@@ -43,6 +43,12 @@ public class StepCountActivity extends BindingActivity {
         stepReceiver = new StepReceiver();
 
         initViews();
+        setupViews();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -65,7 +71,9 @@ public class StepCountActivity extends BindingActivity {
         stepCountText = (TextView) findViewById(R.id.step_count_textView);
         buttonStart = (ImageButton) findViewById(R.id.step_count_start_button);
         backButton = (ImageView) findViewById(R.id.navigation_back);
+    }
 
+    private void setupViews(){
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
