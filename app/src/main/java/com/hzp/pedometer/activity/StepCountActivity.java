@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.components.ComponentsUtil;
@@ -28,7 +29,7 @@ public class StepCountActivity extends BindingActivity {
 
     private RateDashboard rateDashboard;
     private TextView stepCountText;
-    private ImageButton buttonStart;
+    private ToggleButton buttonStart;
 
     private StepReceiver stepReceiver;
     private IntentFilter intentFilter = new IntentFilter(StepManager.ACTION_STEP_COUNT);
@@ -69,7 +70,7 @@ public class StepCountActivity extends BindingActivity {
     private void initViews() {
         rateDashboard = (RateDashboard) findViewById(R.id.step_rate_dashboard_view);
         stepCountText = (TextView) findViewById(R.id.step_count_textView);
-        buttonStart = (ImageButton) findViewById(R.id.step_count_start_button);
+        buttonStart = (ToggleButton) findViewById(R.id.step_count_start_button);
         backButton = (ImageView) findViewById(R.id.navigation_back);
     }
 
@@ -84,11 +85,11 @@ public class StepCountActivity extends BindingActivity {
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isServiceBinded()){
-                    if(getService().isWorking()){
+                if (isServiceBinded()) {
+                    if (getService().isWorking()) {
                         toggleStartButton(false);
                         stopStepCount();
-                    }else{
+                    } else {
                         toggleStartButton(true);
                         startStepCount();
                     }
@@ -115,7 +116,7 @@ public class StepCountActivity extends BindingActivity {
 //                }else{
 //                    buttonStart.setImageResource(R.drawable.ic_button_start_normal);
 //                }
-                 buttonStart.setPressed(state);// FIXME: 2016/1/23 按虚拟键盘会导致button的press状态改变
+                 buttonStart.setChecked(state);
             }
         });
     }

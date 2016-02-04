@@ -45,13 +45,14 @@
             android:layout_toEndOf="@+id/step_count_textView" />
     </RelativeLayout>
 
-    <ImageButton
+    <ToggleButton
         android:id="@+id/step_count_start_button"
         android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_height="120dp"
         android:layout_gravity="center_horizontal"
+        android:textOff=""
+        android:textOn=""
         android:scaleType="centerInside"
-        android:src="@drawable/button_start"
-        android:background="@android:color/transparent" />
+        android:background="@drawable/button_start" />
 
 </LinearLayout>
