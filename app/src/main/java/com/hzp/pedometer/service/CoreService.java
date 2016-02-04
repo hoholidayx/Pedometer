@@ -72,7 +72,10 @@ public class CoreService extends Service implements SensorEventListener {
         super.onDestroy();
         unregisterReceiver(screenReceiver);
         //解除cpu锁定省电
-        wakeLock.release();
+        if(wakeLock.isHeld()){
+            wakeLock.release();
+        }
+
     }
 
     /**
@@ -239,7 +242,9 @@ public class CoreService extends Service implements SensorEventListener {
             switch (intent.getAction()){
                 case Intent.ACTION_SCREEN_ON:
                     //解除唤醒
-                    wakeLock.release();
+                    if(wakeLock.isHeld()){
+                        wakeLock.release();
+                    }
                     break;
                 case Intent.ACTION_SCREEN_OFF:
                     //唤醒cpu
