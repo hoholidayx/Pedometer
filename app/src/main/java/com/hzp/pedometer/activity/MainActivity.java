@@ -47,7 +47,7 @@ public class MainActivity extends BindingActivity {
         actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle("");
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_actionbar_drawer_toggle);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }

@@ -8,7 +8,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_arrow_back"
+        android:src="@drawable/ic_action_back"
         android:id="@+id/navigation_back"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
