@@ -18,6 +18,7 @@ public class MainActivity extends BindingActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBar actionBar;
+    private Toolbar toolbar;
 
     private Handler handler;
 
@@ -34,8 +35,13 @@ public class MainActivity extends BindingActivity {
     private void initViews() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.drawer_navigation_view);
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setupViews();
+        setupDrawerContent(navigationView);
+    }
+
+    private void setupViews(){
         setSupportActionBar(toolbar);
 
         actionBar = getSupportActionBar();
@@ -44,8 +50,6 @@ public class MainActivity extends BindingActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_actionbar_drawer_toggle);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        setupDrawerContent(navigationView);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
