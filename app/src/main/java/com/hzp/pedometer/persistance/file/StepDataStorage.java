@@ -62,7 +62,23 @@ public class StepDataStorage {
         if(executorService!=null && !executorService.isShutdown()){
             executorService.shutdownNow();
         }
-        closeStream();
+        if(fileOutputStream!=null){
+            closeStream();
+        }
+    }
+
+    public String[] getDataFileNames(){
+        return context.getFilesDir().list(new DataFilenameFilter());
+    }
+
+    public void deleteFile(String filename){
+        context.deleteFile(filename);
+    }
+
+    public void deleteFile(String[] filenames){
+        for(String filename:filenames){
+            deleteFile(filename);
+        }
     }
 
     private void closeStream(){
