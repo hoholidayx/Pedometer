@@ -10,6 +10,7 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 
+import com.hzp.pedometer.AppConstants;
 import com.hzp.pedometer.persistance.file.StepDataStorage;
 import com.hzp.pedometer.persistance.sp.StepConfig;
 import com.hzp.pedometer.service.step.StepManager;
@@ -115,7 +116,7 @@ public class CoreService extends Service implements SensorEventListener {
      */
     private void processNormalMode(double a, long n) {
         if (stepDataStorage != null) {
-            stepDataStorage.saveData(a + " " + n);
+            stepDataStorage.saveData(a + " " + n + AppConstants.Separator);
         }
     }
 
