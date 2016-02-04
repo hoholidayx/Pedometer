@@ -6,6 +6,15 @@ import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,7 +77,7 @@ public class StepManager implements StepDetector.OnStepCountListener {
         windowSize = StepConfig.getInstance().getFilterWindowSize();
 
         lastStep = 0;
-        calcRate = (int) ((1000.0/StepConfig.getInstance().getSamplingRate())*windowSize);
+        calcRate = (int) ((1000.0 / StepConfig.getInstance().getSamplingRate()) * windowSize);
 
         executorService = Executors.newSingleThreadExecutor();
         stepDetector = new StepDetector();
@@ -116,6 +125,30 @@ public class StepManager implements StepDetector.OnStepCountListener {
         }
     }
 
+    public void inputPoint(String filename) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(filename));
+            if (reader.ready()) {
+                String temp;
+                String[] data;
+                while ((temp = reader.readLine()) != null) {
+                    data = temp.split(" ");
+                    inputPoint(Double.valueOf(data[0]), Long.valueOf(data[1]));
+                }
+            }
+
+        } catch (IOException e) {
+            // TODO: 2016/2/4 无法读入文件处理
+            e.printStackTrace();
+        }
+    }
+
+    public void inputPoints(String[] filenames) {
+        for(String filename:filenames){
+            inputPoint(filename);
+        }
+    }
+
     /**
      * 窗口满时进行数据处理
      */
@@ -127,8 +160,8 @@ public class StepManager implements StepDetector.OnStepCountListener {
     /**
      * 计算步数每分钟
      */
-    private void calcStepPerMin(){
-        stepPerMin = (getStepCount() - lastStep)*60*1000/calcRate;
+    private void calcStepPerMin() {
+        stepPerMin = (getStepCount() - lastStep) * 60 * 1000 / calcRate;
         lastStep = getStepCount();
     }
 
@@ -159,6 +192,7 @@ public class StepManager implements StepDetector.OnStepCountListener {
 
     /**
      * 获得每分钟的步行速率
+     *
      * @return 步数每分钟
      */
     public int getStepPerMin() {
