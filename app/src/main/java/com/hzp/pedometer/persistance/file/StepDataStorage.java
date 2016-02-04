@@ -1,6 +1,7 @@
 package com.hzp.pedometer.persistance.file;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;

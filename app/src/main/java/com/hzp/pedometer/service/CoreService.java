@@ -122,31 +122,38 @@ public class CoreService extends Service implements SensorEventListener {
 
     private void startNormalMode(){
         StepManager.getInstance().resetData();
+        createNewStepDataStorageRecord();
         //开启定时任务
         stepCalcScheduleService = Executors.newScheduledThreadPool(1);
         //设置间隔每30分钟计算一次数据
-        stepCalcScheduleService.scheduleAtFixedRate(new NormalStepCountTask(), 30, 30, TimeUnit.MINUTES);
+        stepCalcScheduleService.scheduleAtFixedRate(new NormalStepCountTask(), 1, 1, TimeUnit.MINUTES);
     }
 
     private void stopNormalMode(){
         //// TODO: 2016/2/1 关闭定时任务
+        stepCalcScheduleService.shutdown();
     }
 
     class NormalStepCountTask implements Runnable{
 
         @Override
         public void run() {
-           //获取计步数据文件
+           //获取所有未进行计算的计步数据文件
             String[] filenames = stepDataStorage.getDataFileNames();
-            //todo 输入数据进行计步计算
             //开启新的记录
-            try {
-                stepDataStorage.startNewRecord();
-            } catch (FileNotFoundException e) {
-                // TODO: 2016/2/4 异常处理 无法创建新的文件
-            }
+            createNewStepDataStorageRecord();
+            //输入数据进行计步计算
+            StepManager.getInstance().inputPoints(filenames);
             //删除旧的数据
             stepDataStorage.deleteFile(filenames);
+        }
+    }
+
+    private void createNewStepDataStorageRecord(){
+        try {
+            stepDataStorage.startNewRecord();
+        } catch (FileNotFoundException e) {
+            // TODO: 2016/2/4 异常处理 无法创建新的文件
         }
     }
 

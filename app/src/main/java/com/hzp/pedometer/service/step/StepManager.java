@@ -127,7 +127,9 @@ public class StepManager implements StepDetector.OnStepCountListener {
 
     public void inputPoint(String filename) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(filename));
+            BufferedReader reader = new BufferedReader(
+                    new FileReader(
+                            context.getFilesDir().getPath() + File.separator + filename));
             if (reader.ready()) {
                 String temp;
                 String[] data;
@@ -144,7 +146,7 @@ public class StepManager implements StepDetector.OnStepCountListener {
     }
 
     public void inputPoints(String[] filenames) {
-        for(String filename:filenames){
+        for (String filename : filenames) {
             inputPoint(filename);
         }
     }
