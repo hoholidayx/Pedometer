@@ -5,7 +5,7 @@
         <item
             android:id="@+id/menu_drawer_home"
             android:icon="@drawable/ic_action_important"
-            android:title="主页"/>
+            android:title="今日"/>
         <item
             android:id="@+id/menu_drawer_statistic"
             android:icon="@drawable/ic_action_event"

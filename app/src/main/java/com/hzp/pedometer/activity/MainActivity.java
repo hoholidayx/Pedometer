@@ -16,7 +16,7 @@ import com.hzp.pedometer.R;
 import com.hzp.pedometer.fragment.HomePageFragment;
 
 public class MainActivity extends BindingActivity implements
-        HomePageFragment.OnFragmentInteractionListener{
+        HomePageFragment.OnFragmentInteractionListener {
     private Bundle savedInstanceState;
 
     private DrawerLayout drawerLayout;
@@ -52,20 +52,20 @@ public class MainActivity extends BindingActivity implements
         setupDrawerContent(navigationView);
     }
 
-    private void initFragments(){
+    private void initFragments() {
         //防止重叠
-        if(savedInstanceState!=null){
+        if (savedInstanceState != null) {
             return;
         }
         //初始化fragment
         homePageFragment = HomePageFragment.newInstance();
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(frameLayout.getId(),homePageFragment)
+                .add(frameLayout.getId(), homePageFragment)
                 .commit();
     }
 
-    private void setupViews(){
+    private void setupViews() {
         setSupportActionBar(toolbar);
 
         actionBar = getSupportActionBar();
@@ -93,16 +93,16 @@ public class MainActivity extends BindingActivity implements
                 });
     }
 
-    private void menuFragmentsSwitch(final MenuItem menuItem){
-        switch (menuItem.getItemId()){
+    private void menuFragmentsSwitch(final MenuItem menuItem) {
+        if (menuItem.getItemId() != R.id.menu_drawer_step_count) {
+            actionBar.setTitle(menuItem.getTitle());
+        }
+        switch (menuItem.getItemId()) {
             case R.id.menu_drawer_home:
-                actionBar.setTitle("");
                 break;
             case R.id.menu_drawer_statistic:
-                actionBar.setTitle(menuItem.getTitle());
                 break;
             case R.id.menu_drawer_goal:
-                actionBar.setTitle(menuItem.getTitle());
                 break;
             case R.id.menu_drawer_step_count:
                 //TODO 等待当前工作停止，弹出waiting框
@@ -114,7 +114,6 @@ public class MainActivity extends BindingActivity implements
                 }, 1000);
                 break;
             case R.id.menu_drawer_settings:
-                actionBar.setTitle(menuItem.getTitle());
                 break;
         }
     }
