@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -13,7 +14,10 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.hzp.pedometer.R;
+import com.hzp.pedometer.fragment.GoalFragment;
 import com.hzp.pedometer.fragment.HomePageFragment;
+import com.hzp.pedometer.fragment.SettingFragment;
+import com.hzp.pedometer.fragment.StatisticsFragment;
 
 public class MainActivity extends BindingActivity implements
         HomePageFragment.OnFragmentInteractionListener {
@@ -26,6 +30,9 @@ public class MainActivity extends BindingActivity implements
 
     private FrameLayout frameLayout;
     private HomePageFragment homePageFragment;
+    private StatisticsFragment statisticsFragment;
+    private GoalFragment goalFragment;
+    private SettingFragment settingFragment;
 
     private Handler handler;
 
@@ -59,9 +66,16 @@ public class MainActivity extends BindingActivity implements
         }
         //初始化fragment
         homePageFragment = HomePageFragment.newInstance();
+        statisticsFragment = StatisticsFragment.newInstance();
+        goalFragment = GoalFragment.newInstance();
+        settingFragment = SettingFragment.newInstance();
+        replaceFragment(homePageFragment);
+    }
+
+    private void replaceFragment(Fragment fragment){
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(frameLayout.getId(), homePageFragment)
+                .replace(frameLayout.getId(), fragment)
                 .commit();
     }
 
@@ -99,10 +113,13 @@ public class MainActivity extends BindingActivity implements
         }
         switch (menuItem.getItemId()) {
             case R.id.menu_drawer_home:
+                replaceFragment(homePageFragment);
                 break;
             case R.id.menu_drawer_statistic:
+                replaceFragment(statisticsFragment);
                 break;
             case R.id.menu_drawer_goal:
+                replaceFragment(goalFragment);
                 break;
             case R.id.menu_drawer_step_count:
                 //TODO 等待当前工作停止，弹出waiting框
@@ -114,6 +131,7 @@ public class MainActivity extends BindingActivity implements
                 }, 1000);
                 break;
             case R.id.menu_drawer_settings:
+                replaceFragment(settingFragment);
                 break;
         }
     }
