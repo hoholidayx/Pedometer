@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.fragment.GoalFragment;
 import com.hzp.pedometer.fragment.HomePageFragment;
+import com.hzp.pedometer.fragment.SettingFragment;
 import com.hzp.pedometer.fragment.StepSettingFragment;
 import com.hzp.pedometer.fragment.StatisticsFragment;
 
@@ -68,7 +69,7 @@ public class MainActivity extends BindingActivity implements
         homePageFragment = HomePageFragment.newInstance();
         statisticsFragment = StatisticsFragment.newInstance();
         goalFragment = GoalFragment.newInstance();
-        settingFragment = StepSettingFragment.newInstance();
+        settingFragment = SettingFragment.newInstance();
         replaceFragment(homePageFragment);
     }
 
@@ -131,7 +132,7 @@ public class MainActivity extends BindingActivity implements
                 }, 1000);
                 break;
             case R.id.menu_drawer_settings:
-                replaceFragment(stepSettingFragment);
+                replaceFragment(settingFragment);
                 break;
         }
     }
