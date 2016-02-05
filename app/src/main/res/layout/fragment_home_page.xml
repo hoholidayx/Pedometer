@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context="com.hzp.pedometer.fragment.HomePageFragment">
 
-    <com.github.lzyzsd.circleprogress.ArcProgress
+    <com.hzp.pedometer.components.ArcProgress
         style="@style/CustomProgress.ArcProgress.large"
         app:arc_suffix_text="步"
         app:arc_bottom_text="今日已走"
