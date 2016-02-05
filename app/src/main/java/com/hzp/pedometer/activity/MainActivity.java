@@ -70,7 +70,7 @@ public class MainActivity extends BindingActivity implements
 
         actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle("");
+            actionBar.setTitle("今日");
             actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
