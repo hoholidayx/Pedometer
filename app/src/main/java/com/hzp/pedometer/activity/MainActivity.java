@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -16,7 +16,7 @@ import android.widget.FrameLayout;
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.fragment.GoalFragment;
 import com.hzp.pedometer.fragment.HomePageFragment;
-import com.hzp.pedometer.fragment.SettingFragment;
+import com.hzp.pedometer.fragment.StepSettingFragment;
 import com.hzp.pedometer.fragment.StatisticsFragment;
 
 public class MainActivity extends BindingActivity implements
@@ -29,7 +29,7 @@ public class MainActivity extends BindingActivity implements
     private Toolbar toolbar;
 
     private FrameLayout frameLayout;
-    private HomePageFragment homePageFragment;
+    private Fragment homePageFragment;
     private StatisticsFragment statisticsFragment;
     private GoalFragment goalFragment;
     private SettingFragment settingFragment;
@@ -68,12 +68,12 @@ public class MainActivity extends BindingActivity implements
         homePageFragment = HomePageFragment.newInstance();
         statisticsFragment = StatisticsFragment.newInstance();
         goalFragment = GoalFragment.newInstance();
-        settingFragment = SettingFragment.newInstance();
+        settingFragment = StepSettingFragment.newInstance();
         replaceFragment(homePageFragment);
     }
 
     private void replaceFragment(Fragment fragment){
-        getSupportFragmentManager()
+        getFragmentManager()
                 .beginTransaction()
                 .replace(frameLayout.getId(), fragment)
                 .commit();
@@ -131,7 +131,7 @@ public class MainActivity extends BindingActivity implements
                 }, 1000);
                 break;
             case R.id.menu_drawer_settings:
-                replaceFragment(settingFragment);
+                replaceFragment(stepSettingFragment);
                 break;
         }
     }
