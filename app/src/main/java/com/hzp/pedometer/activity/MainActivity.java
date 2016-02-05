@@ -1,6 +1,5 @@
 package com.hzp.pedometer.activity;
 
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.fragment.HomePageFragment;
