@@ -1,5 +1,6 @@
 package com.hzp.pedometer.activity;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,21 +11,30 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.hzp.pedometer.R;
+import com.hzp.pedometer.fragment.HomePageFragment;
 
-public class MainActivity extends BindingActivity {
+public class MainActivity extends BindingActivity implements
+        HomePageFragment.OnFragmentInteractionListener{
+    private Bundle savedInstanceState;
+
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBar actionBar;
     private Toolbar toolbar;
+
+    private FrameLayout frameLayout;
+    private HomePageFragment homePageFragment;
 
     private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.savedInstanceState = savedInstanceState;
         setContentView(R.layout.activity_main);
 
         handler = new Handler();
@@ -36,9 +46,25 @@ public class MainActivity extends BindingActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.drawer_navigation_view);
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        frameLayout = (FrameLayout) findViewById(R.id.activity_main_content);
+
+        initFragments();
 
         setupViews();
         setupDrawerContent(navigationView);
+    }
+
+    private void initFragments(){
+        //防止重叠
+        if(savedInstanceState!=null){
+            return;
+        }
+        //初始化fragment
+        homePageFragment = HomePageFragment.newInstance();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(frameLayout.getId(),homePageFragment)
+                .commit();
     }
 
     private void setupViews(){
