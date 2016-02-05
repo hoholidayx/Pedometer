@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="navigation_top_detail_title">实时计步</string>
+    <string name="navigation_step_setting_title">算法设置</string>
+    <string name="navigation_app_setting_title">应用设置</string>
 </resources>

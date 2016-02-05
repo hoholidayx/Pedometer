@@ -1,19 +1,23 @@
 package com.hzp.pedometer.fragment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hzp.pedometer.R;
+import com.hzp.pedometer.activity.SettingActivity;
 
 
-public class SettingFragment extends Fragment {
+public class SettingFragment extends Fragment{
 
     private RecyclerView recyclerView;
     private String[] items;
@@ -65,27 +69,52 @@ public class SettingFragment extends Fragment {
         super.onDetach();
     }
 
-    class SettingKindListAdapter extends RecyclerView.Adapter<SettingKindListAdapter.Holder> {
+    class SettingKindListAdapter extends RecyclerView.Adapter<SettingKindListAdapter.Holder>
+            implements View.OnClickListener{
 
         @Override
         public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Holder holder = new Holder(
-                    LayoutInflater.from(getActivity())
-                            .inflate(R.layout.list_item_setting_kind
-                                    , parent
-                                    , false)
-            );
-            return holder;
+            View view = LayoutInflater.from(getActivity())
+                    .inflate(R.layout.list_item_setting_kind
+                            , parent
+                            , false);
+            view.setOnClickListener(this);
+            return new Holder(view);
         }
 
         @Override
-        public void onBindViewHolder(Holder holder, int position) {
+        public void onBindViewHolder(Holder holder, final int position) {
             holder.title.setText(items[position]);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Bundle bundle = new Bundle();
+                    Intent intent = new Intent(getActivity(),SettingActivity.class);
+                    switch (position){
+                        case 0:
+                            bundle.putString(SettingActivity.KEY_TITLE
+                                    , getString(R.string.navigation_step_setting_title));
+                            intent.putExtra(SettingActivity.KEY_SETTING_INFO, bundle);
+                            break;
+                        case 1:
+                            bundle.putString(SettingActivity.KEY_TITLE
+                                    , getString(R.string.navigation_app_setting_title));
+                            intent.putExtra(SettingActivity.KEY_SETTING_INFO, bundle);
+                            break;
+                    }
+                    startActivity(intent);
+                }
+            });
         }
 
         @Override
         public int getItemCount() {
             return items.length;
+        }
+
+        @Override
+        public void onClick(View v) {
+
         }
 
         class Holder extends RecyclerView.ViewHolder {
@@ -97,6 +126,11 @@ public class SettingFragment extends Fragment {
                 title = (TextView) itemView.findViewById(R.id.list_item_title);
             }
         }
+
+    }
+
+    interface OnListItemClickListener{
+        void onItemClick(View v,int id);
     }
 
 }
