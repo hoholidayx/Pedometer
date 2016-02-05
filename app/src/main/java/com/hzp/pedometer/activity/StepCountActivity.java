@@ -7,6 +7,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -25,7 +30,7 @@ import com.hzp.pedometer.service.step.StepManager;
  */
 public class StepCountActivity extends BindingActivity {
 
-    private ImageView backButton;
+    private Toolbar toolbar;
 
     private RateDashboard rateDashboard;
     private TextView stepCountText;
@@ -71,16 +76,18 @@ public class StepCountActivity extends BindingActivity {
         rateDashboard = (RateDashboard) findViewById(R.id.step_rate_dashboard_view);
         stepCountText = (TextView) findViewById(R.id.step_count_textView);
         buttonStart = (ToggleButton) findViewById(R.id.step_count_start_button);
-        backButton = (ImageView) findViewById(R.id.navigation_back);
+        toolbar = (Toolbar) findViewById(R.id.step_count_activity_toolbar);
     }
 
     private void setupViews(){
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setTitle(R.string.navigation_top_detail_title);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {;
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_back);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,7 +123,7 @@ public class StepCountActivity extends BindingActivity {
 //                }else{
 //                    buttonStart.setImageResource(R.drawable.ic_button_start_normal);
 //                }
-                 buttonStart.setChecked(state);
+                buttonStart.setChecked(state);
             }
         });
     }
@@ -170,6 +177,29 @@ public class StepCountActivity extends BindingActivity {
             unregisterReceiver(stepReceiver);
             registerBroadcast = false;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_step_count_activity, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     class StepReceiver extends BroadcastReceiver{
