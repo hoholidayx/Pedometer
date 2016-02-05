@@ -42,11 +42,11 @@ public class RateDashboard extends FrameLayout {
         pointer = (ImageView) findViewById(R.id.rate_dashboard_pointer);
         stepPerMin = (TextView) findViewById(R.id.rate_dashboard_step_per_min);
 
-        Typeface typeface = ComponentsUtil.getDefaultTypeface(context);
-        if (typeface != null) {
-            stepPerMin.setTypeface(typeface);
-            ((TextView) findViewById(R.id.rate_dashboard_step_per_min_info)).setTypeface(typeface);
-        }
+//        Typeface typeface = ComponentsUtil.getDefaultTypeface(context);
+//        if (typeface != null) {
+//            stepPerMin.setTypeface(typeface);
+//            ((TextView) findViewById(R.id.rate_dashboard_step_per_min_info)).setTypeface(typeface);
+//        }
 
         reset();
     }
