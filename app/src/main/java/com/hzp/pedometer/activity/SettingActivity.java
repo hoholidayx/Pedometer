@@ -1,5 +1,6 @@
 package com.hzp.pedometer.activity;
 
+
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +16,6 @@ public class SettingActivity extends AppCompatActivity {
     public static final String KEY_TITLE = "TITLE";
 
     private Bundle savedInstanceState;
-    private StepSettingFragment stepSettingFragment;
 
     private String title;
 
@@ -44,8 +44,8 @@ public class SettingActivity extends AppCompatActivity {
         }
         if(getString(R.string.navigation_step_setting_title).equals(title)){
             getFragmentManager().beginTransaction()
-                    .add(R.id.setting_content,StepSettingFragment.newInstance())
-                    .commit();
+                    .replace(R.id.setting_content,StepSettingFragment.newInstance())
+                            .commit();
         }else if(getString(R.string.navigation_app_setting_title).equals(title)){
 //            getFragmentManager().beginTransaction()
 //                    .add(R.id.setting_content,StepSettingFragment.newInstance())

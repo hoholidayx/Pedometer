@@ -30,7 +30,7 @@ public class MainActivity extends BindingActivity implements
     private Toolbar toolbar;
 
     private FrameLayout frameLayout;
-    private Fragment homePageFragment;
+    private HomePageFragment homePageFragment;
     private StatisticsFragment statisticsFragment;
     private GoalFragment goalFragment;
     private SettingFragment settingFragment;
