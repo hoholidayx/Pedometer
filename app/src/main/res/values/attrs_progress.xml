@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="ArcProgress">
         <attr name="arc_progress" format="float"/>
+        <attr name="arc_is_int" format="boolean"/>
         <attr name="arc_angle" format="float"/>
         <attr name="arc_stroke_width" format="dimension"/>
         <attr name="arc_max" format="integer"/>

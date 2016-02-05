@@ -112,6 +112,7 @@ public class ArcProgress extends View {
         suffixTextPadding = attributes.getDimension(R.styleable.ArcProgress_arc_suffix_text_padding, default_suffix_padding);
         bottomTextSize = attributes.getDimension(R.styleable.ArcProgress_arc_bottom_text_size, default_bottom_text_size);
         bottomText = attributes.getString(R.styleable.ArcProgress_arc_bottom_text);
+        isInt = attributes.getBoolean(R.styleable.ArcProgress_arc_is_int,true);
     }
 
     protected void initPainters() {
