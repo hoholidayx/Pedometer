@@ -11,7 +11,7 @@ import com.hzp.pedometer.service.step.StepManager;
  * @email hoholiday@hotmail.com
  */
 public class PedometerApplication extends Application{
-    
+
     @Override
     public void onCreate() {
         super.onCreate();
