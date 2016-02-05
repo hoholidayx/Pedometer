@@ -27,7 +27,13 @@
         </activity>
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.StepCountActivity" />
-        <activity android:name=".activity.SettingActivity"></activity>
+        <activity android:name=".activity.SettingActivity" />
+
+        <provider
+            android:name=".persistance.db.UserDataProvider"
+            android:authorities="com.hzp.pedometer.userdata"
+            android:enabled="true"
+            android:exported="false"/>
     </application>
 
 </manifest>
