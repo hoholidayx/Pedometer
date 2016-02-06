@@ -10,14 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.hzp.pedometer.R;
+import com.hzp.pedometer.entity.PlanCard;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class PlanFragment extends Fragment {
 
     private RecyclerView recyclerView;
 
+
+
     public PlanFragment() {
-        // Required empty public constructor
     }
 
     public static PlanFragment newInstance() {
@@ -40,7 +45,7 @@ public class PlanFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_plan, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.fragment_goal_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(new ItemAdapter());
+        recyclerView.setAdapter(new PlanCardAdapter());
 
         return view;
     }
@@ -56,28 +61,38 @@ public class PlanFragment extends Fragment {
         super.onDetach();
     }
 
-    public static class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder>{
+    public class PlanCardAdapter extends RecyclerView.Adapter<PlanCardAdapter.PlanCardHolder>{
 
-        @Override
-        public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return null;
+        private List<PlanCard> planCards;
+
+        public PlanCardAdapter(){
+            planCards = new ArrayList<>();
+            planCards.add(new PlanCard());
         }
 
         @Override
-        public void onBindViewHolder(ItemHolder holder, int position) {
+        public PlanCardHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(getActivity())
+                    .inflate(R.layout.list_item_plan_card
+                    ,parent
+                    ,false);
+            return new PlanCardHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(PlanCardHolder holder, int position) {
 
         }
 
         @Override
         public int getItemCount() {
-            return 0;
+            return planCards.size();
         }
 
-        class ItemHolder extends RecyclerView.ViewHolder {
+        class PlanCardHolder extends RecyclerView.ViewHolder {
 
-            public ItemHolder(View itemView) {
+            public PlanCardHolder(View itemView) {
                 super(itemView);
-
             }
         }
     }
