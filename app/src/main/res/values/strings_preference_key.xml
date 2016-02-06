@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="KEY_ALPHA">ALPHA</string>
+    <string name="KEY_BETA">BETA</string>
+    <string name="KEY_K_NUMBER">K_NUMBER</string>
+    <string name="KEY_M_NUMBER">M_NUMBER</string>
+    <string name="KEY_FILTER_WINDOW_SIZE">FILTER_WINDOW_SIZE</string>
+    <string name="KEY_SAMPLING_RATE">SAMPLING_RATE</string>
+</resources>

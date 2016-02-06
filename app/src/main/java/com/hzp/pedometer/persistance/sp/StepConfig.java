@@ -1,6 +1,8 @@
 package com.hzp.pedometer.persistance.sp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 /**
  * @author 何志鹏 on 2016/1/17.
@@ -10,13 +12,12 @@ import android.content.Context;
  */
 public class StepConfig extends BaseSp{
 
-    public static final String FILE_NAME = "StepConfig";
 
-    private static final String KEY_ALPHA = "alpha";
-    private static final String KEY_BETA = "beta";
-    private static final String KEY_K_NUMBER = "k_number";
-    private static final String KEY_M_NUMBER = "m_number";
-    private static final String KEY_FILTER_WINDOW_SIZE = "filter_window_size";
+    private static final String KEY_ALPHA = "ALPHA";
+    private static final String KEY_BETA = "BETA";
+    private static final String KEY_K_NUMBER = "K_NUMBER";
+    private static final String KEY_M_NUMBER = "M_NUMBER";
+    private static final String KEY_FILTER_WINDOW_SIZE = "FILTER_WINDOW_SIZE";
     private static final String KEY_SAMPLING_RATE = "SAMPLING_RATE";
 
     public static final double DEFAULT_ALPHA = 2.5;
@@ -31,7 +32,6 @@ public class StepConfig extends BaseSp{
     public static final double DEFAULT_GRAVITY = 9.8;
 
     private static StepConfig instance;
-
 
     private StepConfig(){
     }
@@ -48,8 +48,8 @@ public class StepConfig extends BaseSp{
     }
 
     @Override
-    public void init(Context context,String fileName){
-        super.init(context, fileName);
+    public void init(Context context){
+        super.init(context);
     }
 
     public double getAlpha(){

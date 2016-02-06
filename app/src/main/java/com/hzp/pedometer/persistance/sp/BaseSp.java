@@ -2,6 +2,7 @@ package com.hzp.pedometer.persistance.sp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 /**
  * @author 何志鹏 on 2016/1/17.
@@ -16,6 +17,10 @@ public class BaseSp {
 
     public void init(Context context,String fileName){
         preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
+    }
+
+    public void init(Context context){
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public double getDouble(String key,double defaultValue){

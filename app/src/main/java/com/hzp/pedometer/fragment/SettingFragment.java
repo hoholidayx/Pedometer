@@ -1,6 +1,7 @@
 package com.hzp.pedometer.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
@@ -33,9 +34,9 @@ public class SettingFragment extends PreferenceFragment {
         }
 
         // Load the preferences from an XML resource
-        addPreferencesFromResource(R.xml.preference_setting_step);
-    }
+        addPreferencesFromResource(R.xml.preference);
 
+    }
 
     @Override
     public void onAttach(Activity activity) {

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="参数设置">
+        <EditTextPreference
+            android:key="@string/KEY_ALPHA"
+            android:summary="alpha值"
+            android:inputType="numberDecimal"
+            android:title="Alpha"/>
+        <EditTextPreference
+            android:key="@string/KEY_BETA"
+            android:summary="beta值"
+            android:inputType="numberDecimal"
+            android:title="Beta"/>
+        <EditTextPreference
+            android:key="@string/KEY_K_NUMBER"
+            android:summary="K值"
+            android:inputType="numberSigned"
+            android:title="K"/>
+        <EditTextPreference
+            android:key="@string/KEY_ALPHA"
+            android:summary="M值"
+            android:inputType="numberSigned"
+            android:title="M"/>
+        <EditTextPreference
+            android:key="@string/KEY_FILTER_WINDOW_SIZE"
+            android:summary="处理数据的窗口大小"
+            android:inputType="numberSigned"
+            android:title="windows size"/>
+        <EditTextPreference
+            android:key="@string/KEY_SAMPLING_RATE"
+            android:summary="设备采样率"
+            android:inputType="numberSigned"
+            android:title="采样率"/>
+    </PreferenceCategory>
+</PreferenceScreen>
