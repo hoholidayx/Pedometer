@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.hzp.pedometer.R;
-import com.hzp.pedometer.fragment.GoalFragment;
+import com.hzp.pedometer.fragment.PlanFragment;
 import com.hzp.pedometer.fragment.HomePageFragment;
 import com.hzp.pedometer.fragment.SettingKindFragment;
 import com.hzp.pedometer.fragment.StatisticsFragment;
@@ -31,7 +31,7 @@ public class MainActivity extends BindingActivity implements
     private FrameLayout frameLayout;
     private HomePageFragment homePageFragment;
     private StatisticsFragment statisticsFragment;
-    private GoalFragment goalFragment;
+    private PlanFragment planFragment;
     private SettingKindFragment settingKindFragment;
 
     private Handler handler;
@@ -67,7 +67,7 @@ public class MainActivity extends BindingActivity implements
         //初始化fragment
         homePageFragment = HomePageFragment.newInstance();
         statisticsFragment = StatisticsFragment.newInstance();
-        goalFragment = GoalFragment.newInstance();
+        planFragment = PlanFragment.newInstance();
         settingKindFragment = SettingKindFragment.newInstance();
         replaceFragment(homePageFragment);
     }
@@ -118,8 +118,8 @@ public class MainActivity extends BindingActivity implements
             case R.id.menu_drawer_statistic:
                 replaceFragment(statisticsFragment);
                 break;
-            case R.id.menu_drawer_goal:
-                replaceFragment(goalFragment);
+            case R.id.menu_drawer_plan:
+                replaceFragment(planFragment);
                 break;
             case R.id.menu_drawer_step_count:
                 //TODO 等待当前工作停止，弹出waiting框

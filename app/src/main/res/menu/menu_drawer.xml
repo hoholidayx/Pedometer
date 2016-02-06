@@ -11,9 +11,9 @@
             android:icon="@drawable/ic_action_event"
             android:title="统计数据"/>
         <item
-            android:id="@+id/menu_drawer_goal"
+            android:id="@+id/menu_drawer_plan"
             android:icon="@drawable/ic_action_go_to_today"
-            android:title="目标"/>
+            android:title="计划"/>
         <item
             android:id="@+id/menu_drawer_step_count"
             android:icon="@drawable/ic_action_time"
