@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="参数设置">
-        <EditTextPreference
+        <com.hzp.pedometer.persistance.sp.FloatEditTextPreference
             android:key="@string/KEY_ALPHA"
             android:summary="alpha值"
             android:inputType="numberDecimal"
             android:title="Alpha"/>
-        <EditTextPreference
+        <com.hzp.pedometer.persistance.sp.FloatEditTextPreference
             android:key="@string/KEY_BETA"
             android:summary="beta值"
             android:inputType="numberDecimal"
             android:title="Beta"/>
-        <EditTextPreference
+        <com.hzp.pedometer.persistance.sp.IntEditTextPreference
             android:key="@string/KEY_K_NUMBER"
             android:summary="K值"
             android:inputType="numberSigned"
             android:title="K"/>
-        <EditTextPreference
+        <com.hzp.pedometer.persistance.sp.IntEditTextPreference
             android:key="@string/KEY_ALPHA"
             android:summary="M值"
             android:inputType="numberSigned"
             android:title="M"/>
-        <EditTextPreference
+        <com.hzp.pedometer.persistance.sp.IntEditTextPreference
             android:key="@string/KEY_FILTER_WINDOW_SIZE"
             android:summary="处理数据的窗口大小"
             android:inputType="numberSigned"
             android:title="windows size"/>
-        <EditTextPreference
+        <com.hzp.pedometer.persistance.sp.IntEditTextPreference
             android:key="@string/KEY_SAMPLING_RATE"
             android:summary="设备采样率"
             android:inputType="numberSigned"
