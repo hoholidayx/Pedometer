@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.hzp.pedometer.R;
-import com.hzp.pedometer.fragment.StepSettingFragment;
+import com.hzp.pedometer.fragment.SettingFragment;
 
 public class SettingActivity extends AppCompatActivity {
     public static final String KEY_SETTING_INFO = "SETTING_INFO";
@@ -44,7 +44,7 @@ public class SettingActivity extends AppCompatActivity {
         }
         if(getString(R.string.navigation_step_setting_title).equals(title)){
             getFragmentManager().beginTransaction()
-                    .replace(R.id.setting_content,StepSettingFragment.newInstance())
+                    .replace(R.id.setting_content, SettingFragment.newInstance())
                             .commit();
         }else if(getString(R.string.navigation_app_setting_title).equals(title)){
 //            getFragmentManager().beginTransaction()
