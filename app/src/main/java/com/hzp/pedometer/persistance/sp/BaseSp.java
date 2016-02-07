@@ -11,20 +11,31 @@ import android.preference.PreferenceManager;
 public class BaseSp {
 
     private SharedPreferences preferences;
+    private boolean isDefalutPreference = false;
 
     public BaseSp(){
     }
 
     public void init(Context context,String fileName){
         preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
+        isDefalutPreference = false;
     }
 
     public void init(Context context){
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        isDefalutPreference = true;
     }
 
     public double getDouble(String key,double defaultValue){
-        return preferences.getFloat(key, (float) defaultValue);
+        if(isDefalutPreference){
+            String value = preferences.getString(key,null);
+            if(value!=null){
+                return Double.parseDouble(value);
+            }else{
+                return defaultValue;
+            }
+        }
+        return preferences.getFloat(key,(float)defaultValue);
     }
 
     public void putDouble(String key,double value){
@@ -34,6 +45,14 @@ public class BaseSp {
     }
 
     public int getInt(String key,int defaultValue){
+        if(isDefalutPreference){
+            String value = preferences.getString(key,null);
+            if(value!=null){
+                return Integer.parseInt(value);
+            }else{
+                return defaultValue;
+            }
+        }
         return preferences.getInt(key, defaultValue);
     }
 
