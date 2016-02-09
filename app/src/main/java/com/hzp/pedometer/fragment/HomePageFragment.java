@@ -17,7 +17,7 @@ import com.hzp.pedometer.R;
  * Use the {@link HomePageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomePageFragment extends Fragment {
+public class HomePageFragment extends LazyFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -73,6 +73,11 @@ public class HomePageFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    protected void lazyLoad() {
+
     }
 
     public interface OnFragmentInteractionListener {
