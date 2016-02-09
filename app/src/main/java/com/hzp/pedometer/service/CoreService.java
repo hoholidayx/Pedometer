@@ -12,14 +12,12 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.util.Log;
 
-import com.hzp.pedometer.AppConstants;
+import com.hzp.pedometer.utils.AppConstants;
 import com.hzp.pedometer.persistance.file.StepDataStorage;
 import com.hzp.pedometer.persistance.sp.StepConfig;
 import com.hzp.pedometer.service.step.StepManager;
 
-import java.io.FileNotFoundException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;

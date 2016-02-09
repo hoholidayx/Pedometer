@@ -1,4 +1,4 @@
-package com.hzp.pedometer;
+package com.hzp.pedometer.utils;
 
 /**
  * @author 何志鹏 on 2016/2/4.
