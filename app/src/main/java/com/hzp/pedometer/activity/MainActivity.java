@@ -18,9 +18,9 @@ import com.hzp.pedometer.fragment.PlanFragment;
 import com.hzp.pedometer.fragment.HomePageFragment;
 import com.hzp.pedometer.fragment.SettingKindFragment;
 import com.hzp.pedometer.fragment.StatisticsFragment;
+import com.hzp.pedometer.service.Mode;
 
-public class MainActivity extends BindingActivity implements
-        HomePageFragment.OnFragmentInteractionListener {
+public class MainActivity extends BindingActivity {
     private Bundle savedInstanceState;
 
     private DrawerLayout drawerLayout;
@@ -45,6 +45,19 @@ public class MainActivity extends BindingActivity implements
         handler = new Handler();
 
         initViews();
+    }
+
+    @Override
+    protected void onServiceBind() {
+        super.onServiceBind();
+        if(homePageFragment!=null){
+            homePageFragment.updateProgresses(getService());
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void initViews() {
@@ -72,7 +85,7 @@ public class MainActivity extends BindingActivity implements
         replaceFragment(homePageFragment);
     }
 
-    private void replaceFragment(Fragment fragment){
+    private void replaceFragment(Fragment fragment) {
         getFragmentManager()
                 .beginTransaction()
                 .replace(frameLayout.getId(), fragment)

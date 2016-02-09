@@ -39,7 +39,7 @@ public class CoreService extends Service implements SensorEventListener {
     private boolean Working = false;//运行标识
 
     private ScheduledExecutorService stepCalcScheduleService;
-    private static final int TASK_INTERVAL = 1;//min
+    private static final int TASK_INTERVAL = 5;//min
 
     public CoreService() {
         binder = new CoreBinder();
@@ -144,7 +144,7 @@ public class CoreService extends Service implements SensorEventListener {
         stepCalcScheduleService.scheduleAtFixedRate(new NormalStepCountTask()
                 , TASK_INTERVAL
                 , TASK_INTERVAL
-                , TimeUnit.MINUTES);
+                , TimeUnit.SECONDS);
     }
 
     private void stopNormalMode() {

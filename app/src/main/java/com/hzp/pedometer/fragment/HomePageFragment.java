@@ -15,7 +15,6 @@ import com.hzp.pedometer.service.CoreService;
 public class HomePageFragment extends LazyFragment {
     ;
     private ArcProgress progressStep;
-    private CoreService service;
 
     public HomePageFragment() {
         // Required empty public constructor
@@ -42,13 +41,9 @@ public class HomePageFragment extends LazyFragment {
         return view;
     }
 
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if(activity instanceof BindingActivity){
-            service = ((BindingActivity)activity).getService();
-        }
     }
 
     @Override
@@ -58,6 +53,9 @@ public class HomePageFragment extends LazyFragment {
 
     @Override
     protected void lazyLoad() {
+    }
+
+    public void updateProgresses(CoreService service){
         if(service!=null){
             //加载步数相关数据
             progressStep.setMax(service.countStepFromFiles(new CoreService.CountStepFromFilesListener() {
