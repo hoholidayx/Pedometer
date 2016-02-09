@@ -221,32 +221,35 @@ public class CoreService extends Service implements SensorEventListener {
 
     /**
      * 从数据文件计算步数
+     *
      * @return 文件的总数
      */
-    public int countStepFromFiles(final CountStepFromFilesListener listener){
-        if(isWorking()){
+    public int countStepFromFiles(final CountStepFromFilesListener listener) {
+        if (isWorking()) {
             stopStepCount();
         }
         StepManager.getInstance().resetData();
         final String[] filenames = StepDataStorage.getInstance().getDataFileNames();
 
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }finally {
-                    StepManager.getInstance().setBroadcastEnable(false);
-                    for(String filename:filenames){
-                        StepManager.getInstance().inputPoint(filename);
-                        if(listener!=null){
-                            listener.onStepCount(StepManager.getInstance().getStepCount());
+                } finally {
+                    if (filenames.length != 0) {
+                        StepManager.getInstance().setBroadcastEnable(false);
+                        for (String filename : filenames) {
+                            StepManager.getInstance().inputPoint(filename);
+                            if (listener != null) {
+                                listener.onStepCount(StepManager.getInstance().getStepCount());
+                            }
                         }
+                        StepDataStorage.getInstance().deleteFile(filenames);
+                        StepManager.getInstance().setBroadcastEnable(true);
                     }
-                    StepDataStorage.getInstance().deleteFile(filenames);
-                    StepManager.getInstance().setBroadcastEnable(true);
                 }
             }
         }.start();
@@ -254,7 +257,7 @@ public class CoreService extends Service implements SensorEventListener {
         return filenames.length;
     }
 
-    interface CountStepFromFilesListener{
+    interface CountStepFromFilesListener {
         void onStepCount(int stepCount);
     }
 
@@ -262,7 +265,7 @@ public class CoreService extends Service implements SensorEventListener {
         return Working;
     }
 
-    public StepManager getStepManager(){
+    public StepManager getStepManager() {
         return StepManager.getInstance();
     }
 
