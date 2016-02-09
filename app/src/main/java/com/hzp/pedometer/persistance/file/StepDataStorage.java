@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class StepDataStorage {
 
+    private static StepDataStorage instance;
     private Context context;
     private SimpleDateFormat dateFormat;
 
@@ -35,7 +36,21 @@ public class StepDataStorage {
 
     private static final String dataPrefix = "data_log";
 
-    public StepDataStorage(Context context) {
+    private StepDataStorage() {
+    }
+
+    public static StepDataStorage getInstance(){
+        if(instance == null){
+            synchronized (StepDataStorage.class){
+                if(instance == null){
+                    instance = new StepDataStorage();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public void init(Context context){
         this.context = context;
         dataList = Collections.synchronizedList(
                 new LinkedList<String>());
@@ -46,13 +61,18 @@ public class StepDataStorage {
         this.period = period;
     }
 
-    public void startNewRecord() throws FileNotFoundException {
+    public void startNewRecord(){
         endRecord();
         //创建并打开记录文件
-        fileOutputStream = context.openFileOutput(createFileName(),Context.MODE_APPEND);
-        //启动定时线程
-        executorService = Executors.newScheduledThreadPool(1);
-        executorService.scheduleAtFixedRate(new WriterTask(), period, period, TimeUnit.MILLISECONDS);
+        try {
+            fileOutputStream = context.openFileOutput(createFileName(),Context.MODE_APPEND);
+            //启动定时线程
+            executorService = Executors.newScheduledThreadPool(1);
+            executorService.scheduleAtFixedRate(new WriterTask(), period, period, TimeUnit.MILLISECONDS);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            // TODO: 2016/2/9 异常处理
+        }
     }
 
     public void saveData(String data) {

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 
+import com.hzp.pedometer.persistance.file.StepDataStorage;
 import com.hzp.pedometer.persistance.sp.StepConfig;
 import com.hzp.pedometer.service.step.StepManager;
 
@@ -17,6 +18,7 @@ public class PedometerApplication extends Application{
     public void onCreate() {
         super.onCreate();
 
+        StepDataStorage.getInstance().init(getApplicationContext());
         StepConfig.getInstance().init(getApplicationContext());
         StepManager.getInstance().init(getApplicationContext());
         //开启服务

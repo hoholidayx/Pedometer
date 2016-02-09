@@ -40,8 +40,8 @@ public class CoreService extends Service implements SensorEventListener {
     private Mode mode = Mode.NORMAL;//当前的计步模式
     private boolean Working = false;//运行标识
 
-    private StepDataStorage stepDataStorage;
     private ScheduledExecutorService stepCalcScheduleService;
+    private static final int TASK_INTERVAL = 1;//min
 
     public CoreService() {
         binder = new CoreBinder();
@@ -50,7 +50,6 @@ public class CoreService extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
         super.onCreate();
-        stepDataStorage = new StepDataStorage(this);
         wakeLock = ServiceUtil.getWakeLock(this);
 
         registerScreenReceiver();
@@ -72,7 +71,7 @@ public class CoreService extends Service implements SensorEventListener {
         super.onDestroy();
         unregisterReceiver(screenReceiver);
         //解除cpu锁定省电
-        if(wakeLock.isHeld()){
+        if (wakeLock.isHeld()) {
             wakeLock.release();
         }
 
@@ -87,11 +86,11 @@ public class CoreService extends Service implements SensorEventListener {
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
-    private void registerScreenReceiver(){
+    private void registerScreenReceiver() {
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
         screenReceiver = new ScreenReceiver();
-        registerReceiver(screenReceiver,filter);
+        registerReceiver(screenReceiver, filter);
     }
 
     @Override
@@ -104,7 +103,7 @@ public class CoreService extends Service implements SensorEventListener {
 
         switch (mode) {
             case NORMAL: {
-                processNormalMode(a,System.currentTimeMillis());
+                processNormalMode(a, System.currentTimeMillis());
                 break;
             }
             case REAL_TIME: {
@@ -137,47 +136,40 @@ public class CoreService extends Service implements SensorEventListener {
      * @param n 时间
      */
     private void processNormalMode(double a, long n) {
-        if (stepDataStorage != null) {
-            stepDataStorage.saveData(a + " " + n + AppConstants.Separator);
-        }
+        StepDataStorage.getInstance().saveData(a + " " + n + AppConstants.Separator);
     }
 
-    private void startNormalMode(){
+    private void startNormalMode() {
         StepManager.getInstance().resetData();
-        createNewStepDataStorageRecord();
+        StepDataStorage.getInstance().startNewRecord();
         //开启定时任务
         stepCalcScheduleService = Executors.newScheduledThreadPool(1);
-        //设置间隔每30分钟计算一次数据
-        stepCalcScheduleService.scheduleAtFixedRate(new NormalStepCountTask(), 1, 1, TimeUnit.MINUTES);
+        stepCalcScheduleService.scheduleAtFixedRate(new NormalStepCountTask()
+                , TASK_INTERVAL
+                , TASK_INTERVAL
+                , TimeUnit.MINUTES);
     }
 
-    private void stopNormalMode(){
+    private void stopNormalMode() {
         //// TODO: 2016/2/1 关闭定时任务
         stepCalcScheduleService.shutdown();
     }
 
-    class NormalStepCountTask implements Runnable{
+    class NormalStepCountTask implements Runnable {
 
         @Override
         public void run() {
-           //获取所有未进行计算的计步数据文件
-            String[] filenames = stepDataStorage.getDataFileNames();
+            //获取所有未进行计算的计步数据文件
+//            String[] filenames = stepDataStorage.getDataFileNames();
             //开启新的记录
-            createNewStepDataStorageRecord();
-            //输入数据进行计步计算
-            StepManager.getInstance().inputPoints(filenames);
-            //删除旧的数据
-            stepDataStorage.deleteFile(filenames);
+            StepDataStorage.getInstance().startNewRecord();
+//            //输入数据进行计步计算
+//            StepManager.getInstance().inputPoints(filenames);
+//            //删除旧的数据
+//            stepDataStorage.deleteFile(filenames);
         }
     }
 
-    private void createNewStepDataStorageRecord(){
-        try {
-            stepDataStorage.startNewRecord();
-        } catch (FileNotFoundException e) {
-            // TODO: 2016/2/4 异常处理 无法创建新的文件
-        }
-    }
 
     /**
      * 开始计步
@@ -192,12 +184,12 @@ public class CoreService extends Service implements SensorEventListener {
                     (int) (1.0 / StepConfig.getInstance().getSamplingRate()) * 1000 * 1000);//微秒
             Working = true;
 
-            switch (mode){
-                case NORMAL:{
+            switch (mode) {
+                case NORMAL: {
                     startNormalMode();
                     break;
                 }
-                case REAL_TIME:{
+                case REAL_TIME: {
                     break;
                 }
             }
@@ -215,12 +207,12 @@ public class CoreService extends Service implements SensorEventListener {
             StepManager.getInstance().resetData();
             sensorManager.unregisterListener(this);
 
-            switch (mode){
-                case NORMAL:{
+            switch (mode) {
+                case NORMAL: {
                     stopNormalMode();
                     break;
                 }
-                case REAL_TIME:{
+                case REAL_TIME: {
                     break;
                 }
             }
@@ -235,20 +227,20 @@ public class CoreService extends Service implements SensorEventListener {
         return mode;
     }
 
-    private class ScreenReceiver extends BroadcastReceiver{
+    private class ScreenReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()){
+            switch (intent.getAction()) {
                 case Intent.ACTION_SCREEN_ON:
                     //解除唤醒
-                    if(wakeLock.isHeld()){
+                    if (wakeLock.isHeld()) {
                         wakeLock.release();
                     }
                     break;
                 case Intent.ACTION_SCREEN_OFF:
                     //唤醒cpu
-                    if(isWorking()){
+                    if (isWorking()) {
                         wakeLock.acquire();
                     }
                     break;
