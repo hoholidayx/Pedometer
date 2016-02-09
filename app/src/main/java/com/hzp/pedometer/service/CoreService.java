@@ -12,7 +12,9 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 
+import com.hzp.pedometer.R;
 import com.hzp.pedometer.utils.AppConstants;
 import com.hzp.pedometer.persistance.file.StepDataStorage;
 import com.hzp.pedometer.persistance.sp.StepConfig;
@@ -180,7 +182,7 @@ public class CoreService extends Service implements SensorEventListener {
 
             sensorManager.registerListener(this, sensor,
                     (int) (1.0 / StepConfig.getInstance().getSamplingRate()) * 1000 * 1000);//微秒
-            Working = true;
+            toggleWorkingState(true);
 
             switch (mode) {
                 case NORMAL: {
@@ -200,7 +202,7 @@ public class CoreService extends Service implements SensorEventListener {
      */
     public void stopStepCount() {
         if (Working) {
-            Working = false;
+            toggleWorkingState(false);
 
             StepManager.getInstance().resetData();
             sensorManager.unregisterListener(this);
@@ -233,7 +235,7 @@ public class CoreService extends Service implements SensorEventListener {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
@@ -261,6 +263,10 @@ public class CoreService extends Service implements SensorEventListener {
 
     public boolean isWorking() {
         return Working;
+    }
+
+    private void toggleWorkingState(boolean working){
+        this.Working = working;
     }
 
     public StepManager getStepManager() {

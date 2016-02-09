@@ -64,7 +64,8 @@ public class HomePageFragment extends LazyFragment {
                     progressStep.post(new Runnable() {
                         @Override
                         public void run() {
-                            progressStep.setProgress(stepCount);
+                            progressStep.setProgress(progressStep.getProgress()+1);
+                            progressStep.setContent(String.valueOf(stepCount));
                         }
                     });
                 }

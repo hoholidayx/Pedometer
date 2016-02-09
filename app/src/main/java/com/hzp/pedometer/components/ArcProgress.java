@@ -42,6 +42,7 @@ public class ArcProgress extends View {
     private float arcBottomHeight;
 
     private boolean isInt = true;
+    private String content;
 
     private final int default_finished_color = Color.WHITE;
     private final int default_unfinished_color = Color.rgb(72, 106, 176);
@@ -261,6 +262,10 @@ public class ArcProgress extends View {
         isInt = change;
     }
 
+    public void setContent(String content){
+        this.content = content;
+    }
+
     @Override
     protected int getSuggestedMinimumHeight() {
         return min_size;
@@ -293,11 +298,16 @@ public class ArcProgress extends View {
         canvas.drawArc(rectF, finishedStartAngle, finishedSweepAngle, false, paint);
 
         String text;
-        if(isInt){
-            text = String.valueOf((int)getProgress());
+        if(content == null){
+            if(isInt){
+                text = String.valueOf((int)getProgress());
+            }else{
+                text = String.valueOf(getProgress());
+            }
         }else{
-            text = String.valueOf(getProgress());
+            text = content;
         }
+
         if (!TextUtils.isEmpty(text)) {
             textPaint.setColor(textColor);
             textPaint.setTextSize(textSize);
