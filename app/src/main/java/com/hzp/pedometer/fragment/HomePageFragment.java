@@ -2,38 +2,25 @@ package com.hzp.pedometer.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.hzp.pedometer.R;
+import com.hzp.pedometer.activity.BindingActivity;
+import com.hzp.pedometer.components.ArcProgress;
+import com.hzp.pedometer.service.CoreService;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link HomePageFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link HomePageFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class HomePageFragment extends LazyFragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
+    ;
+    private ArcProgress progressStep;
+    private CoreService service;
 
     public HomePageFragment() {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static HomePageFragment newInstance() {
         HomePageFragment fragment = new HomePageFragment();
         Bundle args = new Bundle();
@@ -44,43 +31,46 @@ public class HomePageFragment extends LazyFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home_page, container, false);
+        View view =  inflater.inflate(R.layout.fragment_home_page, container, false);
+
+        progressStep = (ArcProgress) view.findViewById(R.id.arc_progress_step);
+        return view;
     }
 
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) activity;
-        } else {
-            throw new RuntimeException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+        if(activity instanceof BindingActivity){
+            service = ((BindingActivity)activity).getService();
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override
     protected void lazyLoad() {
-
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
+        if(service!=null){
+            //加载步数相关数据
+            progressStep.setMax(service.countStepFromFiles(new CoreService.CountStepFromFilesListener() {
+                @Override
+                public void onStepCount(final int stepCount) {
+                    progressStep.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressStep.setProgress(stepCount);
+                        }
+                    });
+                }
+            }));
+        }
     }
 }

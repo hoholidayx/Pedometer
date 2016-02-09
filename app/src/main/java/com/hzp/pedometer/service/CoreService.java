@@ -255,7 +255,7 @@ public class CoreService extends Service implements SensorEventListener {
         return filenames.length;
     }
 
-    interface CountStepFromFilesListener {
+    public interface CountStepFromFilesListener {
         void onStepCount(int stepCount);
     }
 
