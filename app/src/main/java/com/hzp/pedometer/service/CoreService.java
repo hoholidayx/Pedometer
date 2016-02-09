@@ -223,6 +223,10 @@ public class CoreService extends Service implements SensorEventListener {
         return Working;
     }
 
+    public StepManager getStepManager(){
+        return StepManager.getInstance();
+    }
+
     public Mode getMode() {
         return mode;
     }
