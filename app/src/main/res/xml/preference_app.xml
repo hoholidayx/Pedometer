@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="应用设置">
+        <SwitchPreference
+            android:key="@string/KEY_ENABLE_NORMAL_STEP_COUNT"
+            android:summary="计步服务"
+            android:defaultValue="true"/>
+    </PreferenceCategory>
+</PreferenceScreen>

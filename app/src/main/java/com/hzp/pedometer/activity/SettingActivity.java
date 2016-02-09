@@ -44,12 +44,12 @@ public class SettingActivity extends AppCompatActivity {
         }
         if(getString(R.string.navigation_step_setting_title).equals(title)){
             getFragmentManager().beginTransaction()
-                    .replace(R.id.setting_content, SettingFragment.newInstance())
+                    .replace(R.id.setting_content, SettingFragment.newInstance(R.xml.preference))
                             .commit();
         }else if(getString(R.string.navigation_app_setting_title).equals(title)){
-//            getFragmentManager().beginTransaction()
-//                    .add(R.id.setting_content,StepSettingFragment.newInstance())
-//                    .commit();
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.setting_content, SettingFragment.newInstance(R.xml.preference_app))
+                    .commit();
         }
 
     }

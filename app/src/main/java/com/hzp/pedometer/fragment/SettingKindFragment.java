@@ -92,14 +92,13 @@ public class SettingKindFragment extends Fragment{
                         case 0:
                             bundle.putString(SettingActivity.KEY_TITLE
                                     , getString(R.string.navigation_step_setting_title));
-                            intent.putExtra(SettingActivity.KEY_SETTING_INFO, bundle);
                             break;
                         case 1:
                             bundle.putString(SettingActivity.KEY_TITLE
                                     , getString(R.string.navigation_app_setting_title));
-                            intent.putExtra(SettingActivity.KEY_SETTING_INFO, bundle);
                             break;
                     }
+                    intent.putExtra(SettingActivity.KEY_SETTING_INFO, bundle);
                     startActivity(intent);
                 }
             });
