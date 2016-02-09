@@ -238,6 +238,7 @@ public class CoreService extends Service implements SensorEventListener {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }finally {
+                    StepManager.getInstance().setBroadcastEnable(false);
                     for(String filename:filenames){
                         StepManager.getInstance().inputPoint(filename);
                         if(listener!=null){
@@ -245,6 +246,7 @@ public class CoreService extends Service implements SensorEventListener {
                         }
                     }
                     StepDataStorage.getInstance().deleteFile(filenames);
+                    StepManager.getInstance().setBroadcastEnable(true);
                 }
             }
         }.start();
