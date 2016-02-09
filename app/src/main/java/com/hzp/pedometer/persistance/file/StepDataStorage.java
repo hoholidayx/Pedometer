@@ -128,7 +128,8 @@ public class StepDataStorage {
 
             } catch (IOException e) {
                 //TODO
-                e.printStackTrace();
+            }finally {
+                endRecord();
             }
         }
     }
