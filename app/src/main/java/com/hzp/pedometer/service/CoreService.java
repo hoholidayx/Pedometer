@@ -140,7 +140,6 @@ public class CoreService extends Service implements SensorEventListener {
     }
 
     private void startNormalMode() {
-        StepManager.getInstance().resetData();
         StepDataStorage.getInstance().startNewRecord();
         //开启定时任务
         stepCalcScheduleService = Executors.newScheduledThreadPool(1);
@@ -151,8 +150,9 @@ public class CoreService extends Service implements SensorEventListener {
     }
 
     private void stopNormalMode() {
-        //// TODO: 2016/2/1 关闭定时任务
+        //关闭定时任务
         stepCalcScheduleService.shutdown();
+        StepDataStorage.getInstance().endRecord();
     }
 
     class NormalStepCountTask implements Runnable {
@@ -217,6 +217,43 @@ public class CoreService extends Service implements SensorEventListener {
                 }
             }
         }
+    }
+
+    /**
+     * 从数据文件计算步数
+     * @return 文件的总数
+     */
+    public int countStepFromFiles(final CountStepFromFilesListener listener){
+        if(isWorking()){
+            stopStepCount();
+        }
+        StepManager.getInstance().resetData();
+        final String[] filenames = StepDataStorage.getInstance().getDataFileNames();
+
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }finally {
+                    for(String filename:filenames){
+                        StepManager.getInstance().inputPoint(filename);
+                        if(listener!=null){
+                            listener.onStepCount(StepManager.getInstance().getStepCount());
+                        }
+                    }
+                    StepDataStorage.getInstance().deleteFile(filenames);
+                }
+            }
+        }.start();
+
+        return filenames.length;
+    }
+
+    interface CountStepFromFilesListener{
+        void onStepCount(int stepCount);
     }
 
     public boolean isWorking() {
