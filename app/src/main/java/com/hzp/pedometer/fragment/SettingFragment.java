@@ -8,6 +8,9 @@ import android.preference.PreferenceScreen;
 import android.util.Log;
 
 import com.hzp.pedometer.R;
+import com.hzp.pedometer.activity.BindingActivity;
+import com.hzp.pedometer.service.CoreService;
+import com.hzp.pedometer.service.Mode;
 
 import java.util.Map;
 
@@ -23,7 +26,7 @@ public class SettingFragment extends PreferenceFragment {
     public static SettingFragment newInstance(int preferenceResId) {
         SettingFragment fragment = new SettingFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_SETTING_PREFERENCE,preferenceResId);
+        args.putInt(ARG_SETTING_PREFERENCE, preferenceResId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -41,9 +44,9 @@ public class SettingFragment extends PreferenceFragment {
 
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-        switch (preferenceResId){
+        switch (preferenceResId) {
             case R.xml.preference_app:
-                if(preference.getKey().equals(getString(R.string.KEY_ENABLE_NORMAL_STEP_COUNT))){
+                if (preference.getKey().equals(getString(R.string.KEY_ENABLE_NORMAL_STEP_COUNT))) {
                     onEnableNormalStepCountChange(preference.getSharedPreferences().getBoolean(
                             getString(R.string.KEY_ENABLE_NORMAL_STEP_COUNT),
                             true
@@ -54,9 +57,13 @@ public class SettingFragment extends PreferenceFragment {
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 
-    private void onEnableNormalStepCountChange(boolean enable){
-        // TODO: 2016/2/9  
-        Log.e("启动",""+enable);
+    private void onEnableNormalStepCountChange(boolean enable) {
+        CoreService service = ((BindingActivity) getActivity()).getService();
+        if (enable && service!=null) {
+            service.startStepCount(Mode.NORMAL);
+        } else if(service!=null) {
+            service.stopStepCount();
+        }
     }
 
     @Override
