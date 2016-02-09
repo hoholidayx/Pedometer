@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.fragment.SettingFragment;
 
-public class SettingActivity extends AppCompatActivity {
+public class SettingActivity extends BindingActivity {
     public static final String KEY_SETTING_INFO = "SETTING_INFO";
     public static final String KEY_TITLE = "TITLE";
 
