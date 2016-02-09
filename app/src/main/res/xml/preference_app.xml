@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="@string/key_app_setting">
     <PreferenceCategory android:title="应用设置">
         <SwitchPreference
             android:key="@string/KEY_ENABLE_NORMAL_STEP_COUNT"

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="@string/key_algorithm_setting">
     <PreferenceCategory android:title="参数设置">
         <EditTextPreference
             android:key="@string/KEY_ALPHA"

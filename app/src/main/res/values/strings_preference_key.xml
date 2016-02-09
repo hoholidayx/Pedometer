@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--算法设置-->
+    <string name="key_algorithm_setting">algorithm_setting</string>
     <string name="KEY_ALPHA">ALPHA</string>
     <string name="KEY_BETA">BETA</string>
     <string name="KEY_K_NUMBER">K_NUMBER</string>
@@ -8,5 +9,6 @@
     <string name="KEY_FILTER_WINDOW_SIZE">FILTER_WINDOW_SIZE</string>
     <string name="KEY_SAMPLING_RATE">SAMPLING_RATE</string>
     <!--应用设置-->
+    <string name="key_app_setting">app_setting</string>
     <string name="KEY_ENABLE_NORMAL_STEP_COUNT">ENABLE_NORMAL_STEP_COUNT</string>
 </resources>

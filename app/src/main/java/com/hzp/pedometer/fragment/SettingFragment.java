@@ -2,9 +2,14 @@ package com.hzp.pedometer.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import com.hzp.pedometer.R;
+
+import java.util.Map;
 
 public class SettingFragment extends PreferenceFragment {
     private static final String ARG_SETTING_PREFERENCE = "setting_preference";
@@ -32,7 +37,26 @@ public class SettingFragment extends PreferenceFragment {
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(preferenceResId);
+    }
 
+    @Override
+    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        switch (preferenceResId){
+            case R.xml.preference_app:
+                if(preference.getKey().equals(getString(R.string.KEY_ENABLE_NORMAL_STEP_COUNT))){
+                    onEnableNormalStepCountChange(preference.getSharedPreferences().getBoolean(
+                            getString(R.string.KEY_ENABLE_NORMAL_STEP_COUNT),
+                            true
+                    ));
+                }
+                break;
+        }
+        return super.onPreferenceTreeClick(preferenceScreen, preference);
+    }
+
+    private void onEnableNormalStepCountChange(boolean enable){
+        // TODO: 2016/2/9  
+        Log.e("启动",""+enable);
     }
 
     @Override
