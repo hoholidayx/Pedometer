@@ -41,7 +41,8 @@ public class CoreService extends Service implements SensorEventListener {
     private boolean Working = false;//运行标识
 
     private ScheduledExecutorService stepCalcScheduleService;
-    private static final int TASK_INTERVAL = 5;//min
+    private static final int TASK_INTERVAL = 30;//min
+    private static final int TASK_WAIT_TIME = 3000;//ms
 
     public CoreService() {
         binder = new CoreBinder();
@@ -146,12 +147,12 @@ public class CoreService extends Service implements SensorEventListener {
         stepCalcScheduleService.scheduleAtFixedRate(new NormalStepCountTask()
                 , TASK_INTERVAL
                 , TASK_INTERVAL
-                , TimeUnit.SECONDS);
+                , TimeUnit.MINUTES);
     }
 
     private void stopNormalMode() {
         //关闭定时任务
-        stepCalcScheduleService.shutdown();
+        stepCalcScheduleService.shutdownNow();
         StepDataStorage.getInstance().endRecord();
     }
 
@@ -235,7 +236,10 @@ public class CoreService extends Service implements SensorEventListener {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(500);
+                    synchronized (StepDataStorage.class){
+//                        wait(TASK_WAIT_TIME);
+                        sleep(1000);
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {

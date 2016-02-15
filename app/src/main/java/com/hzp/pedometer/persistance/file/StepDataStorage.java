@@ -2,6 +2,7 @@ package com.hzp.pedometer.persistance.file;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,10 +40,10 @@ public class StepDataStorage {
     private StepDataStorage() {
     }
 
-    public static StepDataStorage getInstance(){
-        if(instance == null){
-            synchronized (StepDataStorage.class){
-                if(instance == null){
+    public static StepDataStorage getInstance() {
+        if (instance == null) {
+            synchronized (StepDataStorage.class) {
+                if (instance == null) {
                     instance = new StepDataStorage();
                 }
             }
@@ -50,22 +51,22 @@ public class StepDataStorage {
         return instance;
     }
 
-    public void init(Context context){
+    public void init(Context context) {
         this.context = context;
         dataList = Collections.synchronizedList(
                 new LinkedList<String>());
-        dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm", Locale.getDefault());
+        dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault());
     }
 
     public void setPeriod(long period) {
         this.period = period;
     }
 
-    public void startNewRecord(){
+    public void startNewRecord() {
         endRecord();
         //创建并打开记录文件
         try {
-            fileOutputStream = context.openFileOutput(createFileName(),Context.MODE_APPEND);
+            fileOutputStream = context.openFileOutput(createFileName(), Context.MODE_APPEND);
             //启动定时线程
             executorService = Executors.newScheduledThreadPool(1);
             executorService.scheduleAtFixedRate(new WriterTask(), period, period, TimeUnit.MILLISECONDS);
@@ -80,56 +81,56 @@ public class StepDataStorage {
     }
 
     public void endRecord() {
-        if(executorService!=null && !executorService.isShutdown()){
-            executorService.shutdownNow();
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdown();
         }
-        if(fileOutputStream!=null){
+        if (fileOutputStream != null) {
             closeStream();
         }
     }
 
-    public String[] getDataFileNames(){
+    public String[] getDataFileNames() {
         return context.getFilesDir().list(new DataFilenameFilter());
     }
 
-    public void deleteFile(String filename){
+    public void deleteFile(String filename) {
         context.deleteFile(filename);
     }
 
-    public void deleteFile(String[] filenames){
-        for(String filename:filenames){
+    public void deleteFile(String[] filenames) {
+        for (String filename : filenames) {
             deleteFile(filename);
         }
     }
 
-    private void closeStream(){
+    private void closeStream() {
         try {
             fileOutputStream.close();
         } catch (IOException e) {
             //TODO 异常处理
             e.printStackTrace();
-        }finally {
+        } finally {
             fileOutputStream = null;
         }
     }
 
-    class WriterTask implements Runnable{
+    class WriterTask implements Runnable {
 
         @Override
         public void run() {
-            try{
-                for(int i =0;i<dataList.size();i++){
-                    String data = dataList.remove(0);
-                    if(fileOutputStream!=null){
-                        fileOutputStream.write(data.getBytes());
+            synchronized (this) {
+                try {
+                    for (int i = 0; i < dataList.size(); i++) {
+                        String data = dataList.remove(0);
+                        if (fileOutputStream != null) {
+                            fileOutputStream.write(data.getBytes());
+                        }
                     }
+                } catch (IndexOutOfBoundsException | IOException e) {
+                    endRecord();
+                } finally {
+                    notifyAll();
                 }
-            }catch (IndexOutOfBoundsException e){
-
-            } catch (IOException e) {
-                //TODO
-            }finally {
-                endRecord();
             }
         }
     }
