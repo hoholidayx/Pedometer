@@ -15,7 +15,7 @@ import java.util.List;
  * @author 何志鹏 on 2016/2/16.
  * @email hoholiday@hotmail.com
  */
-public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.PlanCardHolder>
+public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.DailyDataHolder>
         implements ItemTouchHelperAdapter {
 
     private List<Object> dataList;
@@ -26,16 +26,16 @@ public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.Plan
     }
 
     @Override
-    public PlanCardHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DailyDataHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.list_item_plan_card
                         , parent
                         , false);
-        return new PlanCardHolder(view);
+        return new DailyDataHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(PlanCardHolder holder, final int position) {
+    public void onBindViewHolder(DailyDataHolder holder, final int position) {
     }
 
     @Override
@@ -55,9 +55,9 @@ public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.Plan
         notifyItemRemoved(position);
     }
 
-    class PlanCardHolder extends RecyclerView.ViewHolder {
+    class DailyDataHolder extends RecyclerView.ViewHolder {
 
-        public PlanCardHolder(View itemView) {
+        public DailyDataHolder(View itemView) {
             super(itemView);
         }
     }
