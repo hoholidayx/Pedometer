@@ -39,7 +39,7 @@ public class DailyFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_plan, container, false);
+        View view = inflater.inflate(R.layout.fragment_daily, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.fragment_goal_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         DailyListAdapter adapter = new DailyListAdapter(getActivity());
