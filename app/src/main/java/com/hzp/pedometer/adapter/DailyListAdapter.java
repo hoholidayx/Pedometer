@@ -55,6 +55,11 @@ public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.Dail
         notifyItemRemoved(position);
     }
 
+    public void addItem(Object item,int position){
+        dataList.add(position,item);
+        notifyItemInserted(position);
+    }
+
     class DailyDataHolder extends RecyclerView.ViewHolder {
 
         public DailyDataHolder(View itemView) {
