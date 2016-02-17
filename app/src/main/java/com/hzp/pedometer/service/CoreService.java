@@ -12,14 +12,14 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.preference.PreferenceManager;
 
-import com.hzp.pedometer.R;
+import com.hzp.pedometer.persistance.db.DailyDataManager;
 import com.hzp.pedometer.utils.AppConstants;
 import com.hzp.pedometer.persistance.file.StepDataStorage;
 import com.hzp.pedometer.persistance.sp.StepConfig;
 import com.hzp.pedometer.service.step.StepManager;
 
+import java.util.Calendar;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,8 +41,11 @@ public class CoreService extends Service implements SensorEventListener {
     private boolean Working = false;//运行标识
 
     private ScheduledExecutorService stepCalcScheduleService;
-    private static final int TASK_INTERVAL = 30;//min
-    private static final int TASK_WAIT_TIME = 3000;//ms
+    private static final int RECORD_TASK_INTERVAL = 30;//min
+    private static final int RECORD_TASK_WAIT_TIME = 1000;//ms
+
+    //计步工作开始和结束的时间
+    private long startTime,endTime;
 
     public CoreService() {
         binder = new CoreBinder();
@@ -145,8 +148,8 @@ public class CoreService extends Service implements SensorEventListener {
         //开启定时任务
         stepCalcScheduleService = Executors.newScheduledThreadPool(1);
         stepCalcScheduleService.scheduleAtFixedRate(new NormalStepCountTask()
-                , TASK_INTERVAL
-                , TASK_INTERVAL
+                , RECORD_TASK_INTERVAL
+                , RECORD_TASK_INTERVAL
                 , TimeUnit.MINUTES);
     }
 
@@ -180,6 +183,7 @@ public class CoreService extends Service implements SensorEventListener {
     public void startStepCount(Mode mode) {
         if (!isWorking()) {
             this.mode = mode;
+            startTime = Calendar.getInstance().getTimeInMillis();
 
             sensorManager.registerListener(this, sensor,
                     (int) (1.0 / StepConfig.getInstance().getSamplingRate()) * 1000 * 1000);//微秒
@@ -204,6 +208,7 @@ public class CoreService extends Service implements SensorEventListener {
     public void stopStepCount() {
         if (Working) {
             toggleWorkingState(false);
+            endTime = Calendar.getInstance().getTimeInMillis();
 
             StepManager.getInstance().resetData();
             sensorManager.unregisterListener(this);
@@ -237,22 +242,31 @@ public class CoreService extends Service implements SensorEventListener {
             public void run() {
                 try {
                     synchronized (StepDataStorage.class){
-//                        wait(TASK_WAIT_TIME);
-                        sleep(1000);
+//                        wait(RECORD_TASK_WAIT_TIME);
+                        sleep(RECORD_TASK_WAIT_TIME);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
+                    int stepCount = 0;
+
                     if (filenames.length != 0) {
                         StepManager.getInstance().setBroadcastEnable(false);
                         for (String filename : filenames) {
                             StepManager.getInstance().inputPoint(filename);
+                            stepCount = StepManager.getInstance().getStepCount();
                             if (listener != null) {
-                                listener.onStepCount(StepManager.getInstance().getStepCount());
+                                listener.onStepCount(stepCount);
                             }
                         }
                         StepDataStorage.getInstance().deleteFile(filenames);
                         StepManager.getInstance().setBroadcastEnable(true);
+                        DailyDataManager.getInstance().saveData(
+                                Calendar.getInstance().getTimeInMillis(),
+                                startTime,
+                                endTime,
+                                stepCount
+                        );
                     }
                 }
             }
