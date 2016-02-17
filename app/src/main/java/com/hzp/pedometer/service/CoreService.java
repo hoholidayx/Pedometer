@@ -19,6 +19,7 @@ import com.hzp.pedometer.persistance.file.StepDataStorage;
 import com.hzp.pedometer.persistance.sp.StepConfig;
 import com.hzp.pedometer.service.step.StepManager;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -105,13 +106,16 @@ public class CoreService extends Service implements SensorEventListener {
                         Math.pow(event.values[1], 2) +
                         Math.pow(event.values[2], 2));
 
+        BigDecimal bd = new BigDecimal(a);
+        bd = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
+
         switch (mode) {
             case NORMAL: {
-                processNormalMode(a, System.currentTimeMillis());
+                processNormalMode(bd.doubleValue(), System.currentTimeMillis());
                 break;
             }
             case REAL_TIME: {
-                processRealTimeMode(a, System.currentTimeMillis());
+                processRealTimeMode(bd.doubleValue(), System.currentTimeMillis());
                 break;
             }
         }
