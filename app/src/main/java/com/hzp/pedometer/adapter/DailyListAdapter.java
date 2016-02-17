@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.hzp.pedometer.R;
+import com.hzp.pedometer.entity.DailyData;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,17 +19,18 @@ import java.util.List;
 public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.DailyDataHolder>
         implements ItemTouchHelperAdapter {
 
-    private List<Object> dataList;
+    private List<DailyData> dataList;
     private Context context;
 
-    public DailyListAdapter(Context context) {
+    public DailyListAdapter(Context context,List<DailyData> dataList) {
         this.context = context;
+        this.dataList = dataList;
     }
 
     @Override
     public DailyDataHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
-                .inflate(R.layout.list_item_plan_card
+                .inflate(R.layout.list_item_setting_kind
                         , parent
                         , false);
         return new DailyDataHolder(view);
@@ -55,7 +57,7 @@ public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.Dail
         notifyItemRemoved(position);
     }
 
-    public void addItem(Object item,int position){
+    public void addItem(DailyData item,int position){
         dataList.add(position,item);
         notifyItemInserted(position);
     }
