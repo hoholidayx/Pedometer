@@ -231,8 +231,12 @@ public class CoreService extends Service implements SensorEventListener {
      * @return 文件的总数
      */
     public int countStepFromFiles(final CountStepFromFilesListener listener) {
+        final boolean flag;
         if (isWorking()) {
             stopStepCount();
+            flag = getMode().equals(Mode.NORMAL);
+        }else{
+            flag = false;
         }
         StepManager.getInstance().resetData();
         final String[] filenames = StepDataStorage.getInstance().getDataFileNames();
@@ -260,13 +264,17 @@ public class CoreService extends Service implements SensorEventListener {
                             }
                         }
                         StepDataStorage.getInstance().deleteFile(filenames);
-                        StepManager.getInstance().setBroadcastEnable(true);
                         DailyDataManager.getInstance().saveData(
                                 Calendar.getInstance().getTimeInMillis(),
                                 startTime,
                                 endTime,
                                 stepCount
                         );
+                    }
+                    //恢复工作现场
+                    StepManager.getInstance().setBroadcastEnable(true);
+                    if(flag){
+                        startStepCount(Mode.NORMAL);
                     }
                 }
             }
