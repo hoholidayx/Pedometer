@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.hzp.pedometer.entity.DailyData;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -73,6 +74,20 @@ public class DailyDataManager {
 
     public void saveData(DailyData data) {
         saveData(data.getModifyTime(), data.getStartTime(), data.getEndTime(), data.getStepCount());
+    }
+
+    public DailyData[] getDataListByDay(int year,int month,int dayOfMonth){
+        long start,end;
+        Calendar ca = Calendar.getInstance();
+
+        ca.set(year,month,dayOfMonth,0,1);
+        start = ca.getTimeInMillis();
+
+        ca.set(Calendar.HOUR_OF_DAY,23);
+        ca.set(Calendar.MINUTE,59);
+
+        end = ca.getTimeInMillis();
+        return getDataList(start,end,SortOrder.MODIFY_TIME_DESC);
     }
 
     public DailyData[] getDataList(long startTime, long endTime, SortOrder order) {

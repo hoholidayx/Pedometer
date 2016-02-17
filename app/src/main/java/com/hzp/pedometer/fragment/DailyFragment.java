@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
 
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.adapter.DailyListAdapter;
@@ -15,11 +17,13 @@ import com.hzp.pedometer.adapter.SimpleItemTouchHelperCallback;
 import com.hzp.pedometer.entity.DailyData;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class DailyFragment extends Fragment {
 
     private RecyclerView recyclerView;
+    private CalendarView calendarView;
 
     public DailyFragment() {
     }
@@ -51,7 +55,18 @@ public class DailyFragment extends Fragment {
         new ItemTouchHelper(new SimpleItemTouchHelperCallback(adapter))
                 .attachToRecyclerView(recyclerView);
 
+        calendarView = (CalendarView) view.findViewById(R.id.fragment_daily_calendar_view);
+        calendarView.setOnDateChangeListener(new DateChangeListener());
+
         return view;
+    }
+
+    class DateChangeListener implements CalendarView.OnDateChangeListener{
+
+        @Override
+        public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+            // TODO: 2016/2/17
+        }
     }
 
     @Override
