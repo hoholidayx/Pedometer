@@ -42,10 +42,10 @@ public class CoreService extends Service implements SensorEventListener {
 
     private ScheduledExecutorService stepCalcScheduleService;
     private static final int RECORD_TASK_INTERVAL = 30;//min
-    private static final int RECORD_TASK_WAIT_TIME = 1000;//ms
+    private static final int RECORD_TASK_WAIT_TIME = 2000;//ms
 
     //计步工作开始和结束的时间
-    private long startTime,endTime;
+    private long startTime, endTime;
 
     public CoreService() {
         binder = new CoreBinder();
@@ -235,7 +235,7 @@ public class CoreService extends Service implements SensorEventListener {
         if (isWorking()) {
             stopStepCount();
             flag = getMode().equals(Mode.NORMAL);
-        }else{
+        } else {
             flag = false;
         }
         StepManager.getInstance().resetData();
@@ -245,9 +245,8 @@ public class CoreService extends Service implements SensorEventListener {
             @Override
             public void run() {
                 try {
-                    synchronized (StepDataStorage.class){
-//                        wait(RECORD_TASK_WAIT_TIME);
-                        sleep(RECORD_TASK_WAIT_TIME);
+                    synchronized ( StepDataStorage.getInstance()){
+                        StepDataStorage.getInstance().wait(RECORD_TASK_WAIT_TIME);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -273,7 +272,7 @@ public class CoreService extends Service implements SensorEventListener {
                     }
                     //恢复工作现场
                     StepManager.getInstance().setBroadcastEnable(true);
-                    if(flag){
+                    if (flag) {
                         startStepCount(Mode.NORMAL);
                     }
                 }
@@ -291,7 +290,7 @@ public class CoreService extends Service implements SensorEventListener {
         return Working;
     }
 
-    private void toggleWorkingState(boolean working){
+    private void toggleWorkingState(boolean working) {
         this.Working = working;
     }
 
