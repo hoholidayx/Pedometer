@@ -44,10 +44,10 @@ public class CoreService extends Service implements SensorEventListener {
 
     private ScheduledExecutorService normalStepCountService;
     //进行数据记录的时间间隔
-    private static final int RECORD_TASK_INTERVAL = 15;//min
+    private static final int RECORD_TASK_INTERVAL = 1;//min
     private static final int RECORD_TASK_WAIT_TIME = 2000;//ms
     //进行数据计算的时间间隔
-    private static final int COUNT_STEP_TASK_INTERVAL = 30;//min
+    private static final int COUNT_STEP_TASK_INTERVAL = 2;//min
     private int recordTempCount = 0;
 
     public CoreService() {
@@ -156,6 +156,7 @@ public class CoreService extends Service implements SensorEventListener {
     }
 
     private void startNormalMode() {
+        StepManager.getInstance().setStartTime(Calendar.getInstance().getTimeInMillis());
         //开启定时任务
         normalStepCountService = Executors.newScheduledThreadPool(2);
         normalStepCountService.scheduleAtFixedRate(new RecordStepDataTask()
@@ -166,7 +167,7 @@ public class CoreService extends Service implements SensorEventListener {
 
     private void stopNormalMode() {
         //关闭定时任务
-        normalStepCountService.shutdownNow();
+        normalStepCountService.shutdown();
         StepDataStorage.getInstance().endRecord();
         recordTempCount = 0;
     }
@@ -186,10 +187,15 @@ public class CoreService extends Service implements SensorEventListener {
                     COUNT_STEP_TASK_INTERVAL) {
                 countStepFromFiles();
                 recordTempCount = 0;
+            }else{
+                //开启新的记录
+                StepDataStorage.getInstance().startNewRecord();
+                StepDataStorage.getInstance().clearBuffer();
+                StepDataStorage.getInstance().saveData(
+                        StepManager.getInstance().getStartTime() + AppConstants.Separator
+                );
+                recordTempCount++;
             }
-            //开启新的记录
-            StepDataStorage.getInstance().startNewRecord();
-            recordTempCount++;
         }
     }
 
@@ -202,9 +208,6 @@ public class CoreService extends Service implements SensorEventListener {
     public void startStepCount(Mode mode) {
         if (!isWorking()) {
             this.mode = mode;
-
-            sensorManager.registerListener(this, sensor,
-                    (int) (1.0 / StepConfig.getInstance().getSamplingRate()) * 1000 * 1000);//微秒
             toggleWorkingState(true);
 
             switch (mode) {
@@ -217,6 +220,9 @@ public class CoreService extends Service implements SensorEventListener {
                     break;
                 }
             }
+            //等待模式初始化后才读入加速度数据
+            sensorManager.registerListener(this, sensor,
+                    (int) (1.0 / StepConfig.getInstance().getSamplingRate()) * 1000 * 1000);//微秒
         }
 
     }
@@ -228,7 +234,6 @@ public class CoreService extends Service implements SensorEventListener {
         if (Working) {
             toggleWorkingState(false);
 
-            StepManager.getInstance().resetData();
             sensorManager.unregisterListener(this);
 
             switch (mode) {
@@ -241,6 +246,8 @@ public class CoreService extends Service implements SensorEventListener {
                     break;
                 }
             }
+
+            StepManager.getInstance().resetData();
         }
     }
 
@@ -281,7 +288,7 @@ public class CoreService extends Service implements SensorEventListener {
                         for (String filename : filenames) {
                             //读取数据文件的起始记录时间
                             startTime = StepDataStorage.getInstance().getDataStartTime(filename);
-                            if(startTime==0){
+                            if (startTime == 0) {
                                 continue;
                             }
                             StepManager.getInstance().setStartTime(startTime);
@@ -294,7 +301,7 @@ public class CoreService extends Service implements SensorEventListener {
                             //如该时间段计步数不为0才进行数据库记录
                             if (stepCount != 0) {
                                 DailyDataManager.getInstance().saveData(
-                                        FileUtils.getFileLastModified(getApplicationContext(),filename),
+                                        FileUtils.getFileLastModified(getApplicationContext(), filename),
                                         startTime,
                                         endTime,
                                         stepCount
@@ -331,30 +338,30 @@ public class CoreService extends Service implements SensorEventListener {
         return mode;
     }
 
-private class ScreenReceiver extends BroadcastReceiver {
+    private class ScreenReceiver extends BroadcastReceiver {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        switch (intent.getAction()) {
-            case Intent.ACTION_SCREEN_ON:
-                //解除唤醒
-                if (wakeLock.isHeld()) {
-                    wakeLock.release();
-                }
-                break;
-            case Intent.ACTION_SCREEN_OFF:
-                //唤醒cpu
-                if (isWorking()) {
-                    wakeLock.acquire();
-                }
-                break;
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case Intent.ACTION_SCREEN_ON:
+                    //解除唤醒
+                    if (wakeLock.isHeld()) {
+                        wakeLock.release();
+                    }
+                    break;
+                case Intent.ACTION_SCREEN_OFF:
+                    //唤醒cpu
+                    if (isWorking()) {
+                        wakeLock.acquire();
+                    }
+                    break;
+            }
         }
     }
-}
 
-public class CoreBinder extends Binder {
-    public CoreService getService() {
-        return CoreService.this;
+    public class CoreBinder extends Binder {
+        public CoreService getService() {
+            return CoreService.this;
+        }
     }
-}
 }

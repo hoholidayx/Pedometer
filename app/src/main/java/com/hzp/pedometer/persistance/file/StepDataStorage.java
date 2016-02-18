@@ -105,6 +105,10 @@ public class StepDataStorage {
         }
     }
 
+    public void clearBuffer(){
+        dataList.clear();
+    }
+
     private void closeStream() {
         try {
             fileOutputStream.close();
