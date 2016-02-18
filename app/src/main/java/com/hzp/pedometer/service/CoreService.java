@@ -79,7 +79,7 @@ public class CoreService extends Service implements SensorEventListener {
         if (wakeLock.isHeld()) {
             wakeLock.release();
         }
-
+        DailyDataManager.getInstance().closeDatabase();
     }
 
     /**
