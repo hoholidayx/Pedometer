@@ -24,6 +24,7 @@ public class DailyFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private CalendarView calendarView;
+    private DailyListAdapter adapter;
 
     public DailyFragment() {
     }
@@ -49,7 +50,7 @@ public class DailyFragment extends Fragment {
 
         recyclerView = (RecyclerView) view.findViewById(R.id.fragment_daily_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        DailyListAdapter adapter = new DailyListAdapter(getActivity(), new ArrayList<DailyData>());
+        adapter = new DailyListAdapter(getActivity(), new ArrayList<DailyData>());
         recyclerView.setAdapter(adapter);
 
         new ItemTouchHelper(new SimpleItemTouchHelperCallback(adapter))

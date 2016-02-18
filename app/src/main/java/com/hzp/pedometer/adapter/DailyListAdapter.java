@@ -5,12 +5,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.entity.DailyData;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author 何志鹏 on 2016/2/16.
@@ -22,15 +25,18 @@ public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.Dail
     private List<DailyData> dataList;
     private Context context;
 
+    private SimpleDateFormat dateFormat;
+
     public DailyListAdapter(Context context,List<DailyData> dataList) {
         this.context = context;
         this.dataList = dataList;
+        dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
     }
 
     @Override
     public DailyDataHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
-                .inflate(R.layout.list_item_setting_kind
+                .inflate(R.layout.list_item_daily_data
                         , parent
                         , false);
         return new DailyDataHolder(view);
@@ -38,6 +44,9 @@ public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.Dail
 
     @Override
     public void onBindViewHolder(DailyDataHolder holder, final int position) {
+        DailyData data = dataList.get(position);
+        holder.time.setText(dateFormat.format(data.getModifyTime()));
+        holder.stepCount.setText(String.valueOf(data.getStepCount()));
     }
 
     @Override
@@ -64,8 +73,12 @@ public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.Dail
 
     class DailyDataHolder extends RecyclerView.ViewHolder {
 
+        private TextView time,stepCount;
+
         public DailyDataHolder(View itemView) {
             super(itemView);
+            time = (TextView) itemView.findViewById(R.id.list_item_time);
+            stepCount = (TextView) itemView.findViewById(R.id.list_item_step_count);
         }
     }
 }
