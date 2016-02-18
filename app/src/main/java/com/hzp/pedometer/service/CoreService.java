@@ -57,8 +57,16 @@ public class CoreService extends Service implements SensorEventListener {
         super.onCreate();
         wakeLock = ServiceUtil.getWakeLock(this);
 
+        initManagers();
         registerScreenReceiver();
         initSensors();
+    }
+
+    private void initManagers(){
+        StepDataStorage.getInstance().init(getApplicationContext());
+        StepConfig.getInstance().init(getApplicationContext());
+        StepManager.getInstance().init(getApplicationContext());
+        DailyDataManager.getInstance().init(getApplicationContext());
     }
 
     @Override
