@@ -41,9 +41,12 @@ public class CoreService extends Service implements SensorEventListener {
     private Mode mode = Mode.NORMAL;//当前的计步模式
     private boolean Working = false;//运行标识
 
-    private ScheduledExecutorService stepCalcScheduleService;
-    private static final int RECORD_TASK_INTERVAL = 30;//min
+    private ScheduledExecutorService normalStepCountService;
+    //进行数据记录的时间间隔
+    private static final int RECORD_TASK_INTERVAL = 15;//min
     private static final int RECORD_TASK_WAIT_TIME = 2000;//ms
+    //进行数据计算的时间间隔
+    private static final int COUNT_STEP_TASK_INTERVAL = 1;//hour
 
     //计步工作开始和结束的时间
     private long startTime, endTime;
@@ -158,31 +161,35 @@ public class CoreService extends Service implements SensorEventListener {
     private void startNormalMode() {
         StepDataStorage.getInstance().startNewRecord();
         //开启定时任务
-        stepCalcScheduleService = Executors.newScheduledThreadPool(1);
-        stepCalcScheduleService.scheduleAtFixedRate(new NormalStepCountTask()
+        normalStepCountService = Executors.newScheduledThreadPool(2);
+        normalStepCountService.scheduleAtFixedRate(new RecordStepDataTask()
                 , RECORD_TASK_INTERVAL
                 , RECORD_TASK_INTERVAL
                 , TimeUnit.MINUTES);
+        normalStepCountService.scheduleAtFixedRate(new CountStepDataTask()
+                ,COUNT_STEP_TASK_INTERVAL
+                ,COUNT_STEP_TASK_INTERVAL
+                ,TimeUnit.HOURS);
     }
 
     private void stopNormalMode() {
         //关闭定时任务
-        stepCalcScheduleService.shutdownNow();
+        normalStepCountService.shutdownNow();
         StepDataStorage.getInstance().endRecord();
     }
 
-    class NormalStepCountTask implements Runnable {
-
+    class RecordStepDataTask implements Runnable {
         @Override
         public void run() {
-            //获取所有未进行计算的计步数据文件
-//            String[] filenames = stepDataStorage.getDataFileNames();
             //开启新的记录
             StepDataStorage.getInstance().startNewRecord();
-//            //输入数据进行计步计算
-//            StepManager.getInstance().inputPoints(filenames);
-//            //删除旧的数据
-//            stepDataStorage.deleteFile(filenames);
+        }
+    }
+
+    class CountStepDataTask implements Runnable{
+        @Override
+        public void run() {
+            countStepFromFiles(null);
         }
     }
 
@@ -275,12 +282,15 @@ public class CoreService extends Service implements SensorEventListener {
                             }
                         }
                         StepDataStorage.getInstance().deleteFile(filenames);
-                        DailyDataManager.getInstance().saveData(
-                                Calendar.getInstance().getTimeInMillis(),
-                                startTime,
-                                endTime,
-                                stepCount
-                        );
+                        //如该时间段计步数不为0才进行数据库记录
+                        if(stepCount!=0){
+                            DailyDataManager.getInstance().saveData(
+                                    Calendar.getInstance().getTimeInMillis(),
+                                    startTime,
+                                    endTime,
+                                    stepCount
+                            );
+                        }
                     }
                     //恢复工作现场
                     StepManager.getInstance().setBroadcastEnable(true);
