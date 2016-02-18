@@ -44,10 +44,10 @@ public class CoreService extends Service implements SensorEventListener {
 
     private ScheduledExecutorService normalStepCountService;
     //进行数据记录的时间间隔
-    private static final int RECORD_TASK_INTERVAL = 1;//min
+    private static final int RECORD_TASK_INTERVAL = 10;//min
     private static final int RECORD_TASK_WAIT_TIME = 2000;//ms
     //进行数据计算的时间间隔
-    private static final int COUNT_STEP_TASK_INTERVAL = 2;//min
+    private static final int COUNT_STEP_TASK_INTERVAL = 30;//min
     private int recordTempCount = 0;
 
     public CoreService() {
