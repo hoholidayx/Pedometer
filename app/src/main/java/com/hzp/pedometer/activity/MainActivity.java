@@ -49,9 +49,6 @@ public class MainActivity extends BindingActivity {
     @Override
     protected void onServiceBind() {
         super.onServiceBind();
-        if(homePageFragment!=null){
-            homePageFragment.updateProgresses(getService());
-        }
     }
 
     @Override

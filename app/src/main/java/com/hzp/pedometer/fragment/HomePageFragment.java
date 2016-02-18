@@ -55,21 +55,4 @@ public class HomePageFragment extends LazyFragment {
     protected void lazyLoad() {
     }
 
-    public void updateProgresses(CoreService service){
-        if(service!=null){
-            //加载步数相关数据
-            progressStep.setMax(service.countStepFromFiles(new CoreService.CountStepFromFilesListener() {
-                @Override
-                public void onStepCount(final int stepCount) {
-                    progressStep.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressStep.setProgress(progressStep.getProgress()+1);
-                            progressStep.setContent(String.valueOf(stepCount));
-                        }
-                    });
-                }
-            }));
-        }
-    }
 }
