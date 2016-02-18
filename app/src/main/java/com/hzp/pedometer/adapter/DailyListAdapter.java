@@ -71,6 +71,11 @@ public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.Dail
         notifyItemInserted(position);
     }
 
+    public void clearItems(){
+        dataList.clear();
+        notifyDataSetChanged();
+    }
+
     class DailyDataHolder extends RecyclerView.ViewHolder {
 
         private TextView time,stepCount;

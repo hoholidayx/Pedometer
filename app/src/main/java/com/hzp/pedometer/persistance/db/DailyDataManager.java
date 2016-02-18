@@ -48,7 +48,8 @@ public class DailyDataManager {
     }
 
     public enum SortOrder {
-        MODIFY_TIME_DESC(DailyDataTable.DailyDataEntry.COLUMNS_NAME_MODIFY_TIME + " DESC");
+        MODIFY_TIME_DESC(DailyDataTable.DailyDataEntry.COLUMNS_NAME_MODIFY_TIME + " DESC"),
+        MODIFY_TIME_ASC(DailyDataTable.DailyDataEntry.COLUMNS_NAME_MODIFY_TIME + " ASC");
 
         private String value;
 
@@ -87,7 +88,7 @@ public class DailyDataManager {
         ca.set(Calendar.MINUTE,59);
 
         end = ca.getTimeInMillis();
-        return getDataList(start,end,SortOrder.MODIFY_TIME_DESC);
+        return getDataList(start,end,SortOrder.MODIFY_TIME_ASC);
     }
 
     public DailyData[] getDataList(long startTime, long endTime, SortOrder order) {
@@ -100,7 +101,7 @@ public class DailyDataManager {
 
         String selection =
                 DailyDataTable.DailyDataEntry.COLUMNS_NAME_START_TIME +
-                        " >= ?  and" +
+                        " >= ?  and " +
                         DailyDataTable.DailyDataEntry.COLUMNS_NAME_END_TIME +
                         "<= ?";
         String[] selectionArgs = {
@@ -150,7 +151,7 @@ public class DailyDataManager {
                                     DailyDataTable.DailyDataEntry.COLUMNS_NAME_STEP_COUNT)));
 
             list[i] = dailyData;
-
+            i++;
         } while (cursor.moveToNext());
 
         return list;

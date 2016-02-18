@@ -15,6 +15,7 @@ import com.hzp.pedometer.R;
 import com.hzp.pedometer.adapter.DailyListAdapter;
 import com.hzp.pedometer.adapter.SimpleItemTouchHelperCallback;
 import com.hzp.pedometer.entity.DailyData;
+import com.hzp.pedometer.persistance.db.DailyDataManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,7 +67,13 @@ public class DailyFragment extends Fragment {
 
         @Override
         public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-            // TODO: 2016/2/17
+            DailyData[] dataList = DailyDataManager.getInstance().getDataListByDay(year,month,dayOfMonth);
+            adapter.clearItems();
+            if(dataList!=null){
+                for(DailyData data:dataList){
+                    adapter.addItem(data,0);
+                }
+            }
         }
     }
 
