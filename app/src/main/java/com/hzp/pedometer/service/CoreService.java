@@ -18,6 +18,7 @@ import com.hzp.pedometer.utils.AppConstants;
 import com.hzp.pedometer.persistance.file.StepDataStorage;
 import com.hzp.pedometer.persistance.sp.StepConfig;
 import com.hzp.pedometer.service.step.StepManager;
+import com.hzp.pedometer.utils.FileUtils;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -46,10 +47,8 @@ public class CoreService extends Service implements SensorEventListener {
     private static final int RECORD_TASK_INTERVAL = 15;//min
     private static final int RECORD_TASK_WAIT_TIME = 2000;//ms
     //进行数据计算的时间间隔
-    private static final int COUNT_STEP_TASK_INTERVAL = 1;//hour
-
-    //计步工作开始和结束的时间
-    private long startTime, endTime;
+    private static final int COUNT_STEP_TASK_INTERVAL = 30;//min
+    private int recordTempCount = 0;
 
     public CoreService() {
         binder = new CoreBinder();
@@ -65,7 +64,7 @@ public class CoreService extends Service implements SensorEventListener {
         initSensors();
     }
 
-    private void initManagers(){
+    private void initManagers() {
         StepDataStorage.getInstance().init(getApplicationContext());
         StepConfig.getInstance().init(getApplicationContext());
         StepManager.getInstance().init(getApplicationContext());
@@ -118,15 +117,15 @@ public class CoreService extends Service implements SensorEventListener {
                         Math.pow(event.values[2], 2));
 
         BigDecimal bd = new BigDecimal(a);
-        bd = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
+        bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
 
         switch (mode) {
             case NORMAL: {
-                processNormalMode(bd.doubleValue(), System.currentTimeMillis());
+                processNormalMode(bd.doubleValue());
                 break;
             }
             case REAL_TIME: {
-                processRealTimeMode(bd.doubleValue(), System.currentTimeMillis());
+                processRealTimeMode(bd.doubleValue());
                 break;
             }
         }
@@ -142,54 +141,55 @@ public class CoreService extends Service implements SensorEventListener {
      * 处理实时计步模式数据
      *
      * @param a 加速度
-     * @param n 时间
      */
-    private void processRealTimeMode(double a, long n) {
-        StepManager.getInstance().inputPoint(a, n);
+    private void processRealTimeMode(double a) {
+        StepManager.getInstance().inputPoint(a);
     }
 
     /**
      * 处理正常计步模式数据
      *
      * @param a 加速度
-     * @param n 时间
      */
-    private void processNormalMode(double a, long n) {
-        StepDataStorage.getInstance().saveData(a + " " + n + AppConstants.Separator);
+    private void processNormalMode(double a) {
+        StepDataStorage.getInstance().saveData(a + AppConstants.Separator);
     }
 
     private void startNormalMode() {
-        StepDataStorage.getInstance().startNewRecord();
         //开启定时任务
         normalStepCountService = Executors.newScheduledThreadPool(2);
         normalStepCountService.scheduleAtFixedRate(new RecordStepDataTask()
-                , RECORD_TASK_INTERVAL
+                , 0
                 , RECORD_TASK_INTERVAL
                 , TimeUnit.MINUTES);
-        normalStepCountService.scheduleAtFixedRate(new CountStepDataTask()
-                ,COUNT_STEP_TASK_INTERVAL
-                ,COUNT_STEP_TASK_INTERVAL
-                ,TimeUnit.HOURS);
     }
 
     private void stopNormalMode() {
         //关闭定时任务
         normalStepCountService.shutdownNow();
         StepDataStorage.getInstance().endRecord();
+        recordTempCount = 0;
+    }
+
+    private void startRealTimeMode() {
+        StepManager.getInstance().setStartTime(Calendar.getInstance().getTimeInMillis());
+    }
+
+    private void stopRealTimeMode() {
+
     }
 
     class RecordStepDataTask implements Runnable {
         @Override
         public void run() {
+            if (recordTempCount * RECORD_TASK_INTERVAL >=
+                    COUNT_STEP_TASK_INTERVAL) {
+                countStepFromFiles();
+                recordTempCount = 0;
+            }
             //开启新的记录
             StepDataStorage.getInstance().startNewRecord();
-        }
-    }
-
-    class CountStepDataTask implements Runnable{
-        @Override
-        public void run() {
-            countStepFromFiles(null);
+            recordTempCount++;
         }
     }
 
@@ -202,7 +202,6 @@ public class CoreService extends Service implements SensorEventListener {
     public void startStepCount(Mode mode) {
         if (!isWorking()) {
             this.mode = mode;
-            startTime = Calendar.getInstance().getTimeInMillis();
 
             sensorManager.registerListener(this, sensor,
                     (int) (1.0 / StepConfig.getInstance().getSamplingRate()) * 1000 * 1000);//微秒
@@ -214,6 +213,7 @@ public class CoreService extends Service implements SensorEventListener {
                     break;
                 }
                 case REAL_TIME: {
+                    startRealTimeMode();
                     break;
                 }
             }
@@ -227,7 +227,6 @@ public class CoreService extends Service implements SensorEventListener {
     public void stopStepCount() {
         if (Working) {
             toggleWorkingState(false);
-            endTime = Calendar.getInstance().getTimeInMillis();
 
             StepManager.getInstance().resetData();
             sensorManager.unregisterListener(this);
@@ -238,6 +237,7 @@ public class CoreService extends Service implements SensorEventListener {
                     break;
                 }
                 case REAL_TIME: {
+                    stopRealTimeMode();
                     break;
                 }
             }
@@ -249,7 +249,8 @@ public class CoreService extends Service implements SensorEventListener {
      *
      * @return 文件的总数
      */
-    public int countStepFromFiles(final CountStepFromFilesListener listener) {
+    public int countStepFromFiles() {
+        //保存现场
         final boolean flag;
         if (isWorking()) {
             stopStepCount();
@@ -264,33 +265,43 @@ public class CoreService extends Service implements SensorEventListener {
             @Override
             public void run() {
                 try {
-                    synchronized ( StepDataStorage.getInstance()){
+                    synchronized (StepDataStorage.getInstance()) {
                         StepDataStorage.getInstance().wait(RECORD_TASK_WAIT_TIME);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    int stepCount = 0;
+                    int stepCount;
+                    long startTime, endTime;
 
                     if (filenames.length != 0) {
+
                         StepManager.getInstance().setBroadcastEnable(false);
+
                         for (String filename : filenames) {
-                            StepManager.getInstance().inputPoint(filename);
+                            //读取数据文件的起始记录时间
+                            startTime = StepDataStorage.getInstance().getDataStartTime(filename);
+                            if(startTime==0){
+                                continue;
+                            }
+                            StepManager.getInstance().setStartTime(startTime);
+
+                            StepManager.getInstance().inputPointSync(filename);
+
                             stepCount = StepManager.getInstance().getStepCount();
-                            if (listener != null) {
-                                listener.onStepCount(stepCount);
+                            endTime = StepManager.getInstance().getEndTime();
+
+                            //如该时间段计步数不为0才进行数据库记录
+                            if (stepCount != 0) {
+                                DailyDataManager.getInstance().saveData(
+                                        FileUtils.getFileLastModified(getApplicationContext(),filename),
+                                        startTime,
+                                        endTime,
+                                        stepCount
+                                );
                             }
                         }
                         StepDataStorage.getInstance().deleteFile(filenames);
-                        //如该时间段计步数不为0才进行数据库记录
-                        if(stepCount!=0){
-                            DailyDataManager.getInstance().saveData(
-                                    Calendar.getInstance().getTimeInMillis(),
-                                    startTime,
-                                    endTime,
-                                    stepCount
-                            );
-                        }
                     }
                     //恢复工作现场
                     StepManager.getInstance().setBroadcastEnable(true);
@@ -302,10 +313,6 @@ public class CoreService extends Service implements SensorEventListener {
         }.start();
 
         return filenames.length;
-    }
-
-    public interface CountStepFromFilesListener {
-        void onStepCount(int stepCount);
     }
 
     public boolean isWorking() {
@@ -324,30 +331,30 @@ public class CoreService extends Service implements SensorEventListener {
         return mode;
     }
 
-    private class ScreenReceiver extends BroadcastReceiver {
+private class ScreenReceiver extends BroadcastReceiver {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-                case Intent.ACTION_SCREEN_ON:
-                    //解除唤醒
-                    if (wakeLock.isHeld()) {
-                        wakeLock.release();
-                    }
-                    break;
-                case Intent.ACTION_SCREEN_OFF:
-                    //唤醒cpu
-                    if (isWorking()) {
-                        wakeLock.acquire();
-                    }
-                    break;
-            }
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        switch (intent.getAction()) {
+            case Intent.ACTION_SCREEN_ON:
+                //解除唤醒
+                if (wakeLock.isHeld()) {
+                    wakeLock.release();
+                }
+                break;
+            case Intent.ACTION_SCREEN_OFF:
+                //唤醒cpu
+                if (isWorking()) {
+                    wakeLock.acquire();
+                }
+                break;
         }
     }
+}
 
-    public class CoreBinder extends Binder {
-        public CoreService getService() {
-            return CoreService.this;
-        }
+public class CoreBinder extends Binder {
+    public CoreService getService() {
+        return CoreService.this;
     }
+}
 }

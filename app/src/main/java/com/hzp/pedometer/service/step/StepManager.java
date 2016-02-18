@@ -2,23 +2,16 @@ package com.hzp.pedometer.service.step;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfig;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -44,13 +37,16 @@ public class StepManager implements StepDetector.OnStepCountListener {
     private ExecutorService executorService;
 
     private List<Double> accelerationList;
-    private List<Long> timeList;
 
     private boolean broadcastEnable = true;//是否开启步数广播
 
     private int stepPerMin;//步数每分钟
     private int lastStep;//上一次记录的步数
     private int calcRate;//每分钟步数计算间隔 ms
+
+    private long startTime;//管理器计步的开始时间 ms
+    private long endTime;//计算结束的时间
+    private long samplingInterval;//采样点的时间间隔 ms
 
     //载入native库
     static {
@@ -79,6 +75,8 @@ public class StepManager implements StepDetector.OnStepCountListener {
         lastStep = 0;
         calcRate = (int) ((1000.0 / StepConfig.getInstance().getSamplingRate()) * windowSize);
 
+        samplingInterval = (long) (1000.0 / StepConfig.getInstance().getSamplingRate());
+
         executorService = Executors.newSingleThreadExecutor();
         stepDetector = new StepDetector();
         stepDetector.setStepCountListener(this);
@@ -91,63 +89,77 @@ public class StepManager implements StepDetector.OnStepCountListener {
             accelerationList = Collections.synchronizedList(
                     new LinkedList<Double>());
         }
-        if (timeList == null) {
-            timeList = Collections.synchronizedList(
-                    new LinkedList<Long>());
-        }
+
         stepPerMin = 0;
         lastStep = 0;
 
+        startTime = endTime = 0;
+
         accelerationList.clear();
-        timeList.clear();
         stepDetector.reset();
-        //TODO 线程池关闭后不能再打开？
-//        executorService.shutdown();
+
+        windowSize = StepConfig.getInstance().getFilterWindowSize();
+        calcRate = (int) ((1000.0 / StepConfig.getInstance().getSamplingRate()) * windowSize);
+
+        samplingInterval = (long) (1000.0 / StepConfig.getInstance().getSamplingRate());
+    }
+
+    /**
+     * 开始输入数据
+     * 在inputPoint函数之前调用
+     * 否则无法计算
+     * @param startTime 开始时间 ms
+     */
+    public void setStartTime(long startTime){
+        this.startTime = startTime;
+        endTime = startTime;
+    }
+
+    public long getEndTime() {
+        return endTime;
     }
 
     /**
      * 读入加速度和时间点数据
      *
      * @param a    加速度
-     * @param time 时间戳
      */
-    public void inputPoint(double a, long time) {
+    public void inputPoint(double a) {
         accelerationList.add(a);
-        timeList.add(time);
         if (accelerationList.size() >= windowSize) {
             processData();
         }
     }
 
-    public void inputPoints(List<Double> aList, List<Long> timeList) {
+    public void inputPoints(List<Double> aList) {
         for (int i = 0; i < aList.size(); i++) {
-            inputPoint(aList.get(i), timeList.get(i));
+            inputPoint(aList.get(i));
         }
     }
 
-    public void inputPoint(String filename) {
+    /**
+     * 同步计算数据
+     * @param filename 计步数据文件名
+     */
+    public void inputPointSync(String filename) {
         try {
             BufferedReader reader = new BufferedReader(
                     new FileReader(
                             context.getFilesDir().getPath() + File.separator + filename));
             if (reader.ready()) {
                 String temp;
-                String[] data;
+                reader.readLine();//跳过第一行的时间记录
                 while ((temp = reader.readLine()) != null) {
-                    data = temp.split(" ");
-                    inputPoint(Double.valueOf(data[0]), Long.valueOf(data[1]));
+                    accelerationList.add(Double.valueOf(temp));
+                    if (accelerationList.size() >= windowSize) {
+                        processDataSync();
+                    }
                 }
             }
-
+            reader.close();
         } catch (IOException e) {
             // TODO: 2016/2/4 无法读入文件处理
             e.printStackTrace();
-        }
-    }
-
-    public void inputPoints(String[] filenames) {
-        for (String filename : filenames) {
-            inputPoint(filename);
         }
     }
 
@@ -157,6 +169,11 @@ public class StepManager implements StepDetector.OnStepCountListener {
     private void processData() {
         calcStepPerMin();
         executorService.submit(new ProcessThread());
+    }
+
+    private void processDataSync(){
+        calcStepPerMin();
+        coreCalculateWork();
     }
 
     /**
@@ -201,6 +218,10 @@ public class StepManager implements StepDetector.OnStepCountListener {
         return stepPerMin;
     }
 
+    public long getStartTime() {
+        return startTime;
+    }
+
     /**
      * 开关步数广播
      */
@@ -209,33 +230,35 @@ public class StepManager implements StepDetector.OnStepCountListener {
     }
 
     class ProcessThread implements Runnable {
-        private double[] data;
-        private long[] time;
 
         @Override
         public void run() {
-            //复制window size个数据来进行计算
-            data = new double[windowSize];
-            time = new long[windowSize];
-            for (int i = 0; i < windowSize; i++) {
-                data[i] = accelerationList.remove(0);
-                time[i] = timeList.remove(0);
-            }
-
-            //预处理和小波变换
-            double[] result =
-                    Wavelet.waveletFilter(
-                            Wavelet.medianFilter(data, windowSize)
-                            , windowSize);
-
-            //计步计算
-            for (int i = 0; i < windowSize; i++) {
-                stepDetector.stepDetection(result[i], time[i]);
-            }
+            coreCalculateWork();
             //发送计步结果广播
             sendStepBroadcast();
         }
     }
 
+    private void coreCalculateWork(){
+        double[] data;
+        //复制window size个数据来进行计算
+        data = new double[windowSize];
+
+        for (int i = 0; i < windowSize; i++) {
+            data[i] = accelerationList.remove(0);
+        }
+
+        //预处理和小波变换
+        double[] result =
+                Wavelet.waveletFilter(
+                        Wavelet.medianFilter(data, windowSize)
+                        , windowSize);
+
+        //计步计算
+        for (int i = 0; i < windowSize; i++) {
+            stepDetector.stepDetection(result[i], endTime);
+            endTime += samplingInterval;
+        }
+    }
 
 }

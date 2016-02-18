@@ -4,9 +4,11 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -112,6 +114,22 @@ public class StepDataStorage {
         } finally {
             fileOutputStream = null;
         }
+    }
+
+    public long getDataStartTime(String stepDataName){
+        long result = 0;
+        try {
+            BufferedReader reader = new BufferedReader(
+                    new FileReader(
+                            context.getFilesDir().getPath() + File.separator + stepDataName));
+            if(reader.ready()){
+                result = Long.valueOf(reader.readLine());
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     class WriterTask implements Runnable {
