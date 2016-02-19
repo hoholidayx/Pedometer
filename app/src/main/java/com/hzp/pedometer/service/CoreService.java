@@ -221,7 +221,7 @@ public class CoreService extends Service implements SensorEventListener {
             }
             //等待模式初始化后才读入加速度数据
             sensorManager.registerListener(this, sensor,
-                    (int) (1.0 / StepConfig.getInstance().getSamplingRate()) * 1000 * 1000);//微秒
+                    (int) ((1.0 / StepConfig.getInstance().getSamplingRate()) * 1000 * 1000));//微秒
         }
 
     }
