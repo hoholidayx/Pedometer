@@ -13,7 +13,7 @@ import math.utils.BaseMath;
 /**
  * @author 何志鹏 on 2016/1/17.
  * @email hoholiday@hotmail.com
- * <p>
+ * <p/>
  * 计步算法模块
  */
 public class StepDetector {
@@ -79,15 +79,15 @@ public class StepDetector {
         S = WaveState.INIT;
 
         anm1 = an = 0;
-        ap = av = StepConfig.DEFAULT_GRAVITY;
+        ap = av = 0;
         ThAp = ThAv = 0;
 
         n = 0;
-        np = nv =0;
+        np = nv = 0;
 
         Thp = Thv = 0;
 
-        mjuA = StepConfig.DEFAULT_GRAVITY;
+        mjuA = 0;
         sigmaA = 0;
         mjuP = mjuV = 0;
         sigmaP = sigmaV = 0;
@@ -114,7 +114,7 @@ public class StepDetector {
 
         //初始进行计算的三个加速度
         for (int i = 0; i < 3; i++) {
-            aList.add(StepConfig.DEFAULT_GRAVITY);
+            aList.add(0.0);
         }
     }
 
@@ -163,10 +163,10 @@ public class StepDetector {
             peakList.remove(0);
 
         double interval = n - np;
-        if(interval > StepConfig.DEFAULT_STEP_INTERVAL_MAX){
+        if (interval > StepConfig.DEFAULT_STEP_INTERVAL_MAX) {
             interval = StepConfig.DEFAULT_STEP_INTERVAL_MAX;
         }
-        if(interval < StepConfig.DEFAULT_STEP_INTERVAL_MIN){
+        if (interval < StepConfig.DEFAULT_STEP_INTERVAL_MIN) {
             interval = StepConfig.DEFAULT_STEP_INTERVAL_MIN;
         }
         peakList.add(interval);
@@ -175,7 +175,7 @@ public class StepDetector {
         sigmaP = BaseMath.stdev(peakList, mjuP);
 
 
-        Thp =Math.abs(mjuP + sigmaP / BETA);
+        Thp = Math.abs(mjuP + sigmaP / BETA);
     }
 
     private void updateMjvVandSigmaV() {
@@ -184,10 +184,10 @@ public class StepDetector {
             valleyList.remove(0);
 
         double interval = n - nv;
-        if(interval > StepConfig.DEFAULT_STEP_INTERVAL_MAX){
+        if (interval > StepConfig.DEFAULT_STEP_INTERVAL_MAX) {
             interval = StepConfig.DEFAULT_STEP_INTERVAL_MAX;
         }
-        if(interval < StepConfig.DEFAULT_STEP_INTERVAL_MIN){
+        if (interval < StepConfig.DEFAULT_STEP_INTERVAL_MIN) {
             interval = StepConfig.DEFAULT_STEP_INTERVAL_MIN;
         }
         valleyList.add(interval);
@@ -195,7 +195,7 @@ public class StepDetector {
         mjuV = BaseMath.avg(valleyList);
         sigmaV = BaseMath.stdev(valleyList, mjuV);
 
-        Thv =Math.abs(mjuV + sigmaV / BETA);
+        Thv = Math.abs(mjuV + sigmaV / BETA);
     }
 
     private void updateSigmaA(double anp1) {
@@ -204,11 +204,11 @@ public class StepDetector {
         aList.add(anp1);
         sigmaA = BaseMath.stdev(aList);
 
-        // TODO: 2016/1/17  测试固定上下限
-        if (sigmaA < 0.3f) {
-            sigmaA = 0.3 * ALPHA;
-        } else if (sigmaA > 5.0) {
-            sigmaA = 5.0 * ALPHA;
+        // TODO: 2016/2/19 固定上下限阈值测试
+        if (sigmaA < 0.5) {
+            sigmaA = 0.5 * ALPHA;
+        } else if (sigmaA > 2) {
+            sigmaA = 2 * ALPHA;
         }
     }
 
