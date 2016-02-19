@@ -27,7 +27,7 @@ public class StepConfig extends BaseSp{
     public static final int DEFAULT_STEP_INTERVAL_MAX = 2000;//ms
     public static final int DEFAULT_STEP_INTERVAL_MIN = 0;//ms
     public static final int DEFAULT_FILTER_WINDOW_SIZE = 200;//过滤模块默认窗口大小
-    public static final double DEFAULT_SAMPLING_RATE = 100;//默认采样率Hz
+    public static final double DEFAULT_SAMPLING_RATE = 50;//默认采样率Hz
     //默认重力加速度
     public static final double DEFAULT_GRAVITY = 9.8;
 
