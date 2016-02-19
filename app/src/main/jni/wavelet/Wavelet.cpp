@@ -81,7 +81,7 @@ void Wavelet::doIDWT(){
 	int i = 0;
 	int tmpDataLength = 0, tmp = 0;
 
-	double low = 1.0, high = 0.0;
+	double low = 1.0, high = 0.5;
 
 	//前两层权值为0
 	for (int k = 1; k <= 2; k++){
