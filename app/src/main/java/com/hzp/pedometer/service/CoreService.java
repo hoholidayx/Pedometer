@@ -155,7 +155,6 @@ public class CoreService extends Service implements SensorEventListener {
     }
 
     private void startNormalMode() {
-        StepManager.getInstance().setStartTime(Calendar.getInstance().getTimeInMillis());
         //开启定时任务
         normalStepCountService = Executors.newScheduledThreadPool(2);
         normalStepCountService.scheduleAtFixedRate(new RecordStepDataTask()
