@@ -7,20 +7,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.hzp.pedometer.R;
-import com.hzp.pedometer.components.ComponentsUtil;
 import com.hzp.pedometer.components.RateDashboard;
 import com.hzp.pedometer.service.Mode;
 import com.hzp.pedometer.service.step.StepManager;
@@ -104,14 +100,15 @@ public class StepCountActivity extends BindingActivity {
             }
         });
 
+        // TODO: 2016/2/19 字体内存无法释放,typeface只能创建一次
         //设置字体
-        RelativeLayout textInfoLayout = (RelativeLayout) findViewById(R.id.step_count_text_info_panel);
-        Typeface typeface = ComponentsUtil.getDefaultTypeface(this);
-        if (typeface != null) {
-            for (int i = 0; i < textInfoLayout.getChildCount(); i++) {
-                ((TextView) textInfoLayout.getChildAt(i)).setTypeface(typeface);
-            }
-        }
+//        RelativeLayout textInfoLayout = (RelativeLayout) findViewById(R.id.step_count_text_info_panel);
+//        Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/trends.ttf");
+//        if (typeface != null) {
+//            for (int i = 0; i < textInfoLayout.getChildCount(); i++) {
+//                ((TextView) textInfoLayout.getChildAt(i)).setTypeface(typeface);
+//            }
+//        }
     }
 
     private void toggleStartButton(final boolean state){
