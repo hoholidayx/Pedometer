@@ -188,6 +188,7 @@ public class CoreService extends Service implements SensorEventListener {
                 recordTempCount = 0;
             } else {
                 //开启新的记录
+                StepManager.getInstance().setStartTime(Calendar.getInstance().getTimeInMillis());
                 StepDataStorage.getInstance().startNewRecord();
                 StepDataStorage.getInstance().clearBuffer();
                 StepDataStorage.getInstance().saveData(
