@@ -111,10 +111,9 @@ public class CoreService extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         //合加速度
-        double a = Math.sqrt(
-                Math.pow(event.values[0], 2) +
-                        Math.pow(event.values[1], 2) +
-                        Math.pow(event.values[2], 2));
+        double a =
+                ServiceUtil.
+                        accelerationCorrection(event.values[0], event.values[1], event.values[2]);
 
         BigDecimal bd = new BigDecimal(a);
         bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -187,7 +186,7 @@ public class CoreService extends Service implements SensorEventListener {
                     COUNT_STEP_TASK_INTERVAL) {
                 countStepFromFiles();
                 recordTempCount = 0;
-            }else{
+            } else {
                 //开启新的记录
                 StepDataStorage.getInstance().startNewRecord();
                 StepDataStorage.getInstance().clearBuffer();
