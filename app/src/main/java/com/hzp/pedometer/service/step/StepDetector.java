@@ -205,8 +205,8 @@ public class StepDetector {
         sigmaA = BaseMath.stdev(aList);
 
         // TODO: 2016/2/19 固定上下限阈值测试
-        if (sigmaA < 0.5) {
-            sigmaA = 0.5 * ALPHA;
+        if (sigmaA < 0.2) {
+            sigmaA = 0.2 * ALPHA;
         } else if (sigmaA > 2) {
             sigmaA = 2 * ALPHA;
         }
