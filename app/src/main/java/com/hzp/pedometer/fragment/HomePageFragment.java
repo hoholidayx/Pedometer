@@ -17,7 +17,7 @@ import java.util.Random;
 
 
 public class HomePageFragment extends Fragment {
-    private ArcProgress progressStep;
+    private ArcProgress progressStep,progressCa,progressKm;
 
     public HomePageFragment() {
         // Required empty public constructor
@@ -41,6 +41,8 @@ public class HomePageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
         progressStep = (ArcProgress) view.findViewById(R.id.arc_progress_step);
+        progressCa = (ArcProgress) view.findViewById(R.id.arc_progress_ca);
+        progressKm = (ArcProgress) view.findViewById(R.id.arc_progress_km);
 
         loadData();
 
@@ -67,8 +69,11 @@ public class HomePageFragment extends Fragment {
         return dataList;
     }
 
-    private void displayStepCount(final DailyData[] dataList){
+    private void displayProgress(final DailyData[] dataList){
         progressStep.setMax(dataList.length);
+        progressCa.setMax(dataList.length);
+        progressKm.setMax(dataList.length);
+
         final Handler handler = new Handler();
         new Thread(){
             @Override
@@ -83,6 +88,12 @@ public class HomePageFragment extends Fragment {
                         public void run() {
                             progressStep.setContent(String.valueOf(finalStepCount));
                             progressStep.setProgress(progressStep.getProgress() + 1);
+
+                            progressCa.setContent(String.format("%.2f",finalStepCount*0.04));
+                            progressCa.setProgress(progressCa.getProgress() + 1);
+
+                            progressKm.setContent(String.format("%.2f",finalStepCount * 0.8 / 1000));
+                            progressKm.setProgress(progressKm.getProgress() + 1);
                         }
                     });
                     try {
@@ -99,6 +110,6 @@ public class HomePageFragment extends Fragment {
         //加载数据
         DailyData[] dataList = loadDailyData();
         //绑定数据到控件
-        displayStepCount(dataList);
+        displayProgress(dataList);
     }
 }
