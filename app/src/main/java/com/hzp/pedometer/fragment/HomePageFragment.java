@@ -109,7 +109,9 @@ public class HomePageFragment extends Fragment {
     private void loadData() {
         //加载数据
         DailyData[] dataList = loadDailyData();
-        //绑定数据到控件
-        displayProgress(dataList);
+        if(dataList!=null){
+            //绑定数据到控件
+            displayProgress(dataList);
+        }
     }
 }
