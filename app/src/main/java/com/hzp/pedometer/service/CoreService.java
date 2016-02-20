@@ -12,6 +12,7 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.util.Log;
 
 import com.hzp.pedometer.persistance.db.DailyDataManager;
 import com.hzp.pedometer.utils.AppConstants;
@@ -289,6 +290,7 @@ public class CoreService extends Service implements SensorEventListener {
                             if (startTime == 0) {
                                 continue;
                             }
+                            StepManager.getInstance().resetData();
                             StepManager.getInstance().setStartTime(startTime);
 
                             StepManager.getInstance().inputPointSync(filename);
@@ -345,12 +347,14 @@ public class CoreService extends Service implements SensorEventListener {
                     //解除唤醒
                     if (wakeLock.isHeld()) {
                         wakeLock.release();
+                        Log.i("CoreService","lock release");
                     }
                     break;
                 case Intent.ACTION_SCREEN_OFF:
                     //唤醒cpu
                     if (isWorking()) {
                         wakeLock.acquire();
+                        Log.i("CoreService", "lock acquire");
                     }
                     break;
             }
