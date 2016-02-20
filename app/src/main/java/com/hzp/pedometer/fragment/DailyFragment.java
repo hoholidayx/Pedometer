@@ -1,6 +1,7 @@
 package com.hzp.pedometer.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,9 @@ import com.hzp.pedometer.adapter.DailyListAdapter;
 import com.hzp.pedometer.adapter.SimpleItemTouchHelperCallback;
 import com.hzp.pedometer.entity.DailyData;
 import com.hzp.pedometer.persistance.db.DailyDataManager;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,7 +28,7 @@ import java.util.Calendar;
 public class DailyFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private CalendarView calendarView;
+    private MaterialCalendarView calendarView;
     private DailyListAdapter adapter;
 
     public DailyFragment() {
@@ -57,22 +61,41 @@ public class DailyFragment extends Fragment {
         new ItemTouchHelper(new SimpleItemTouchHelperCallback(adapter))
                 .attachToRecyclerView(recyclerView);
 
-        calendarView = (CalendarView) view.findViewById(R.id.fragment_daily_calendar_view);
-        calendarView.setOnDateChangeListener(new DateChangeListener());
+        calendarView = (MaterialCalendarView) view.findViewById(R.id.fragment_daily_calendar_view);
+        calendarView.setOnDateChangedListener(new DateChangeListener());
+        calendarView.setDateSelected(Calendar.getInstance(),true);
+
+        //更新当天的数据
+        Calendar ca = Calendar.getInstance();
+        updateDataList(
+                ca.get(Calendar.YEAR),
+                ca.get(Calendar.MONTH),
+                ca.get(Calendar.DAY_OF_MONTH));
 
         return view;
     }
 
-    class DateChangeListener implements CalendarView.OnDateChangeListener{
+    class DateChangeListener implements OnDateSelectedListener {
 
         @Override
-        public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-            DailyData[] dataList = DailyDataManager.getInstance().getDataListByDay(year,month,dayOfMonth);
-            adapter.clearItems();
-            if(dataList!=null){
-                for(DailyData data:dataList){
-                    adapter.addItem(data,0);
-                }
+        public void onDateSelected(@NonNull MaterialCalendarView widget,
+                                   @NonNull CalendarDay date,
+                                   boolean selected) {
+            updateDataList(date.getYear(), date.getMonth(), date.getDay());
+        }
+    }
+
+    private void updateDataList(int year, int month, int dayOfMonth) {
+        DailyData[] dataList = DailyDataManager.getInstance()
+                .getDataListByDay(
+                        year,
+                        month,
+                        dayOfMonth
+                );
+        adapter.clearItems();
+        if (dataList != null) {
+            for (DailyData data : dataList) {
+                adapter.addItem(data, 0);
             }
         }
     }
