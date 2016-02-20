@@ -15,6 +15,7 @@ import android.widget.CalendarView;
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.adapter.DailyListAdapter;
 import com.hzp.pedometer.adapter.SimpleItemTouchHelperCallback;
+import com.hzp.pedometer.components.DefaultDividerItemDecoration;
 import com.hzp.pedometer.entity.DailyData;
 import com.hzp.pedometer.persistance.db.DailyDataManager;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -55,6 +56,7 @@ public class DailyFragment extends Fragment {
 
         recyclerView = (RecyclerView) view.findViewById(R.id.fragment_daily_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.addItemDecoration(new DefaultDividerItemDecoration(getResources()));
         adapter = new DailyListAdapter(getActivity(), new ArrayList<DailyData>());
         recyclerView.setAdapter(adapter);
 
