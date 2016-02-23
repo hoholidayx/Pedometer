@@ -1,36 +1,27 @@
 package com.hzp.pedometer.fragment;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.BubbleData;
-import com.github.mikephil.charting.data.BubbleDataSet;
-import com.github.mikephil.charting.data.BubbleEntry;
-import com.github.mikephil.charting.data.CandleData;
-import com.github.mikephil.charting.data.CandleDataSet;
-import com.github.mikephil.charting.data.CandleEntry;
 import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.data.ScatterData;
-import com.github.mikephil.charting.data.ScatterDataSet;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.hzp.pedometer.R;
+import com.hzp.pedometer.entity.DailyData;
+import com.hzp.pedometer.persistance.db.DailyDataManager;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class StatisticsFragment extends Fragment {
@@ -59,7 +50,7 @@ public class StatisticsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.fragment_statistics, container, false);
+        View view = inflater.inflate(R.layout.fragment_statistics, container, false);
 
         combinedChart = (CombinedChart) view.findViewById(R.id.statistics_weekly_combined_chart);
         setupWeeklyBarChart(combinedChart);
@@ -67,11 +58,13 @@ public class StatisticsFragment extends Fragment {
         return view;
     }
 
-    private void setupWeeklyBarChart(CombinedChart barChart){
+    private void setupWeeklyBarChart(CombinedChart barChart) {
         barChart.setTouchEnabled(false);
         barChart.setScaleEnabled(false);
         barChart.setDoubleTapToZoomEnabled(false);
         barChart.setDragEnabled(true);
+        barChart.setDescription("");
+        combinedChart.setDescriptionPosition(0, 0);
 
 
         YAxis rightAxis = combinedChart.getAxisRight();
@@ -85,36 +78,46 @@ public class StatisticsFragment extends Fragment {
         XAxis xAxis = combinedChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
 
-        String[] d = new String[]{"1","2","3","4","5","6"};
+        String[] d = new String[]{"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
         CombinedData data = new CombinedData(d);
 
-        data.setData(generateLineData());
-        data.setData(generateBarData());
+        DailyData[][] dayList = getDataByWeek();
+        data.setData(generateLineDataAvgPerDay(dayList));
+        data.setData(generateBarDataStepPerDay(dayList));
 
         combinedChart.setData(data);
         combinedChart.invalidate();
 
     }
 
-    private LineData generateLineData() {
+    //生成混合图表的线性数据
+    private LineData generateLineDataAvgPerDay(DailyData[][] dataList) {
 
         LineData d = new LineData();
 
         ArrayList<Entry> entries = new ArrayList<Entry>();
 
-        for (int index = 0; index < 5; index++)
-            entries.add(new Entry(getRandom(15, 10), index));
+        //加载数据
+        for (int i = 0; i < dataList.length; i++) {
+            int dayAvg = 0;
+            int dayStepSum = 0;
+            if (dataList[i] != null) {
+                for (int j = 0; j < dataList[i].length; j++) {
+                    dayStepSum += dataList[i][j].getStepCount();
+                }
+                dayAvg = dayStepSum/(i+1);
+            }
+            entries.add(new BarEntry(dayAvg, i));
+        }
 
-        LineDataSet set = new LineDataSet(entries, "Line DataSet");
-        set.setColor(Color.rgb(240, 238, 70));
+        LineDataSet set = new LineDataSet(entries, "周平均步数");
         set.setLineWidth(2.5f);
-        set.setCircleColor(Color.rgb(240, 238, 70));
         set.setCircleRadius(5f);
-        set.setFillColor(Color.rgb(240, 238, 70));
         set.setDrawCubic(true);
         set.setDrawValues(true);
         set.setValueTextSize(10f);
-        set.setValueTextColor(Color.rgb(240, 238, 70));
+        set.setColor(getResources().getColor(R.color.colorGreen));
+        set.setCircleColor(getResources().getColor(R.color.colorGreen));
 
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
 
@@ -123,19 +126,25 @@ public class StatisticsFragment extends Fragment {
         return d;
     }
 
-    private BarData generateBarData() {
+    //生成混合图表的柱状数据
+    private BarData generateBarDataStepPerDay(DailyData[][] dataList) {
 
         BarData d = new BarData();
 
         ArrayList<BarEntry> entries = new ArrayList<BarEntry>();
 
-        for (int index = 0; index < 5; index++)
-            entries.add(new BarEntry(getRandom(3000, 10000), index));
+        //加载数据
+        for (int i = 0; i < dataList.length; i++) {
+            int dayStepSum = 0;
+            if (dataList[i] != null) {
+                for (int j = 0; j < dataList[i].length; j++) {
+                    dayStepSum += dataList[i][j].getStepCount();
+                }
+            }
+            entries.add(new BarEntry(dayStepSum, i));
+        }
 
-        BarDataSet set = new BarDataSet(entries, "Bar DataSet");
-        set.setColor(Color.rgb(60, 220, 78));
-        set.setValueTextColor(Color.rgb(60, 220, 78));
-        set.setValueTextSize(10f);
+        BarDataSet set = new BarDataSet(entries, "步数");
         d.addDataSet(set);
 
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -143,8 +152,21 @@ public class StatisticsFragment extends Fragment {
         return d;
     }
 
-    private float getRandom(float range, float startsfrom) {
-        return (float) (Math.random() * range) + startsfrom;
+    private DailyData[][] getDataByWeek() {
+        Calendar ca = Calendar.getInstance();
+        int days = 7;
+        DailyData[][] dataList = new DailyData[days][];
+
+        for (int i = Calendar.SUNDAY, j = 0; i < Calendar.SATURDAY; i++, j++) {
+            ca.set(Calendar.DAY_OF_WEEK, i);
+            DailyData[] temp = DailyDataManager.getInstance().getDataListByDay(
+                    ca.get(Calendar.YEAR),
+                    ca.get(Calendar.MONTH),
+                    ca.get(Calendar.DAY_OF_MONTH)
+            );
+            dataList[j] = temp;
+        }
+        return dataList;
     }
 
 
