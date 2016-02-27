@@ -78,7 +78,7 @@ public class StatisticsFragment extends Fragment {
         XAxis xAxis = combinedChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
 
-        String[] d = new String[]{"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
+        String[] d = new String[]{ "周日","周一", "周二", "周三", "周四", "周五", "周六"};
         CombinedData data = new CombinedData(d);
 
         DailyData[][] dayList = getDataByWeek();
@@ -154,6 +154,10 @@ public class StatisticsFragment extends Fragment {
 
     private DailyData[][] getDataByWeek() {
         Calendar ca = Calendar.getInstance();
+        ca.set(Calendar.HOUR_OF_DAY,0);
+        ca.set(Calendar.MINUTE,1);
+        ca.set(Calendar.SECOND,0);
+
         int days = 7;
         DailyData[][] dataList = new DailyData[days][];
 
