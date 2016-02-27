@@ -158,7 +158,7 @@ public class StatisticsFragment extends Fragment {
         int days = 7;
         DailyData[][] dataList = new DailyData[days][];
 
-        for (int i = Calendar.SUNDAY, j = 0; i < Calendar.SATURDAY; i++, j++) {
+        for (int i = Calendar.SUNDAY, j = 0; i <= Calendar.SATURDAY; i++, j++) {
             ca.set(Calendar.DAY_OF_WEEK, i);
             DailyData[] temp = DailyDataManager.getInstance().getDataListByDay(
                     ca.get(Calendar.YEAR),
