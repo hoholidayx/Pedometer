@@ -154,9 +154,6 @@ public class StatisticsFragment extends Fragment {
 
     private DailyData[][] getDataByWeek() {
         Calendar ca = Calendar.getInstance();
-        ca.set(Calendar.HOUR_OF_DAY,0);
-        ca.set(Calendar.MINUTE,1);
-        ca.set(Calendar.SECOND,0);
 
         int days = 7;
         DailyData[][] dataList = new DailyData[days][];
