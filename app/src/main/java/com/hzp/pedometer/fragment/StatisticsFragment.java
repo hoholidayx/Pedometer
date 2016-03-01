@@ -22,7 +22,6 @@ import com.hzp.pedometer.persistance.db.DailyDataManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 
 public class StatisticsFragment extends Fragment {
@@ -81,7 +80,7 @@ public class StatisticsFragment extends Fragment {
         XAxis xAxis = combinedChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
 
-        String[] d = generateXPivotArray();
+        String[] d = generateXAxisArray();
         CombinedData data = new CombinedData(d);
 
         DailyData[][] dayList = getDataRecentDays(recentDays);
@@ -96,7 +95,7 @@ public class StatisticsFragment extends Fragment {
     /**
      * 生成x轴的日期列表
      */
-    private String[] generateXPivotArray() {
+    private String[] generateXAxisArray() {
         Calendar ca = Calendar.getInstance();
         String[] d = new String[recentDays];
 
