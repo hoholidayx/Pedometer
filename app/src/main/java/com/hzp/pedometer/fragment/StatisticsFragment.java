@@ -22,9 +22,12 @@ import com.hzp.pedometer.persistance.db.DailyDataManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 
 public class StatisticsFragment extends Fragment {
+
+    private int recentDays = 7;
 
     private CombinedChart combinedChart;
 
@@ -78,16 +81,33 @@ public class StatisticsFragment extends Fragment {
         XAxis xAxis = combinedChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
 
-        String[] d = new String[]{ "周日","周一", "周二", "周三", "周四", "周五", "周六"};
+        String[] d = generateXPivotArray();
         CombinedData data = new CombinedData(d);
 
-        DailyData[][] dayList = getDataByWeek();
+        DailyData[][] dayList = getDataRecentDays(recentDays);
         data.setData(generateLineDataAvgPerDay(dayList));
         data.setData(generateBarDataStepPerDay(dayList));
 
         combinedChart.setData(data);
         combinedChart.invalidate();
 
+    }
+
+    /**
+     * 生成x轴的日期列表
+     */
+    private String[] generateXPivotArray() {
+        Calendar ca = Calendar.getInstance();
+        String[] d = new String[recentDays];
+
+        ca.add(Calendar.DAY_OF_MONTH,-6);
+
+        for (int i = 0; i < recentDays; i++) {
+            d[i] = ca.get(Calendar.DAY_OF_MONTH) + 1 + "日";
+            ca.add(Calendar.DAY_OF_MONTH,+1);
+        }
+
+        return d;
     }
 
     //生成混合图表的线性数据
@@ -105,7 +125,7 @@ public class StatisticsFragment extends Fragment {
                 for (int j = 0; j < dataList[i].length; j++) {
                     dayStepSum += dataList[i][j].getStepCount();
                 }
-                dayAvg = dayStepSum/(i+1);
+                dayAvg = dayStepSum / (i + 1);
             }
             entries.add(new BarEntry(dayAvg, i));
         }
@@ -152,20 +172,21 @@ public class StatisticsFragment extends Fragment {
         return d;
     }
 
-    private DailyData[][] getDataByWeek() {
+    private DailyData[][] getDataRecentDays(int days) {
         Calendar ca = Calendar.getInstance();
 
-        int days = 7;
         DailyData[][] dataList = new DailyData[days][];
 
-        for (int i = Calendar.SUNDAY, j = 0; i <= Calendar.SATURDAY; i++, j++) {
-            ca.set(Calendar.DAY_OF_WEEK, i);
+        for (int i = 0; i < days; i++) {
+
+            ca.add(Calendar.DAY_OF_WEEK, -1);
+
             DailyData[] temp = DailyDataManager.getInstance().getDataListByDay(
                     ca.get(Calendar.YEAR),
                     ca.get(Calendar.MONTH),
                     ca.get(Calendar.DAY_OF_MONTH)
             );
-            dataList[j] = temp;
+            dataList[i] = temp;
         }
         return dataList;
     }
