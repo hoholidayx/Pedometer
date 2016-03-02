@@ -129,7 +129,7 @@ public class StatisticsFragment extends Fragment {
             entries.add(new BarEntry(dayAvg, i));
         }
 
-        LineDataSet set = new LineDataSet(entries, "周平均步数");
+        LineDataSet set = new LineDataSet(entries, "近7天平均步数");
         set.setLineWidth(2.5f);
         set.setCircleRadius(5f);
         set.setDrawCubic(true);
