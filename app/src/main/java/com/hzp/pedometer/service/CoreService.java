@@ -172,7 +172,7 @@ public class CoreService extends Service implements SensorEventListener {
     }
 
     private void startRealTimeMode() {
-        StepManager.getInstance().setStartTime(Calendar.getInstance().getTimeInMillis());
+        StepManager.getInstance().start(Calendar.getInstance().getTimeInMillis());
     }
 
     private void stopRealTimeMode() {
@@ -291,7 +291,7 @@ public class CoreService extends Service implements SensorEventListener {
                                 continue;
                             }
                             StepManager.getInstance().resetData();
-                            StepManager.getInstance().setStartTime(startTime);
+                            StepManager.getInstance().start(startTime);
 
                             StepManager.getInstance().inputPointSync(filename);
 

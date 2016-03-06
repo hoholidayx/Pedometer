@@ -110,7 +110,7 @@ public class StepManager implements StepDetector.OnStepCountListener {
      * 否则无法计算
      * @param startTime 开始时间 ms
      */
-    public void setStartTime(long startTime){
+    public void start(long startTime){
         this.startTime = startTime;
         endTime = startTime;
     }
