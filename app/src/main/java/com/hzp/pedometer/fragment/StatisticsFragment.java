@@ -99,10 +99,10 @@ public class StatisticsFragment extends Fragment {
         Calendar ca = Calendar.getInstance();
         String[] d = new String[recentDays];
 
-        ca.add(Calendar.DAY_OF_MONTH,-6);
+        ca.add(Calendar.DAY_OF_MONTH, -6);
 
         for (int i = 0; i < recentDays; i++) {
-            d[i] = ca.get(Calendar.DAY_OF_MONTH) + 1 + "日";
+            d[i] = ca.get(Calendar.DAY_OF_MONTH)  + "日";
             ca.add(Calendar.DAY_OF_MONTH,+1);
         }
 
@@ -124,8 +124,8 @@ public class StatisticsFragment extends Fragment {
                 for (int j = 0; j < dataList[i].length; j++) {
                     dayStepSum += dataList[i][j].getStepCount();
                 }
-                dayAvg = dayStepSum / (i + 1);
             }
+            dayAvg = dayStepSum / (i + 1);
             entries.add(new BarEntry(dayAvg, i));
         }
 
@@ -159,8 +159,11 @@ public class StatisticsFragment extends Fragment {
                 for (int j = 0; j < dataList[i].length; j++) {
                     dayStepSum += dataList[i][j].getStepCount();
                 }
+                entries.add(new BarEntry(dayStepSum, i));
+            }else{
+                entries.add(new BarEntry(0, i));
             }
-            entries.add(new BarEntry(dayStepSum, i));
+
         }
 
         BarDataSet set = new BarDataSet(entries, "步数");
@@ -173,12 +176,11 @@ public class StatisticsFragment extends Fragment {
 
     private DailyData[][] getDataRecentDays(int days) {
         Calendar ca = Calendar.getInstance();
+        ca.add(Calendar.DAY_OF_MONTH, -days+1);
 
         DailyData[][] dataList = new DailyData[days][];
 
-        for (int i = 0; i < days; i++) {
-
-            ca.add(Calendar.DAY_OF_WEEK, -1);
+        for (int i = 0; i <days; i++) {
 
             DailyData[] temp = DailyDataManager.getInstance().getDataListByDay(
                     ca.get(Calendar.YEAR),
@@ -186,6 +188,8 @@ public class StatisticsFragment extends Fragment {
                     ca.get(Calendar.DAY_OF_MONTH)
             );
             dataList[i] = temp;
+
+            ca.add(Calendar.DAY_OF_MONTH, +1);
         }
         return dataList;
     }
