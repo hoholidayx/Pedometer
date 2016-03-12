@@ -264,13 +264,4 @@ public class StepDetector {
         listener = null;
     }
 
-    public interface OnStepCountListener {
-        /**
-         * 步数增加后回调
-         *
-         * @param count 总步数
-         */
-        void onStepCounted(int count);
-    }
-
 }

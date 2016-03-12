@@ -21,7 +21,7 @@ import wavelet.utils.Wavelet;
  * @author 何志鹏 on 2016/1/18.
  * @email hoholiday@hotmail.com
  */
-public class StepManager implements StepDetector.OnStepCountListener {
+public class StepManager implements OnStepCountListener {
 
     public static final String ACTION_STEP_COUNT = "step_count";
     public static final String KEY_STEP_COUNT = "STEP_COUNT";
