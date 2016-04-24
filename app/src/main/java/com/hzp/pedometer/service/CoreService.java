@@ -255,7 +255,7 @@ public class CoreService extends Service implements SensorEventListener {
      *
      * @return 文件的总数
      */
-    public int countStepFromFiles() {
+    private int countStepFromFiles() {
         //保存现场
         final boolean flag;
         if (isWorking()) {
