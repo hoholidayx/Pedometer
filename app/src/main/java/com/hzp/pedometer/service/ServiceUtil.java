@@ -12,7 +12,7 @@ public class ServiceUtil {
     /**
      * 竖直加速度修正
      */
-    static final float alpha = 0.8f, graviteSum = 9.8f;
+    static final float alpha = 0.8f;
     static float[] gravity = new float[3];
     static float[] linear_acceleration = new float[3];
 
@@ -32,9 +32,13 @@ public class ServiceUtil {
         linear_acceleration[1] = value2 - gravity[1];
         linear_acceleration[2] = value3 - gravity[2];
 
-        return linear_acceleration[0] * gravity[0] / graviteSum
-                + linear_acceleration[1] * gravity[1] / graviteSum
-                + linear_acceleration[2] * gravity[2] / graviteSum;
+        float gravitySum = (float) Math.sqrt(
+                gravity[0]*gravity[0]+gravity[1]*gravity[1]+gravity[2]*gravity[2]
+        );
+
+        return linear_acceleration[0] * gravity[0] / gravitySum
+                + linear_acceleration[1] * gravity[1] / gravitySum
+                + linear_acceleration[2] * gravity[2] / gravitySum;
     }
 
     public static PowerManager.WakeLock getWakeLock(Context context){
