@@ -70,13 +70,6 @@ public class StepManager implements OnStepCountListener {
     public void init(Context context) {
         this.context = context;
 
-        windowSize = StepConfig.getInstance().getFilterWindowSize();
-
-        lastStep = 0;
-        calcRate = (int) ((1000.0 / StepConfig.getInstance().getSamplingRate()) * windowSize);
-
-        samplingInterval = (long) (1000.0 / StepConfig.getInstance().getSamplingRate());
-
         executorService = Executors.newSingleThreadExecutor();
         stepDetector = new StepDetector();
         stepDetector.setStepCountListener(this);
