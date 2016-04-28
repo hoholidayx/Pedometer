@@ -1,5 +1,8 @@
 package com.hzp.pedometer.service.step;
 
+import android.util.Log;
+
+
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,15 +40,18 @@ public class NewStepDetector {
     public double BETA = 0.4;//波谷自适应阈值调整参数
     public double GAMMA = 0.7 ;//时间间隔自适应阈值调整参数
 
-    public int windowSize = 5;//加速度分析窗口 影响  适应性《——》稳定性
+    public int windowSize = 15;//加速度分析窗口 影响  适应性《——》稳定性
     public int timeWindowSize = 3;//时间分析窗口
 
     private List<Double> peakList = new LinkedList<>();
     private List<Double> valleyList = new LinkedList<>();
     private List<Double> stepTimeList = new LinkedList<>();
 
-    public double Th_enterPeakc;
-    public double Th_enterValleyc;
+
+    public double anm1,anm2;//最近检测到的两次加速度
+
+    public double peakAvg;//波峰平均值
+    public double valleyAvg;//波谷平均值
 
     public boolean stepSwitch;//计步锁定的次数锁定开关
     public int tempStepCount;//临时锁定计步数
@@ -59,36 +65,69 @@ public class NewStepDetector {
     }
 
     private void initConfig() {
-        Th_preMove = 0.8;
-        Th_enterPeak = 1.2;
-        Th_enterValley = -1;
-        Th_stepFinish = -0.3;
+        Th_preMove = 0.5;
+        Th_enterPeak = 1.0;
+        Th_enterValley = -0.8;
+        Th_stepFinish = -0.4;
         Th_stepTime =0;
         Th_stepSwitchTime = 5000;
 
-        Th_enterPeakc = Th_enterPeak;
-        Th_enterValleyc = Th_enterValley;
+        peakAvg = Th_enterPeak;
+        valleyAvg = Th_enterValley;
 
         cState = State.STAY;
 
         stepSwitch = false;
 
+        peakList.clear();
+        valleyList.clear();
+        stepTimeList.clear();
+
+        anm1 = anm2 =0;
+
         stepCount = 0;
         tempStepCount =0;
     }
+
+    private boolean detectiveEnterPeak(double a){
+        if(anm1>=anm2){
+            if(a>=anm1 && a>=Th_preMove){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean detectiveEnterValley(double a){
+
+        if(anm1<=anm2){
+            if(a<=anm1 && a<=Th_stepFinish){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void updateLastTowPoint(double a){
+        anm2=anm1;
+        anm1 = a;
+    }
+
 
     public void preAdjustPeak(double a) {
         if (peakList.size() > windowSize) {
             peakList.remove(0);
         }
-        peakList.add(a);
+        peakList.add(a-Th_preMove);
+
     }
 
     public void preAdjustValley(double a) {
         if (valleyList.size() > windowSize) {
             valleyList.remove(0);
         }
-        valleyList.add(a);
+        valleyList.add( a - Th_stepFinish);
+
     }
 
     public void preAdjustTime(long timeInterval) {
@@ -104,15 +143,15 @@ public class NewStepDetector {
     }
 
     public void adjustThEnterPeak() {
-        Th_enterPeakc = BaseMath.avg(peakList);
+        peakAvg = BaseMath.avg(peakList);
 
-        Th_enterPeak = (1 - ALPHA) * Th_preMove + (ALPHA) * (Th_enterPeakc );
+        Th_enterPeak = Th_preMove + ALPHA * peakAvg;
     }
 
     public void adjustThEnterValley() {
-        Th_enterValleyc = BaseMath.avg(valleyList);
+        valleyAvg = BaseMath.avg(valleyList);
 
-        Th_enterValley = (1 - BETA) * Th_stepFinish + (BETA) * (Th_enterValleyc);
+        Th_enterValley =Th_stepFinish + BETA * valleyAvg;
     }
 
     public void adjustThStepTime() {
@@ -121,6 +160,10 @@ public class NewStepDetector {
     }
 
     public void inputPoint(double a, long t) {
+
+        Log.e("State:",cState.name());
+
+        updateLastTowPoint(a);
 
         switch (cState) {
             case STAY:
@@ -133,7 +176,7 @@ public class NewStepDetector {
                 EnterPeak(a);
                 break;
             case LEAVE_PEAK:
-                leavePeak(a);
+                leavePeak(a,t);
                 break;
             case ENTER_VALLEY:
                 enterValley(a);
@@ -165,52 +208,69 @@ public class NewStepDetector {
 
         if (a < Th_enterPeak && a > Th_preMove) {
             cState = State.PRE_MOVE;
+            if(detectiveEnterPeak(a)){
+                preAdjustPeak(a);
+                adjustThEnterPeak();
+            }
         }
         else if (a <= Th_preMove) {
             cState = State.UNDEFINED;
         }
-        else if (a >= Th_enterPeak) {
-            cState = State.ENTER_PEAK;
+        else if( a>Th_enterPeak){
             preAdjustPeak(a);
+            cState = State.ENTER_PEAK;
+        }
+        else if (detectiveEnterPeak(a)) {
+            preAdjustPeak(a);
+            cState = State.PRE_MOVE;
         }
     }
 
     public void Undefined(double a) {
         if (a >= Th_preMove) {
             cState = State.PRE_MOVE;
-        } else if (a < Th_preMove) {
+        }
+        else if (a < Th_preMove && a> Th_stepFinish) {
             cState = State.STAY;
+        }
+        else if(detectiveEnterValley(a)){
+            cState = State.UNDEFINED;
+            preAdjustValley(a);
+            adjustThEnterValley();
         }
     }
 
     public void EnterPeak(double a) {
 
-        if (a > Th_enterPeak) {
+        if (a>=Th_enterPeak) {
             cState = State.ENTER_PEAK;
             preAdjustPeak(a);
         } else if (a > Th_enterValley && a <= Th_enterPeak) {
             cState = State.LEAVE_PEAK;
-        } else if (a <= Th_enterValley) {
+        } else if (a<=Th_enterValley) {
             cState = State.ENTER_VALLEY;
             preAdjustValley(a);
         }
     }
 
-    public void leavePeak(double a) {
-        if (a > Th_enterPeak) {
+    public void leavePeak(double a,long t) {
+
+        long timeInterval =  t - endTime;
+
+        if (a>Th_enterPeak && timeInterval<=Th_stepTime) {
             cState = State.ENTER_PEAK;
             preAdjustPeak(a);
-        } else if (a <= Th_enterValley) {
+        } else if (a<=Th_enterValley) {
             cState = State.ENTER_VALLEY;
             preAdjustValley(a);
-        } else if (a > Th_enterValley && a < Th_enterPeak) {
+        } else if (a > Th_enterValley && a < Th_enterPeak ) {
             cState = State.LEAVE_PEAK;
         }
     }
 
     public void enterValley(double a) {
 
-        if (a < Th_enterValley) {
+        if (a<Th_enterValley) {
             cState = State.ENTER_VALLEY;
             preAdjustValley(a);
         } else if (a >= Th_enterValley) {
@@ -221,17 +281,19 @@ public class NewStepDetector {
     public void leaveValley(double a, long t) {
 
         long timeInterval;
+        timeInterval = t - endTime;
 
-        if (a < Th_enterValley) {
+
+        if (a<Th_enterValley && timeInterval<=Th_stepTime) {
             cState = State.ENTER_VALLEY;
             preAdjustValley(a);
         }
-        else if (a >= Th_enterValley && a < Th_stepFinish) {
+        else if (a >= Th_enterValley && a < Th_stepFinish ) {
             cState = State.LEAVE_VALLEY;
         }
         else if (a >= Th_stepFinish) {
 
-            timeInterval = t - endTime;
+
             preAdjustTime(timeInterval);
 
             //判断是否超时锁定
@@ -277,7 +339,6 @@ public class NewStepDetector {
             cState = State.STEP_FINISH;
         }
     }
-
 
     public void StepFinished(double a, long t) {
         stepCount++;
