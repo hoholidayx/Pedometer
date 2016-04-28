@@ -25,9 +25,9 @@ public class DailyDataManager {
     }
 
     public static DailyDataManager getInstance() {
-        if (instance == null) {
-            synchronized (DailyDataManager.class) {
-                if (instance == null) {
+        if(instance ==null){
+            synchronized (DailyDataManager.class){
+                if(instance==null){
                     instance = new DailyDataManager();
                 }
             }

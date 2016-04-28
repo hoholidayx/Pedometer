@@ -1,8 +1,6 @@
 package com.hzp.pedometer.persistance.file;
 
 import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,9 +23,9 @@ import java.util.concurrent.TimeUnit;
  * @author 何志鹏 on 2016/2/1.
  * @email hoholiday@hotmail.com
  */
-public class StepDataStorage {
+public class StepDataStorageManager {
 
-    private static StepDataStorage instance;
+    private static StepDataStorageManager instance;
     private Context context;
     private SimpleDateFormat dateFormat;
 
@@ -39,14 +37,14 @@ public class StepDataStorage {
 
     private static final String dataPrefix = "data_log";
 
-    private StepDataStorage() {
+    private StepDataStorageManager() {
     }
 
-    public static StepDataStorage getInstance() {
-        if (instance == null) {
-            synchronized (StepDataStorage.class) {
-                if (instance == null) {
-                    instance = new StepDataStorage();
+    public static StepDataStorageManager getInstance() {
+        if(instance == null){
+            synchronized (StepDataStorageManager.class){
+                if (instance==null){
+                    instance = new StepDataStorageManager();
                 }
             }
         }

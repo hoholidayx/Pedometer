@@ -1,9 +1,6 @@
 package com.hzp.pedometer.service.step;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.hzp.pedometer.persistance.sp.StepConfig;
+import com.hzp.pedometer.persistance.sp.StepConfigManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -70,7 +67,7 @@ public class StepDetector {
      * 初始化参数
      */
     private void initConfig() {
-        StepConfig config = StepConfig.getInstance();
+        StepConfigManager config = StepConfigManager.getInstance();
         ALPHA = config.getAlpha();
         BETA = config.getBeta();
         K = config.getKNumber();
@@ -163,11 +160,11 @@ public class StepDetector {
             peakList.remove(0);
 
         double interval = n - np;
-        if (interval > StepConfig.DEFAULT_STEP_INTERVAL_MAX) {
-            interval = StepConfig.DEFAULT_STEP_INTERVAL_MAX;
+        if (interval > StepConfigManager.DEFAULT_STEP_INTERVAL_MAX) {
+            interval = StepConfigManager.DEFAULT_STEP_INTERVAL_MAX;
         }
-        if (interval < StepConfig.DEFAULT_STEP_INTERVAL_MIN) {
-            interval = StepConfig.DEFAULT_STEP_INTERVAL_MIN;
+        if (interval < StepConfigManager.DEFAULT_STEP_INTERVAL_MIN) {
+            interval = StepConfigManager.DEFAULT_STEP_INTERVAL_MIN;
         }
         peakList.add(interval);
 
@@ -184,11 +181,11 @@ public class StepDetector {
             valleyList.remove(0);
 
         double interval = n - nv;
-        if (interval > StepConfig.DEFAULT_STEP_INTERVAL_MAX) {
-            interval = StepConfig.DEFAULT_STEP_INTERVAL_MAX;
+        if (interval > StepConfigManager.DEFAULT_STEP_INTERVAL_MAX) {
+            interval = StepConfigManager.DEFAULT_STEP_INTERVAL_MAX;
         }
-        if (interval < StepConfig.DEFAULT_STEP_INTERVAL_MIN) {
-            interval = StepConfig.DEFAULT_STEP_INTERVAL_MIN;
+        if (interval < StepConfigManager.DEFAULT_STEP_INTERVAL_MIN) {
+            interval = StepConfigManager.DEFAULT_STEP_INTERVAL_MIN;
         }
         valleyList.add(interval);
 

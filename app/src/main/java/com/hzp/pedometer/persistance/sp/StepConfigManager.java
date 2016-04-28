@@ -1,8 +1,6 @@
 package com.hzp.pedometer.persistance.sp;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 /**
  * @author 何志鹏 on 2016/1/17.
@@ -10,7 +8,7 @@ import android.preference.PreferenceManager;
  *
  * 计步参数配置文件
  */
-public class StepConfig extends BaseSp{
+public class StepConfigManager extends BaseSp{
 
 
     private static final String KEY_ALPHA = "ALPHA";
@@ -31,16 +29,16 @@ public class StepConfig extends BaseSp{
     //默认重力加速度
     public static final double DEFAULT_GRAVITY = 9.8;
 
-    private static StepConfig instance;
+    private static StepConfigManager instance;
 
-    private StepConfig(){
+    private StepConfigManager(){
     }
 
-    public static StepConfig getInstance() {
+    public static StepConfigManager getInstance() {
         if(instance == null){
-            synchronized(StepConfig.class){
+            synchronized(StepConfigManager.class){
                 if(instance == null){
-                    instance = new StepConfig();
+                    instance = new StepConfigManager();
                 }
             }
         }

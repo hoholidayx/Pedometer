@@ -2,12 +2,6 @@ package com.hzp.pedometer;
 
 import android.app.Application;
 import android.content.Intent;
-import android.preference.PreferenceManager;
-
-import com.hzp.pedometer.persistance.db.DailyDataManager;
-import com.hzp.pedometer.persistance.file.StepDataStorage;
-import com.hzp.pedometer.persistance.sp.StepConfig;
-import com.hzp.pedometer.service.step.StepManager;
 
 /**
  * @author 何志鹏 on 2016/1/16.

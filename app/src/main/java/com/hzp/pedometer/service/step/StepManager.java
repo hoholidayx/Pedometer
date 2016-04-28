@@ -3,7 +3,7 @@ package com.hzp.pedometer.service.step;
 import android.content.Context;
 import android.content.Intent;
 
-import com.hzp.pedometer.persistance.sp.StepConfig;
+import com.hzp.pedometer.persistance.sp.StepConfigManager;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -57,9 +57,9 @@ public class StepManager implements OnStepCountListener {
     }
 
     public static StepManager getInstance() {
-        if (instance == null) {
-            synchronized (StepManager.class) {
-                if (instance == null) {
+        if(instance == null){
+            synchronized (StepManager.class){
+                if(instance ==null){
                     instance = new StepManager();
                 }
             }
@@ -91,10 +91,10 @@ public class StepManager implements OnStepCountListener {
         accelerationList.clear();
         stepDetector.reset();
 
-        windowSize = StepConfig.getInstance().getFilterWindowSize();
-        calcRate = (int) ((1000.0 / StepConfig.getInstance().getSamplingRate()) * windowSize);
+        windowSize = StepConfigManager.getInstance().getFilterWindowSize();
+        calcRate = (int) ((1000.0 / StepConfigManager.getInstance().getSamplingRate()) * windowSize);
 
-        samplingInterval = (long) (1000.0 / StepConfig.getInstance().getSamplingRate());
+        samplingInterval = (long) (1000.0 / StepConfigManager.getInstance().getSamplingRate());
     }
 
     /**
