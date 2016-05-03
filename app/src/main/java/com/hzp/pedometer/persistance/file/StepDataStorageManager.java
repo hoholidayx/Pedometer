@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -75,7 +76,7 @@ public class StepDataStorageManager {
             executorService = Executors.newScheduledThreadPool(1);
             //延迟period后启动写入任务，然后每间隔period再进行一次写入
             executorService.scheduleAtFixedRate(new WriterTask(), period, period, TimeUnit.MILLISECONDS);
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException |RejectedExecutionException e) {
             e.printStackTrace();
             endRecord();
         }
