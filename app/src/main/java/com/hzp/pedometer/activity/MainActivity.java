@@ -131,7 +131,6 @@ public class MainActivity extends BindingActivity {
                 replaceFragment(dailyFragment);
                 break;
             case R.id.menu_drawer_step_count:
-                //TODO 等待当前工作停止，弹出waiting框
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {

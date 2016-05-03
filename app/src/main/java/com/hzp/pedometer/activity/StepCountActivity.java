@@ -5,21 +5,19 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.components.RateDashboard;
-import com.hzp.pedometer.service.Mode;
-import com.hzp.pedometer.service.step.StepManager;
+import com.hzp.pedometer.service.StepCountMode;
+import com.hzp.pedometer.service.step.StepCountModule;
 
 /**
  * 计步器工作页面
@@ -33,7 +31,7 @@ public class StepCountActivity extends BindingActivity {
     private ToggleButton buttonStart;
 
     private StepReceiver stepReceiver;
-    private IntentFilter intentFilter = new IntentFilter(StepManager.ACTION_STEP_COUNT);
+    private IntentFilter intentFilter = new IntentFilter(StepCountModule.ACTION_STEP_COUNT);
 
     private boolean registerBroadcast = false;
 
@@ -62,7 +60,7 @@ public class StepCountActivity extends BindingActivity {
     @Override
     protected void onServiceBind() {
         //恢复现场
-        if(getService().isWorking()){
+        if(getService().isRealTimeModeSwitch()){
             toggleStartButton(true);
             registerBroadcast();
         }
@@ -89,7 +87,7 @@ public class StepCountActivity extends BindingActivity {
             @Override
             public void onClick(View v) {
                 if (isServiceBinded()) {
-                    if (getService().isWorking()) {
+                    if (getService().isRealTimeModeSwitch()) {
                         toggleStartButton(false);
                         stopStepCount();
                     } else {
@@ -151,14 +149,14 @@ public class StepCountActivity extends BindingActivity {
     private void startStepCount() {
         setStepCount(0);
         setStepPerMin(0);
-        getService().startStepCount(Mode.REAL_TIME);
+        getService().startStepCount(StepCountMode.REAL_TIME);
 
         registerBroadcast();
 
     }
 
     private void stopStepCount() {
-        getService().stopStepCount();
+        getService().stopStepCount(StepCountMode.REAL_TIME);
         unregisterBroadcast();
     }
 
@@ -204,8 +202,8 @@ public class StepCountActivity extends BindingActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent !=null){
-                int stepCount = intent.getIntExtra(StepManager.KEY_STEP_COUNT,0);
-                int stepPerMin = intent.getIntExtra(StepManager.KEY_STEP_PER_MIN, 0);
+                int stepCount = intent.getIntExtra(StepCountModule.KEY_STEP_COUNT,0);
+                int stepPerMin = intent.getIntExtra(StepCountModule.KEY_STEP_PER_MIN, 0);
 
                 setStepCount(stepCount);
                 setStepPerMin(stepPerMin);

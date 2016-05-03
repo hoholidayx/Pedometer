@@ -5,14 +5,11 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.activity.BindingActivity;
 import com.hzp.pedometer.service.CoreService;
-import com.hzp.pedometer.service.Mode;
-
-import java.util.Map;
+import com.hzp.pedometer.service.StepCountMode;
 
 public class SettingFragment extends PreferenceFragment {
     private static final String ARG_SETTING_PREFERENCE = "setting_preference";
@@ -59,10 +56,13 @@ public class SettingFragment extends PreferenceFragment {
 
     private void onEnableNormalStepCountChange(boolean enable) {
         CoreService service = ((BindingActivity) getActivity()).getService();
-        if (enable && service!=null) {
-            service.startStepCount(Mode.NORMAL);
-        } else if(service!=null) {
-            service.stopStepCount();
+        if( service!=null){
+
+            if (enable) {
+                service.startStepCount(StepCountMode.NORMAL);
+            } else {
+                service.stopStepCount(StepCountMode.NORMAL);
+            }
         }
     }
 

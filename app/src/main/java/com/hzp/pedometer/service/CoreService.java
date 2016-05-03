@@ -5,23 +5,19 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
 import com.hzp.pedometer.persistance.db.DailyDataManager;
+import com.hzp.pedometer.persistance.file.FileUtils;
+import com.hzp.pedometer.persistance.file.StepDataStorageManager;
+import com.hzp.pedometer.persistance.sp.StepConfigManager;
+import com.hzp.pedometer.service.step.StepCountModule;
 import com.hzp.pedometer.utils.AppConstants;
-import com.hzp.pedometer.persistance.file.StepDataStorage;
-import com.hzp.pedometer.persistance.sp.StepConfig;
-import com.hzp.pedometer.service.step.StepManager;
-import com.hzp.pedometer.utils.FileUtils;
 
-import java.math.BigDecimal;
+import java.io.File;
 import java.util.Calendar;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,26 +26,20 @@ import java.util.concurrent.TimeUnit;
 /**
  * 核心工作服务
  */
-public class CoreService extends Service implements SensorEventListener {
+public class CoreService extends Service implements DataCollectionManager.OnDataCollectionListener {
 
     private CoreBinder binder;
-
-    private SensorManager sensorManager;
-    private Sensor sensor;
 
     private ScreenReceiver screenReceiver;//监听屏幕关闭系统睡眠
     private PowerManager.WakeLock wakeLock;
 
-    private Mode mode = Mode.NORMAL;//当前的计步模式
-    private boolean Working = false;//运行标识
+
+    private StepCountModule normalStepCountModule, realTimeStepCountModule;
+    private boolean normalModeSwitch = false, realTimeModeSwitch = false;
 
     private ScheduledExecutorService normalStepCountService;
-    //进行数据记录的时间间隔
-    private static final int RECORD_TASK_INTERVAL = 10;//min
-    private static final int RECORD_TASK_WAIT_TIME = 2000;//ms
-    //进行数据计算的时间间隔
-    private static final int COUNT_STEP_TASK_INTERVAL = 30;//min
-    private int recordTempCount = 0;
+    private static final int RECORD_TASK_INTERVAL = 5;//进行数据记录的时间间隔min
+    private static final int CALCULATE_STEP_TASK_INTERVAL = 30 ;//进行数据计算的时间间隔min
 
     public CoreService() {
         binder = new CoreBinder();
@@ -60,16 +50,19 @@ public class CoreService extends Service implements SensorEventListener {
         super.onCreate();
         wakeLock = ServiceUtil.getWakeLock(this);
 
-        initManagers();
+        initModules();
         registerScreenReceiver();
-        initSensors();
     }
 
-    private void initManagers() {
-        StepDataStorage.getInstance().init(getApplicationContext());
-        StepConfig.getInstance().init(getApplicationContext());
-        StepManager.getInstance().init(getApplicationContext());
+    private void initModules() {
+        DataCollectionManager.getInstance().init(getApplicationContext());
+        DataCollectionManager.getInstance().setOnDataCollectionListener(this);
+        StepDataStorageManager.getInstance().init(getApplicationContext());
+        StepConfigManager.getInstance().init(getApplicationContext());
         DailyDataManager.getInstance().init(getApplicationContext());
+
+        normalStepCountModule = new StepCountModule(getApplicationContext(),StepCountMode.NORMAL);
+        realTimeStepCountModule = new StepCountModule(getApplicationContext(),StepCountMode.REAL_TIME);
     }
 
     @Override
@@ -90,16 +83,10 @@ public class CoreService extends Service implements SensorEventListener {
         if (wakeLock.isHeld()) {
             wakeLock.release();
         }
+        //关闭数据库连接
         DailyDataManager.getInstance().closeDatabase();
-    }
-
-    /**
-     * 传感器初始化
-     */
-    private void initSensors() {
-        //初始化重力传感器
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //关闭数据采集
+        DataCollectionManager.getInstance().stop();
     }
 
     private void registerScreenReceiver() {
@@ -109,233 +96,159 @@ public class CoreService extends Service implements SensorEventListener {
         registerReceiver(screenReceiver, filter);
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        //合加速度
-        double a =
-                ServiceUtil.
-                        accelerationCorrection(event.values[0], event.values[1], event.values[2]);
-
-        BigDecimal bd = new BigDecimal(a);
-        bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-
+    public void startStepCount(StepCountMode mode) {
         switch (mode) {
-            case NORMAL: {
-                processNormalMode(bd.doubleValue());
+            case NORMAL:
+                startNormalMode();
                 break;
-            }
-            case REAL_TIME: {
-                processRealTimeMode(bd.doubleValue());
+            case REAL_TIME:
+                startRealTimeMode();
                 break;
-            }
         }
-
     }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        //empty
-    }
-
-    /**
-     * 处理实时计步模式数据
-     *
-     * @param a 加速度
-     */
-    private void processRealTimeMode(double a) {
-        StepManager.getInstance().inputPoint(a);
-    }
-
-    /**
-     * 处理正常计步模式数据
-     *
-     * @param a 加速度
-     */
-    private void processNormalMode(double a) {
-        StepDataStorage.getInstance().saveData(a + AppConstants.Separator);
+    public void stopStepCount(StepCountMode mode) {
+        switch (mode) {
+            case NORMAL:
+                stopNormalMode();
+                break;
+            case REAL_TIME:
+                stopRealTimeMode();
+                break;
+        }
     }
 
     private void startNormalMode() {
-        //开启定时任务
+        if (normalModeSwitch) {
+            return;
+        }
+
+        //判断数据采集模块是否已经开启
+        if (!DataCollectionManager.getInstance().isWorking()) {
+            DataCollectionManager.getInstance().start();
+        }
+
         normalStepCountService = Executors.newScheduledThreadPool(2);
-        normalStepCountService.scheduleAtFixedRate(new RecordStepDataTask()
+        //开启数据定时存储任务
+        normalStepCountService.scheduleAtFixedRate(new recordTaskOfNormalStepCount()
                 , 0
                 , RECORD_TASK_INTERVAL
                 , TimeUnit.MINUTES);
+        //开启数据定时计算任务
+        normalStepCountService.scheduleAtFixedRate(new calcTaskOfNormalStepCount()
+                , 0
+                , CALCULATE_STEP_TASK_INTERVAL
+                , TimeUnit.MINUTES);
+
     }
 
     private void stopNormalMode() {
-        //关闭定时任务
-        normalStepCountService.shutdown();
-        StepDataStorage.getInstance().endRecord();
-        recordTempCount = 0;
+        normalModeSwitch = false;
+
+        //判断是否还需要开启数据采集功能
+        if (canStop()) {
+            DataCollectionManager.getInstance().stop();
+        }
+
+        StepDataStorageManager.getInstance().endRecord();
+
     }
 
     private void startRealTimeMode() {
-        StepManager.getInstance().start(Calendar.getInstance().getTimeInMillis());
+        if (realTimeModeSwitch) {
+            return;
+        }
+        //判断数据采集模块是否已经开启
+        if (!DataCollectionManager.getInstance().isWorking()) {
+            DataCollectionManager.getInstance().start();
+        }
+        realTimeStepCountModule.start(Calendar.getInstance().getTimeInMillis());
+
+        realTimeModeSwitch = true;
     }
 
     private void stopRealTimeMode() {
-
+        realTimeModeSwitch = false;
+        //判断是否还需要开启数据采集功能
+        if (canStop()) {
+            DataCollectionManager.getInstance().stop();
+        }
     }
 
-    class RecordStepDataTask implements Runnable {
+    public boolean isRealTimeModeSwitch() {
+        return realTimeModeSwitch;
+    }
+
+    public boolean isNormalModeSwitch() {
+        return normalModeSwitch;
+    }
+
+    @Override
+    public void onDataReceived(double x, double y, double z) {
+        if (realTimeModeSwitch) {
+            realTimeStepCountModule.inputPoint(x, y, z);
+        }
+        if (normalModeSwitch) {
+            String data = new StringBuffer()
+                    .append(x)
+                    .append(" ")
+                    .append(y)
+                    .append(" ")
+                    .append(z)
+                    .append(AppConstants.Separator).toString();
+            StepDataStorageManager.getInstance().saveData(data);
+        }
+    }
+
+    private boolean canStop() {
+        return !isNormalModeSwitch() && !isRealTimeModeSwitch();
+    }
+
+    /**
+     * 数据定时存储任务
+     */
+    class recordTaskOfNormalStepCount implements Runnable {
         @Override
         public void run() {
-            if (recordTempCount * RECORD_TASK_INTERVAL >=
-                    COUNT_STEP_TASK_INTERVAL) {
-                countStepFromFiles();
-                recordTempCount = 0;
-            } else {
-                //开启新的记录
-                StepDataStorage.getInstance().startNewRecord();
-                StepDataStorage.getInstance().clearBuffer();
-                StepDataStorage.getInstance().saveData(
-                        Calendar.getInstance().getTimeInMillis() + AppConstants.Separator
-                );
-                recordTempCount++;
-            }
-        }
-    }
-
-
-    /**
-     * 开始计步
-     *
-     * @param mode 计步模式
-     */
-    public void startStepCount(Mode mode) {
-        if (!isWorking()) {
-            this.mode = mode;
-            toggleWorkingState(true);
-
-            switch (mode) {
-                case NORMAL: {
-                    startNormalMode();
-                    break;
-                }
-                case REAL_TIME: {
-                    startRealTimeMode();
-                    break;
-                }
-            }
-            //等待模式初始化后才读入加速度数据
-            sensorManager.registerListener(this, sensor,
-                    (int) ((1.0 / StepConfig.getInstance().getSamplingRate()) * 1000 * 1000));//微秒
-        }
-
-    }
-
-    /**
-     * 停止计步
-     */
-    public void stopStepCount() {
-        if (Working) {
-            toggleWorkingState(false);
-
-            sensorManager.unregisterListener(this);
-
-            switch (mode) {
-                case NORMAL: {
-                    stopNormalMode();
-                    break;
-                }
-                case REAL_TIME: {
-                    stopRealTimeMode();
-                    break;
-                }
-            }
-
-            StepManager.getInstance().resetData();
+            //开启新的记录
+            StepDataStorageManager.getInstance().startNewRecord();
+            StepDataStorageManager.getInstance().saveData(
+                    Calendar.getInstance().getTimeInMillis() + AppConstants.Separator
+            );
+            normalModeSwitch = true;
         }
     }
 
     /**
-     * 从数据文件计算步数
-     *
-     * @return 文件的总数
+     * 数据定时计算任务
      */
-    private int countStepFromFiles() {
-        //保存现场
-        final boolean flag;
-        if (isWorking()) {
-            stopStepCount();
-            flag = getMode().equals(Mode.NORMAL);
-        } else {
-            flag = false;
-        }
-        StepManager.getInstance().resetData();
-        final String[] filenames = StepDataStorage.getInstance().getDataFileNames();
-
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    synchronized (StepDataStorage.getInstance()) {
-                        StepDataStorage.getInstance().wait(RECORD_TASK_WAIT_TIME);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    int stepCount;
-                    long startTime, endTime;
-
-                    if (filenames.length != 0) {
-
-                        StepManager.getInstance().setBroadcastEnable(false);
-
-                        for (String filename : filenames) {
-                            //读取数据文件的起始记录时间
-                            startTime = StepDataStorage.getInstance().getDataStartTime(filename);
-                            if (startTime == 0) {
-                                continue;
-                            }
-                            StepManager.getInstance().resetData();
-                            StepManager.getInstance().start(startTime);
-
-                            StepManager.getInstance().inputPointSync(filename);
-
-                            stepCount = StepManager.getInstance().getStepCount();
-                            endTime = StepManager.getInstance().getEndTime();
-
-                            //如该时间段计步数不为0才进行数据库记录
-                            if (stepCount != 0) {
-                                DailyDataManager.getInstance().saveData(
-                                        FileUtils.getFileLastModified(getApplicationContext(), filename),
-                                        startTime,
-                                        endTime,
-                                        stepCount
-                                );
-                            }
-                        }
-                        StepDataStorage.getInstance().deleteFile(filenames);
-                    }
-                    //恢复工作现场
-                    StepManager.getInstance().setBroadcastEnable(true);
-                    if (flag) {
-                        startStepCount(Mode.NORMAL);
-                    }
+    class calcTaskOfNormalStepCount implements Runnable {
+        @Override
+        public void run() {
+            //获取未计算的数据文件名
+            String[] filenames = StepDataStorageManager.getInstance().getDataFileNames();
+            for (String name : filenames) {
+                //获取记录的开始时间
+                long startTime = StepDataStorageManager.getInstance().getDataStartTime(name);
+                if(startTime==0){
+                    continue;
+                }
+                normalStepCountModule.start(startTime);
+                //输入计步数据
+                int stepCount = normalStepCountModule.inputPoint(name);
+                //存储数据到数据库
+                 if(stepCount !=0){
+                    DailyDataManager.getInstance().saveData(
+                            Calendar.getInstance().getTimeInMillis(),
+                            startTime,
+                            normalStepCountModule.getEndTime()
+                            ,stepCount
+                            );
                 }
             }
-        }.start();
-
-        return filenames.length;
-    }
-
-    public boolean isWorking() {
-        return Working;
-    }
-
-    private void toggleWorkingState(boolean working) {
-        this.Working = working;
-    }
-
-    public StepManager getStepManager() {
-        return StepManager.getInstance();
-    }
-
-    public Mode getMode() {
-        return mode;
+            //删除已经计算过的数据文件
+            FileUtils.deleteFile(getApplicationContext(), filenames);
+        }
     }
 
     private class ScreenReceiver extends BroadcastReceiver {
@@ -347,12 +260,12 @@ public class CoreService extends Service implements SensorEventListener {
                     //解除唤醒
                     if (wakeLock.isHeld()) {
                         wakeLock.release();
-                        Log.i("CoreService","lock release");
+                        Log.i("CoreService", "lock release");
                     }
                     break;
                 case Intent.ACTION_SCREEN_OFF:
                     //唤醒cpu
-                    if (isWorking()) {
+                    if (DataCollectionManager.getInstance().isWorking()) {
                         wakeLock.acquire();
                         Log.i("CoreService", "lock acquire");
                     }

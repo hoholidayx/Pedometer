@@ -13,7 +13,10 @@ import math.utils.BaseMath;
  * @author 何志鹏 on 2016/3/12.
  * @email hoholiday@hotmail.com
  */
-public class NewStepDetector {
+public class StepAlgorithm {
+
+    private OnStepCountListener listener;
+
     enum State {
         STAY,//静止态
         PRE_MOVE,//运动预备
@@ -60,15 +63,15 @@ public class NewStepDetector {
 
     public int stepCount;
 
-    public NewStepDetector() {
+    public StepAlgorithm() {
         initConfig();
     }
 
-    private void initConfig() {
-        Th_preMove = 0.5;
-        Th_enterPeak = 1.0;
-        Th_enterValley = -0.8;
-        Th_stepFinish = -0.4;
+    public void initConfig() {
+        Th_preMove = 0.3;
+        Th_enterPeak = 0.8;
+        Th_enterValley = -0.6;
+        Th_stepFinish = -0.2;
         Th_stepTime =0;
         Th_stepSwitchTime = 5000;
 
@@ -89,7 +92,7 @@ public class NewStepDetector {
         tempStepCount =0;
     }
 
-    private boolean detectiveEnterPeak(double a){
+    private boolean detectiveIncrease(double a){
         if(anm1>=anm2){
             if(a>=anm1 && a>=Th_preMove){
                 return true;
@@ -98,7 +101,7 @@ public class NewStepDetector {
         return false;
     }
 
-    private boolean detectiveEnterValley(double a){
+    private boolean detectiveDecrease(double a){
 
         if(anm1<=anm2){
             if(a<=anm1 && a<=Th_stepFinish){
@@ -159,6 +162,11 @@ public class NewStepDetector {
         Th_stepTime = (long) ((GAMMA*avg) - (1-GAMMA)*BaseMath.stdev(stepTimeList,avg));
     }
 
+    /**
+     * 数据输入
+     * @param a 加速度
+     * @param t 时间（毫秒）
+     */
     public void inputPoint(double a, long t) {
 
         Log.e("State:",cState.name());
@@ -208,7 +216,7 @@ public class NewStepDetector {
 
         if (a < Th_enterPeak && a > Th_preMove) {
             cState = State.PRE_MOVE;
-            if(detectiveEnterPeak(a)){
+            if(detectiveIncrease(a)){
                 preAdjustPeak(a);
                 adjustThEnterPeak();
             }
@@ -220,7 +228,7 @@ public class NewStepDetector {
             preAdjustPeak(a);
             cState = State.ENTER_PEAK;
         }
-        else if (detectiveEnterPeak(a)) {
+        else if (detectiveIncrease(a)) {
             preAdjustPeak(a);
             cState = State.PRE_MOVE;
         }
@@ -233,7 +241,7 @@ public class NewStepDetector {
         else if (a < Th_preMove && a> Th_stepFinish) {
             cState = State.STAY;
         }
-        else if(detectiveEnterValley(a)){
+        else if(detectiveDecrease(a)){
             cState = State.UNDEFINED;
             preAdjustValley(a);
             adjustThEnterValley();
@@ -354,4 +362,7 @@ public class NewStepDetector {
         adjustThStepTime();
     }
 
+    public void setStepCountListener(OnStepCountListener listener) {
+        this.listener = listener;
+    }
 }

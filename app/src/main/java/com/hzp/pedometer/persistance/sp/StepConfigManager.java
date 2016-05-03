@@ -15,7 +15,8 @@ public class StepConfigManager extends BaseSp{
     private static final String KEY_BETA = "BETA";
     private static final String KEY_K_NUMBER = "K_NUMBER";
     private static final String KEY_M_NUMBER = "M_NUMBER";
-    private static final String KEY_FILTER_WINDOW_SIZE = "FILTER_WINDOW_SIZE";
+    private static final String KEY_WAVELET_WINDOW_SIZE = "WAVELET_WINDOW_SIZE";
+    private static final String KEY_MEDIAN_WINDOW_SIZE = "MEDIAN_WINDOW_SIZE";
     private static final String KEY_SAMPLING_RATE = "SAMPLING_RATE";
 
     public static final double DEFAULT_ALPHA = 2.5;
@@ -24,8 +25,9 @@ public class StepConfigManager extends BaseSp{
     public static final int DEFAULT_M_NUMBER = 10;
     public static final int DEFAULT_STEP_INTERVAL_MAX = 2000;//ms
     public static final int DEFAULT_STEP_INTERVAL_MIN = 0;//ms
-    public static final int DEFAULT_FILTER_WINDOW_SIZE = 200;//过滤模块默认窗口大小
-    public static final double DEFAULT_SAMPLING_RATE = 50;//默认采样率Hz
+    public static final int DEFAULT_WAVELET_WINDOW_SIZE = 200;//小波变换窗口大小
+    public static final int DEFAULT_MEDIAN_WINDOW_SIZE = 5;//中值滤波窗口大小
+    public static final int DEFAULT_SAMPLING_RATE = 50;//默认采样率Hz
     //默认重力加速度
     public static final double DEFAULT_GRAVITY = 9.8;
 
@@ -55,7 +57,7 @@ public class StepConfigManager extends BaseSp{
     }
 
     public void setAlpha(double alpha){
-        putDouble(KEY_ALPHA,alpha);
+        putDouble(KEY_ALPHA, alpha);
     }
 
     public double getBeta(){
@@ -67,11 +69,11 @@ public class StepConfigManager extends BaseSp{
     }
 
     public int getKNumber(){
-        return getInt(KEY_K_NUMBER,DEFAULT_K_NUMBER);
+        return getInt(KEY_K_NUMBER, DEFAULT_K_NUMBER);
     }
 
     public void setKNumber(int k){
-        putInt(KEY_K_NUMBER,k);
+        putInt(KEY_K_NUMBER, k);
     }
 
     public int getMNumber(){
@@ -82,16 +84,24 @@ public class StepConfigManager extends BaseSp{
         putInt(KEY_M_NUMBER,m);
     }
 
-    public int getFilterWindowSize(){
-        return getInt(KEY_FILTER_WINDOW_SIZE,DEFAULT_FILTER_WINDOW_SIZE);
+    public int getWaveletWindowSize(){
+        return getInt(KEY_WAVELET_WINDOW_SIZE, DEFAULT_WAVELET_WINDOW_SIZE);
     }
 
-    public void setFilterWindowSize(int size){
-        putInt(KEY_FILTER_WINDOW_SIZE,size);
+    public void setWaveletWindowSize(int size){
+        putInt(KEY_WAVELET_WINDOW_SIZE,size);
     }
 
-    public double getSamplingRate(){
-        return getDouble(KEY_SAMPLING_RATE,DEFAULT_SAMPLING_RATE);
+    public int getMedianWindowSize(){
+        return getInt(KEY_MEDIAN_WINDOW_SIZE, DEFAULT_MEDIAN_WINDOW_SIZE);
+    }
+
+    public void setMedianWindowSize(int size){
+        putInt(KEY_MEDIAN_WINDOW_SIZE,size);
+    }
+
+    public int getSamplingRate(){
+        return getInt(KEY_SAMPLING_RATE,DEFAULT_SAMPLING_RATE);
     }
 
     public void setSamplingRate(int rate){

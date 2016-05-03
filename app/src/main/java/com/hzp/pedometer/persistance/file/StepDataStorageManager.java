@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -29,21 +30,23 @@ public class StepDataStorageManager {
     private Context context;
     private SimpleDateFormat dateFormat;
 
-    private List<String> dataList;
+    private List<String> dataBuffer;//写入数据的缓存区
     private FileOutputStream fileOutputStream;
 
     private ScheduledExecutorService executorService;
-    private long period = 1000;
+    private long period = 10000;//缓存写入时间间隔
 
     private static final String dataPrefix = "data_log";
+
+    private String writingFile;//正在被编辑的文件名
 
     private StepDataStorageManager() {
     }
 
     public static StepDataStorageManager getInstance() {
-        if(instance == null){
-            synchronized (StepDataStorageManager.class){
-                if (instance==null){
+        if (instance == null) {
+            synchronized (StepDataStorageManager.class) {
+                if (instance == null) {
                     instance = new StepDataStorageManager();
                 }
             }
@@ -53,7 +56,7 @@ public class StepDataStorageManager {
 
     public void init(Context context) {
         this.context = context;
-        dataList = Collections.synchronizedList(
+        dataBuffer = Collections.synchronizedList(
                 new LinkedList<String>());
         dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault());
     }
@@ -66,48 +69,66 @@ public class StepDataStorageManager {
         endRecord();
         //创建并打开记录文件
         try {
-            fileOutputStream = context.openFileOutput(createFileName(), Context.MODE_APPEND);
+            writingFile = createFileName();
+            fileOutputStream = context.openFileOutput(writingFile, Context.MODE_APPEND);
             //启动定时线程
             executorService = Executors.newScheduledThreadPool(1);
+            //延迟period后启动写入任务，然后每间隔period再进行一次写入
             executorService.scheduleAtFixedRate(new WriterTask(), period, period, TimeUnit.MILLISECONDS);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            // TODO: 2016/2/9 异常处理
+            endRecord();
         }
     }
 
     public void saveData(String data) {
-        dataList.add(data);
+        dataBuffer.add(data);
     }
 
     public void endRecord() {
         if (executorService != null && !executorService.isShutdown()) {
             executorService.shutdown();
         }
-        if (fileOutputStream != null) {
-            closeStream();
-        }
+        closeStream();
+        clearBuffer();
+        writingFile = null;
     }
 
+    /**
+     * 获得加速度数据存储文件名列表
+     *
+     * @return 文件名列表
+     */
     public String[] getDataFileNames() {
-        return context.getFilesDir().list(new DataFilenameFilter());
+        String[] result = context.getFilesDir().list(new DataFilenameFilter());
+        //不读取正在被写入的文件
+        if (writingFile != null && result != null) {
+            int index = Arrays.binarySearch(result, 0, result.length, writingFile);
+            if (index >= 0) {
+                System.arraycopy(result, index + 1, result, index, result.length-1 - index);
+                result[result.length-1] = null;
+            }
+        }
+        return result;
     }
 
-    public void deleteFile(String filename) {
-        context.deleteFile(filename);
-    }
-
-    public void deleteFile(String[] filenames) {
-        for (String filename : filenames) {
-            deleteFile(filename);
+    public long getLastModifyTime(String filename){
+        if(filename!=null){
+            File file = new File(context.getFilesDir().getPath() + File.separator +filename);
+            return file.lastModified();
+        }else{
+            return 0;
         }
     }
 
-    public void clearBuffer(){
-        dataList.clear();
+    public void clearBuffer() {
+        dataBuffer.clear();
     }
 
     private void closeStream() {
+        if (fileOutputStream == null) {
+            return;
+        }
         try {
             fileOutputStream.close();
         } catch (IOException e) {
@@ -118,18 +139,29 @@ public class StepDataStorageManager {
         }
     }
 
-    public long getDataStartTime(String stepDataName){
+    /**
+     * 获取加速度存储文件的记录起始时间
+     *
+     * @param stepDataName 文件名
+     * @return 起始时间
+     */
+    public long getDataStartTime(String stepDataName) {
         long result = 0;
+        if(stepDataName==null){
+            return result;
+        }
         try {
             BufferedReader reader = new BufferedReader(
                     new FileReader(
                             context.getFilesDir().getPath() + File.separator + stepDataName));
-            if(reader.ready()){
+            if (reader.ready()) {
+                //起始时间保存在第一行
                 result = Long.valueOf(reader.readLine());
             }
             reader.close();
-        } catch (IOException e) {
+        } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
+            result = 0;
         }
         return result;
     }
@@ -140,8 +172,8 @@ public class StepDataStorageManager {
         public void run() {
             synchronized (this) {
                 try {
-                    for (int i = 0; i < dataList.size(); i++) {
-                        String data = dataList.remove(0);
+                    for (int i = 0; i < dataBuffer.size(); i++) {
+                        String data = dataBuffer.remove(0);
                         if (fileOutputStream != null) {
                             fileOutputStream.write(data.getBytes());
                         }
