@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 import com.hzp.pedometer.persistance.sp.StepConfigManager;
 
@@ -50,6 +51,9 @@ public class DataCollectionManager  implements SensorEventListener {
 
 
     public void start(){
+        if(isWorking()){
+            return;
+        }
         sensorManager.registerListener(this, sensor,
                 (int) ((1.0 / StepConfigManager.getInstance().getSamplingRate()) * 1000 * 1000));//微秒
         startTime = Calendar.getInstance().getTimeInMillis();
@@ -81,9 +85,12 @@ public class DataCollectionManager  implements SensorEventListener {
      * 传感器初始化
      */
     private void initSensors() {
-        //初始化重力传感器
+        //初始化传感器
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if(sensor==null){
+            Log.e("sensor error","get accelerometer failed!");
+        }
     }
 
     @Override
@@ -108,6 +115,6 @@ public class DataCollectionManager  implements SensorEventListener {
     }
 
     interface OnDataCollectionListener {
-        public void onDataReceived(double x, double y, double z);
+        void onDataReceived(double x, double y, double z);
     }
 }

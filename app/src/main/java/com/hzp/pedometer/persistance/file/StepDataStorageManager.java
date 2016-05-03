@@ -105,18 +105,18 @@ public class StepDataStorageManager {
         if (writingFile != null && result != null) {
             int index = Arrays.binarySearch(result, 0, result.length, writingFile);
             if (index >= 0) {
-                System.arraycopy(result, index + 1, result, index, result.length-1 - index);
-                result[result.length-1] = null;
+                System.arraycopy(result, index + 1, result, index, result.length - 1 - index);
+                result[result.length - 1] = null;
             }
         }
         return result;
     }
 
-    public long getLastModifyTime(String filename){
-        if(filename!=null){
-            File file = new File(context.getFilesDir().getPath() + File.separator +filename);
+    public long getLastModifyTime(String filename) {
+        if (filename != null) {
+            File file = new File(context.getFilesDir().getPath() + File.separator + filename);
             return file.lastModified();
-        }else{
+        } else {
             return 0;
         }
     }
@@ -147,7 +147,7 @@ public class StepDataStorageManager {
      */
     public long getDataStartTime(String stepDataName) {
         long result = 0;
-        if(stepDataName==null){
+        if (stepDataName == null) {
             return result;
         }
         try {
@@ -170,19 +170,15 @@ public class StepDataStorageManager {
 
         @Override
         public void run() {
-            synchronized (this) {
-                try {
-                    for (int i = 0; i < dataBuffer.size(); i++) {
-                        String data = dataBuffer.remove(0);
-                        if (fileOutputStream != null) {
-                            fileOutputStream.write(data.getBytes());
-                        }
+            try {
+                for (int i = 0; i < dataBuffer.size(); i++) {
+                    String data = dataBuffer.remove(0);
+                    if (fileOutputStream != null) {
+                        fileOutputStream.write(data.getBytes());
                     }
-                } catch (IndexOutOfBoundsException | IOException e) {
-                    endRecord();
-                } finally {
-                    notifyAll();
                 }
+            } catch (IndexOutOfBoundsException | IOException e) {
+                endRecord();
             }
         }
     }
