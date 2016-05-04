@@ -4,9 +4,11 @@
     <string name="key_algorithm_setting">algorithm_setting</string>
     <string name="KEY_ALPHA">ALPHA</string>
     <string name="KEY_BETA">BETA</string>
+    <string name="KEY_GAMMA">GAMMA</string>
     <string name="KEY_K_NUMBER">K_NUMBER</string>
     <string name="KEY_M_NUMBER">M_NUMBER</string>
-    <string name="KEY_FILTER_WINDOW_SIZE">FILTER_WINDOW_SIZE</string>
+    <string name="KEY_MEDIAN_WINDOW_SIZE">MEDIAN_WINDOW_SIZE</string>
+    <string name="KEY_WAVELET_WINDOW_SIZE">WAVELET_WINDOW_SIZE</string>
     <string name="KEY_SAMPLING_RATE">SAMPLING_RATE</string>
     <!--应用设置-->
     <string name="key_app_setting">app_setting</string>

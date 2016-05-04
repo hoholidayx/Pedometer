@@ -2,6 +2,8 @@ package com.hzp.pedometer.persistance.sp;
 
 import android.content.Context;
 
+import com.hzp.pedometer.R;
+
 /**
  * @author 何志鹏 on 2016/1/17.
  * @email hoholiday@hotmail.com
@@ -11,18 +13,20 @@ import android.content.Context;
 public class StepConfigManager extends BaseSp{
 
 
-    private static final String KEY_ALPHA = "ALPHA";
-    private static final String KEY_BETA = "BETA";
-    private static final String KEY_K_NUMBER = "K_NUMBER";
-    private static final String KEY_M_NUMBER = "M_NUMBER";
-    private static final String KEY_WAVELET_WINDOW_SIZE = "WAVELET_WINDOW_SIZE";
-    private static final String KEY_MEDIAN_WINDOW_SIZE = "MEDIAN_WINDOW_SIZE";
-    private static final String KEY_SAMPLING_RATE = "SAMPLING_RATE";
+    private  String KEY_ALPHA;
+    private  String KEY_BETA;
+    private  String KEY_GAMMA;
+    private  String KEY_K_NUMBER;
+    private  String KEY_M_NUMBER ;
+    private  String KEY_WAVELET_WINDOW_SIZE;
+    private  String KEY_MEDIAN_WINDOW_SIZE;
+    private  String KEY_SAMPLING_RATE;
 
-    public static final double DEFAULT_ALPHA = 2.5;
-    public static final double DEFAULT_BETA = -3.0;
-    public static final int DEFAULT_K_NUMBER = 25;
-    public static final int DEFAULT_M_NUMBER = 10;
+    public static final double DEFAULT_ALPHA = 0.3;
+    public static final double DEFAULT_BETA = 0.4;
+    public static final double DEFAULT_GAMMA = 0.7;
+    public static final int DEFAULT_K_NUMBER = 15;
+    public static final int DEFAULT_M_NUMBER = 3;
     public static final int DEFAULT_STEP_INTERVAL_MAX = 2000;//ms
     public static final int DEFAULT_STEP_INTERVAL_MIN = 0;//ms
     public static final int DEFAULT_WAVELET_WINDOW_SIZE = 200;//小波变换窗口大小
@@ -50,6 +54,15 @@ public class StepConfigManager extends BaseSp{
     @Override
     public void init(Context context){
         super.init(context);
+
+        KEY_ALPHA = context.getString(R.string.KEY_ALPHA);
+        KEY_BETA = context.getString(R.string.KEY_BETA);
+        KEY_GAMMA = context.getString(R.string.KEY_GAMMA);
+        KEY_K_NUMBER = context.getString(R.string.KEY_K_NUMBER);
+        KEY_M_NUMBER = context.getString(R.string.KEY_M_NUMBER);
+        KEY_WAVELET_WINDOW_SIZE = context.getString(R.string.KEY_WAVELET_WINDOW_SIZE);
+        KEY_MEDIAN_WINDOW_SIZE = context.getString(R.string.KEY_MEDIAN_WINDOW_SIZE);
+        KEY_SAMPLING_RATE = context.getString(R.string.KEY_SAMPLING_RATE);
     }
 
     public double getAlpha(){
@@ -66,6 +79,14 @@ public class StepConfigManager extends BaseSp{
 
     public void setBeta(double beta){
        putDouble(KEY_BETA,beta);
+    }
+
+    public double getGamma(){
+        return getDouble(KEY_GAMMA,DEFAULT_GAMMA);
+    }
+
+    public void setGamma(double gamma){
+        putDouble(KEY_GAMMA,gamma);
     }
 
     public int getKNumber(){

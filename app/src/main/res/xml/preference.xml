@@ -2,35 +2,52 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="@string/key_algorithm_setting">
     <PreferenceCategory android:title="参数设置">
-        <EditTextPreference
-            android:key="@string/KEY_ALPHA"
-            android:summary="alpha值"
-            android:inputType="numberDecimal"
-            android:title="Alpha"/>
-        <EditTextPreference
-            android:key="@string/KEY_BETA"
-            android:summary="beta值"
-            android:inputType="numberDecimal"
-            android:title="Beta"/>
-        <EditTextPreference
-            android:key="@string/KEY_K_NUMBER"
-            android:summary="K值"
-            android:inputType="numberSigned"
-            android:title="K"/>
-        <EditTextPreference
-            android:key="@string/KEY_ALPHA"
-            android:summary="M值"
-            android:inputType="numberSigned"
-            android:title="M"/>
-        <EditTextPreference
-            android:key="@string/KEY_FILTER_WINDOW_SIZE"
-            android:summary="处理数据的窗口大小"
-            android:inputType="numberSigned"
-            android:title="windows size"/>
-        <EditTextPreference
-            android:key="@string/KEY_SAMPLING_RATE"
-            android:summary="设备采样率"
-            android:inputType="numberSigned"
-            android:title="采样率"/>
+
+        <PreferenceCategory android:title="算法参数设置">
+            <EditTextPreference
+                android:inputType="numberDecimal"
+                android:key="@string/KEY_ALPHA"
+                android:summary="Alpha值"
+                android:title="Alpha" />
+            <EditTextPreference
+                android:inputType="numberDecimal"
+                android:key="@string/KEY_BETA"
+                android:summary="Beta值"
+                android:title="Beta" />
+            <EditTextPreference
+                android:inputType="numberDecimal"
+                android:key="@string/KEY_GAMMA"
+                android:summary="Gamma值"
+                android:title="Gamma" />
+            <EditTextPreference
+                android:inputType="numberSigned"
+                android:key="@string/KEY_K_NUMBER"
+                android:summary="K值"
+                android:title="K" />
+            <EditTextPreference
+                android:inputType="numberSigned"
+                android:key="@string/KEY_M_NUMBER"
+                android:summary="M值"
+                android:title="M" />
+        </PreferenceCategory>
+
+        <PreferenceCategory android:title="其他参数设置">
+            <EditTextPreference
+                android:inputType="numberSigned"
+                android:key="@string/KEY_WAVELET_WINDOW_SIZE"
+                android:summary="小波变换窗口大小"
+                android:title="windows size" />
+            <EditTextPreference
+                android:inputType="numberSigned"
+                android:key="@string/KEY_MEDIAN_WINDOW_SIZE"
+                android:summary="中值滤波窗口大小"
+                android:title="windows size" />
+            <EditTextPreference
+                android:inputType="numberSigned"
+                android:key="@string/KEY_SAMPLING_RATE"
+                android:summary="设备采样率"
+                android:title="采样率" />
+        </PreferenceCategory>
+
     </PreferenceCategory>
 </PreferenceScreen>
