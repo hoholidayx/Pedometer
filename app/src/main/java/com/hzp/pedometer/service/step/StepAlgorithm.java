@@ -117,13 +117,13 @@ public class StepAlgorithm {
 
     public void preAdjustPeak(double a) {
 
-        peakWindow.add(a - Th_preMove);
+        peakWindow.add(a);
 
     }
 
     public void preAdjustValley(double a) {
 
-        valleyWindow.add(a - Th_stepFinish);
+        valleyWindow.add(a);
 
     }
 
@@ -139,13 +139,13 @@ public class StepAlgorithm {
     public void adjustThEnterPeak() {
         peakAvg = BaseMath.avg(peakWindow.getList());
 
-        Th_enterPeak = Th_preMove + ALPHA * peakAvg;
+        Th_enterPeak = ALPHA * peakAvg;
     }
 
     public void adjustThEnterValley() {
         valleyAvg = BaseMath.avg(valleyWindow.getList());
 
-        Th_enterValley =Th_stepFinish + BETA * valleyAvg;
+        Th_enterValley =BETA * valleyAvg;
     }
 
     public void adjustThStepTime() {
