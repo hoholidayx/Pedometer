@@ -3,9 +3,7 @@ package com.hzp.pedometer.service.step;
 import android.util.Log;
 
 
-
-import java.util.LinkedList;
-import java.util.List;
+import com.hzp.pedometer.utils.SlideWindow;
 
 import math.utils.BaseMath;
 
@@ -43,12 +41,12 @@ public class StepAlgorithm {
     public double BETA = 0.4;//波谷自适应阈值调整参数
     public double GAMMA = 0.7 ;//时间间隔自适应阈值调整参数
 
-    public int windowSize = 15;//加速度分析窗口 影响  适应性《——》稳定性
-    public int timeWindowSize = 3;//时间分析窗口
+    public int K = 15;//加速度分析窗口
+    public int M = 3;//时间分析窗口
 
-    private List<Double> peakList = new LinkedList<>();
-    private List<Double> valleyList = new LinkedList<>();
-    private List<Double> stepTimeList = new LinkedList<>();
+    private SlideWindow<Double> peakWindow;
+    private SlideWindow<Double> valleyWindow;
+    private SlideWindow<Double> stepTimeWindow;
 
 
     public double anm1,anm2;//最近检测到的两次加速度
@@ -82,9 +80,9 @@ public class StepAlgorithm {
 
         stepSwitch = false;
 
-        peakList.clear();
-        valleyList.clear();
-        stepTimeList.clear();
+        peakWindow = new SlideWindow<>(K);
+        valleyWindow = new SlideWindow<>(K);
+        stepTimeWindow = new SlideWindow<>(M);
 
         anm1 = anm2 =0;
 
@@ -118,48 +116,41 @@ public class StepAlgorithm {
 
 
     public void preAdjustPeak(double a) {
-        if (peakList.size() > windowSize) {
-            peakList.remove(0);
-        }
-        peakList.add(a-Th_preMove);
+
+        peakWindow.add(a - Th_preMove);
 
     }
 
     public void preAdjustValley(double a) {
-        if (valleyList.size() > windowSize) {
-            valleyList.remove(0);
-        }
-        valleyList.add( a - Th_stepFinish);
+
+        valleyWindow.add(a - Th_stepFinish);
 
     }
 
     public void preAdjustTime(long timeInterval) {
-        if (stepTimeList.size() > timeWindowSize) {
-            stepTimeList.remove(0);
-        }
 
         if (timeInterval > 2000) {
             timeInterval = 2000;
         }
 
-        stepTimeList.add((double) timeInterval);
+        stepTimeWindow.add((double) timeInterval);
     }
 
     public void adjustThEnterPeak() {
-        peakAvg = BaseMath.avg(peakList);
+        peakAvg = BaseMath.avg(peakWindow.getList());
 
         Th_enterPeak = Th_preMove + ALPHA * peakAvg;
     }
 
     public void adjustThEnterValley() {
-        valleyAvg = BaseMath.avg(valleyList);
+        valleyAvg = BaseMath.avg(valleyWindow.getList());
 
         Th_enterValley =Th_stepFinish + BETA * valleyAvg;
     }
 
     public void adjustThStepTime() {
-        double avg = BaseMath.avg(stepTimeList);
-        Th_stepTime = (long) ((GAMMA*avg) - (1-GAMMA)*BaseMath.stdev(stepTimeList,avg));
+        double avg = BaseMath.avg(stepTimeWindow.getList());
+        Th_stepTime = (long) ((GAMMA*avg) - (1-GAMMA)*BaseMath.stdev(stepTimeWindow.getList(),avg));
     }
 
     /**
