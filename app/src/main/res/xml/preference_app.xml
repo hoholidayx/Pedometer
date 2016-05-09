@@ -6,5 +6,24 @@
             android:key="@string/KEY_ENABLE_NORMAL_STEP_COUNT"
             android:summary="计步服务"
             android:defaultValue="true"/>
+
+        <EditTextPreference
+            android:inputType="text"
+            android:key="@string/KEY_M_NUMBER"
+            android:summary="中文或英文符号组成"
+            android:title="用户名" />
+
+        <EditTextPreference
+            android:inputType="numberDecimal"
+            android:key="@string/KEY_M_NUMBER"
+            android:summary="cm"
+            android:title="身高" />
+
+        <EditTextPreference
+            android:inputType="numberDecimal"
+            android:key="@string/KEY_M_NUMBER"
+            android:summary="kg"
+            android:title="体重" />
+
     </PreferenceCategory>
 </PreferenceScreen>
