@@ -9,10 +9,64 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.github.mikephil.charting.charts.CombinedChart
+        <!--测试用-->
+        <TableLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:id="@+id/statistics_weekly_combined_chart"/>
+            android:gravity="center"
+            android:layout_marginLeft="30dp"
+            android:layout_height="60dp">
+
+            <TableRow
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                >
+                <TextView
+                    android:text="总步数"/>
+                <TextView
+                    android:layout_marginLeft="15dp"
+                    android:text="42348"/>
+                <TextView
+                    android:layout_marginLeft="15dp"
+                    android:text="步"/>
+            </TableRow>
+            <TableRow
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                >
+                <TextView
+                    android:text="总里程"/>
+                <TextView
+                    android:layout_marginLeft="15dp"
+                    android:text="11.5"/>
+                <TextView
+                    android:layout_marginLeft="15dp"
+                    android:text="km"/>
+            </TableRow>
+            <TableRow
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                >
+                <TextView
+                    android:text="卡路里消耗"/>
+                <TextView
+                    android:layout_marginLeft="15dp"
+                    android:text="566.8"/>
+                <TextView
+                    android:layout_marginLeft="15dp"
+                    android:text="ca"/>
+            </TableRow>
+        </TableLayout>
+        <!--测试结束-->
+
+        <com.github.mikephil.charting.charts.CombinedChart
+            android:id="@+id/statistics_combined_chart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/statistics_pie_chart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
 
     </LinearLayout>
 

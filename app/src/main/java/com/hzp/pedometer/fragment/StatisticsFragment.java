@@ -1,12 +1,16 @@
 package com.hzp.pedometer.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.mikephil.charting.charts.CombinedChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -16,6 +20,8 @@ import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.entity.DailyData;
 import com.hzp.pedometer.persistance.db.DailyDataManager;
@@ -29,6 +35,7 @@ public class StatisticsFragment extends Fragment {
     private int recentDays = 7;
 
     private CombinedChart combinedChart;
+    private PieChart pieChart;
 
     public StatisticsFragment() {
         // Required empty public constructor
@@ -54,13 +61,20 @@ public class StatisticsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_statistics, container, false);
 
-        combinedChart = (CombinedChart) view.findViewById(R.id.statistics_weekly_combined_chart);
-        setupWeeklyBarChart(combinedChart);
+        combinedChart = (CombinedChart) view.findViewById(R.id.statistics_combined_chart);
+        setupCombinedBarChart(combinedChart);
+
+        pieChart = (PieChart) view.findViewById(R.id.statistics_pie_chart);
+        setupPieChart(pieChart);
 
         return view;
     }
 
-    private void setupWeeklyBarChart(CombinedChart barChart) {
+    /**
+     * 配置生成混合柱状图表
+     * @param barChart
+     */
+    private void setupCombinedBarChart(CombinedChart barChart) {
         barChart.setTouchEnabled(false);
         barChart.setScaleEnabled(false);
         barChart.setDoubleTapToZoomEnabled(false);
@@ -109,7 +123,9 @@ public class StatisticsFragment extends Fragment {
         return d;
     }
 
-    //生成混合图表的线性数据
+    /**
+     *生成混合图表的线性数据
+     */
     private LineData generateLineDataAvgPerDay(DailyData[][] dataList) {
 
         LineData d = new LineData();
@@ -145,7 +161,9 @@ public class StatisticsFragment extends Fragment {
         return d;
     }
 
-    //生成混合图表的柱状数据
+    /**
+     * 生成混合图表的柱状数据
+     */
     private BarData generateBarDataStepPerDay(DailyData[][] dataList) {
 
         BarData d = new BarData();
@@ -173,6 +191,115 @@ public class StatisticsFragment extends Fragment {
 
         return d;
     }
+
+    /**
+     * 配置生成饼状图
+     * @param pieChart
+     */
+    private void setupPieChart(PieChart pieChart){
+        pieChart.setHoleColorTransparent(true);
+
+        pieChart.setHoleRadius(60f);  //半径
+        pieChart.setTransparentCircleRadius(64f); // 半透明圈
+
+        pieChart.setDescription("步数统计的时间分布");
+
+        // mChart.setDrawYValues(true);
+        pieChart.setDrawCenterText(true);  //饼状图中间可以添加文字
+
+        pieChart.setDrawHoleEnabled(true);
+
+        pieChart.setRotationAngle(0); // 初始旋转角度
+
+        //pieChart.setDrawXValues(true);
+
+        // enable rotation of the chart by touch
+        pieChart.setRotationEnabled(true); // 可以手动旋转
+
+        // display percentage values
+        pieChart.setUsePercentValues(true);  //显示成百分比
+        // mChart.setUnit(" €");
+        // mChart.setDrawUnitsInChart(true);
+
+        // add a selection listener
+//		mChart.setOnChartValueSelectedListener(this);
+        // mChart.setTouchEnabled(false);
+
+        //		mChart.setOnAnimationListener(this);
+
+        pieChart.setCenterText("总步数 23412");  //饼状图中间的文字
+
+        //设置数据
+        pieChart.setData(getPieData(4,1.1f));
+
+        // undo all highlights
+//		pieChart.highlightValues(null);
+//		pieChart.invalidate();
+
+        Legend mLegend = pieChart.getLegend();  //设置比例图
+        mLegend.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);  //最右边显示
+//		mLegend.setForm(LegendForm.LINE);  //设置比例图的形状，默认是方形
+        mLegend.setXEntrySpace(7f);
+        mLegend.setYEntrySpace(5f);
+
+        pieChart.animateXY(1000, 1000);  //设置动画
+        // mChart.spin(2000, 0, 360);
+    }
+
+    /**
+     * 获取饼状图数据
+     * @param count 分成几部分
+     * @param range 用于饼状图的数据内容
+     */
+    private PieData getPieData(int count, float range) {
+
+        ArrayList<String> xValues = new ArrayList<String>();  //xVals用来表示每个饼块上的内容
+
+        xValues.add("早上");
+        xValues.add("中午");
+        xValues.add("下午");
+        xValues.add("晚上");
+
+        ArrayList<Entry> yValues = new ArrayList<Entry>();  //yVals用来表示封装每个饼块的实际数据
+
+        // 饼图数据
+        /**
+         * 将一个饼形图分成四部分， 四部分的数值比例为14:14:34:38
+         * 所以 14代表的百分比就是14%
+         */
+        float quarterly1 = 14;
+        float quarterly2 = 14;
+        float quarterly3 = 34;
+        float quarterly4 = 38;
+
+        yValues.add(new Entry(quarterly1, 0));
+        yValues.add(new Entry(quarterly2, 1));
+        yValues.add(new Entry(quarterly3, 2));
+        yValues.add(new Entry(quarterly4, 3));
+
+        //y轴的集合
+        PieDataSet pieDataSet = new PieDataSet(yValues, "最近7天"/*显示在比例图上*/);
+        pieDataSet.setSliceSpace(0f); //设置个饼状图之间的距离
+
+        ArrayList<Integer> colors = new ArrayList<Integer>();
+
+        // 饼图颜色
+        colors.add(Color.rgb(205, 205, 205));
+        colors.add(Color.rgb(114, 188, 223));
+        colors.add(Color.rgb(255, 123, 124));
+        colors.add(Color.rgb(57, 135, 200));
+
+        pieDataSet.setColors(colors);
+
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        float px = 5 * (metrics.densityDpi / 160f);
+        pieDataSet.setSelectionShift(px); // 选中态多出的长度
+
+        PieData pieData = new PieData(xValues, pieDataSet);
+
+        return pieData;
+    }
+
 
     private DailyData[][] getDataRecentDays(int days) {
         Calendar ca = Calendar.getInstance();
