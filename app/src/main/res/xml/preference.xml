@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="@string/key_algorithm_setting">
-    <PreferenceCategory android:title="参数设置">
 
         <PreferenceCategory android:title="算法参数设置">
             <EditTextPreference
@@ -48,6 +47,4 @@
                 android:summary="设备采样率"
                 android:title="采样率" />
         </PreferenceCategory>
-
-    </PreferenceCategory>
 </PreferenceScreen>
