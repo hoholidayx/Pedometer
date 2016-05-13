@@ -38,8 +38,8 @@ public class CoreService extends Service implements DataCollectionManager.OnData
     private boolean normalModeSwitch = false, realTimeModeSwitch = false;
 
     private ScheduledExecutorService normalStepCountService;
-    private static final int RECORD_TASK_INTERVAL = 5;//进行数据记录的时间间隔min
-    private static final int CALCULATE_STEP_TASK_INTERVAL = 30 ;//进行数据计算的时间间隔min
+    private static final int RECORD_TASK_INTERVAL = 1;//进行数据记录的时间间隔min
+    private static final int CALCULATE_STEP_TASK_INTERVAL = 3 ;//进行数据计算的时间间隔min
 
     public CoreService() {
         binder = new CoreBinder();
@@ -243,6 +243,8 @@ public class CoreService extends Service implements DataCollectionManager.OnData
                             startTime,
                             normalStepCountModule.getEndTime()
                             ,stepCount
+                            ,ApplyUtils.getmMileage(stepCount)
+                            ,ApplyUtils.getCalorieConsume(stepCount)
                             );
                 }
             }
