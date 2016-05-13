@@ -11,6 +11,7 @@ import com.hzp.pedometer.R;
 import com.hzp.pedometer.components.ArcProgress;
 import com.hzp.pedometer.entity.DailyData;
 import com.hzp.pedometer.persistance.db.DailyDataManager;
+import com.hzp.pedometer.service.ApplyUtils;
 
 import java.util.Calendar;
 import java.util.Random;
@@ -89,10 +90,12 @@ public class HomePageFragment extends Fragment {
                             progressStep.setContent(String.valueOf(finalStepCount));
                             progressStep.setProgress(progressStep.getProgress() + 1);
 
-                            progressCa.setContent(String.format("%.2f",finalStepCount*0.04));
+                            progressCa.setContent(String.format("%.2f"
+                                    , ApplyUtils.getCalorieConsume(finalStepCount)));
                             progressCa.setProgress(progressCa.getProgress() + 1);
 
-                            progressKm.setContent(String.format("%.2f",finalStepCount * 0.8 / 1000));
+                            progressKm.setContent(String.format("%.2f"
+                                    ,ApplyUtils.getmMileage(finalStepCount)));
                             progressKm.setProgress(progressKm.getProgress() + 1);
                         }
                     });
