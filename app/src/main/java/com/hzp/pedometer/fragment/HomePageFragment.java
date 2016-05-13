@@ -80,10 +80,16 @@ public class HomePageFragment extends Fragment {
             @Override
             public void run() {
                 int stepCount = 0;
+                double calorieSum = 0,milesSum=0;
                 Random rd = new Random();
-                for (DailyData data : dataList) {
+                for (final DailyData data : dataList) {
                     stepCount += data.getStepCount();
+                    calorieSum +=data.getCalorie();
+                    milesSum +=data.getMiles();
+
                     final int finalStepCount = stepCount;
+                    final double finalCalorieSum  = calorieSum;
+                    final double finalMilesSum = milesSum;
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -91,11 +97,11 @@ public class HomePageFragment extends Fragment {
                             progressStep.setProgress(progressStep.getProgress() + 1);
 
                             progressCa.setContent(String.format("%.2f"
-                                    , ApplyUtils.getCalorieConsume(finalStepCount)));
+                                    , finalCalorieSum));
                             progressCa.setProgress(progressCa.getProgress() + 1);
 
                             progressKm.setContent(String.format("%.2f"
-                                    ,ApplyUtils.getmMileage(finalStepCount)));
+                                    ,finalMilesSum));
                             progressKm.setProgress(progressKm.getProgress() + 1);
                         }
                     });
