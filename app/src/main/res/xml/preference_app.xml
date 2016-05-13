@@ -9,21 +9,39 @@
 
         <EditTextPreference
             android:inputType="text"
-            android:key="@string/KEY_M_NUMBER"
+            android:key="username"
             android:summary="中文或英文符号组成"
             android:title="用户名" />
 
         <EditTextPreference
             android:inputType="numberDecimal"
-            android:key="@string/KEY_M_NUMBER"
+            android:key="height"
             android:summary="cm"
             android:title="身高" />
 
         <EditTextPreference
             android:inputType="numberDecimal"
-            android:key="@string/KEY_M_NUMBER"
+            android:key="weight"
             android:summary="kg"
             android:title="体重" />
+
+        <EditTextPreference
+            android:inputType="numberSigned"
+            android:key="@string/KEY_STEPS_SUM"
+            android:summary="已走过的步数"
+            android:title="总步数"/>
+
+        <EditTextPreference
+            android:inputType="numberDecimal"
+            android:key="@string/KEY_MILES_SUM"
+            android:summary="里程总数km"
+            android:title="总里程"/>
+
+        <EditTextPreference
+            android:inputType="numberDecimal"
+            android:key="@string/KEY_CALORIE_SUM"
+            android:summary="消耗的总卡路里数"
+            android:title="总卡路里消耗"/>
 
     </PreferenceCategory>
 </PreferenceScreen>
