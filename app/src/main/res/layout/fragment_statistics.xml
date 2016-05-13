@@ -24,7 +24,8 @@
                     android:text="总步数"/>
                 <TextView
                     android:layout_marginLeft="15dp"
-                    android:text="42348"/>
+                    android:text="0"
+                    android:id="@+id/statistics_steps_sum"/>
                 <TextView
                     android:layout_marginLeft="15dp"
                     android:text="步"/>
@@ -37,7 +38,8 @@
                     android:text="总里程"/>
                 <TextView
                     android:layout_marginLeft="15dp"
-                    android:text="11.5"/>
+                    android:text="0.0"
+                    android:id="@+id/statistics_miles_sum"/>
                 <TextView
                     android:layout_marginLeft="15dp"
                     android:text="km"/>
@@ -50,7 +52,8 @@
                     android:text="卡路里消耗"/>
                 <TextView
                     android:layout_marginLeft="15dp"
-                    android:text="566.8"/>
+                    android:text="0.0"
+                    android:id="@+id/statistics_calorie_sum"/>
                 <TextView
                     android:layout_marginLeft="15dp"
                     android:text="ca"/>

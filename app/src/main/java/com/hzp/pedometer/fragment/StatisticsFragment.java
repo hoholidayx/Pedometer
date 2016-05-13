@@ -7,6 +7,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -25,6 +26,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.hzp.pedometer.R;
 import com.hzp.pedometer.entity.DailyData;
 import com.hzp.pedometer.persistance.db.DailyDataManager;
+import com.hzp.pedometer.persistance.sp.ApplyDataManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,6 +36,7 @@ public class StatisticsFragment extends Fragment {
 
     private int recentDays = 7;
 
+    private TextView stepsSum,milesSum,calorieSum;
     private CombinedChart combinedChart;
     private PieChart pieChart;
 
@@ -60,6 +63,11 @@ public class StatisticsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_statistics, container, false);
+
+        stepsSum = (TextView) view.findViewById(R.id.statistics_steps_sum);
+        milesSum = (TextView) view.findViewById(R.id.statistics_miles_sum);
+        calorieSum = (TextView) view.findViewById(R.id.statistics_calorie_sum);
+        setupTableData(stepsSum,milesSum,calorieSum);
 
         combinedChart = (CombinedChart) view.findViewById(R.id.statistics_combined_chart);
         setupCombinedBarChart(combinedChart);
@@ -300,6 +308,17 @@ public class StatisticsFragment extends Fragment {
         return pieData;
     }
 
+    /**
+     * 设置表格内的统计数据
+     * @param stepsSum 总步数
+     * @param milesSum 总里程
+     * @param calorieSum 总卡路里消耗
+     */
+    private void setupTableData(TextView stepsSum,TextView milesSum,TextView calorieSum){
+        stepsSum.setText(String.valueOf(ApplyDataManager.getInstance().getStepsSum()));
+        milesSum.setText(String.valueOf(ApplyDataManager.getInstance().getMileSum()));
+        calorieSum.setText(String.valueOf(ApplyDataManager.getInstance().getCalorieSum()));
+    }
 
     private DailyData[][] getDataRecentDays(int days) {
         Calendar ca = Calendar.getInstance();
