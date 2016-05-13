@@ -13,4 +13,7 @@
     <!--应用设置-->
     <string name="key_app_setting">app_setting</string>
     <string name="KEY_ENABLE_NORMAL_STEP_COUNT">ENABLE_NORMAL_STEP_COUNT</string>
+    <string name="KEY_STEPS_SUM">STEPS_SUM</string>
+    <string name="KEY_MILES_SUM">MILES_SUM</string>
+    <string name="KEY_CALORIE_SUM">CALORIE_SUM</string>
 </resources>

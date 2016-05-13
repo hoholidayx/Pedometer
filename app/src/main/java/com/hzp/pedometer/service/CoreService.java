@@ -13,6 +13,7 @@ import android.util.Log;
 import com.hzp.pedometer.persistance.db.DailyDataManager;
 import com.hzp.pedometer.persistance.file.FileUtils;
 import com.hzp.pedometer.persistance.file.StepDataStorageManager;
+import com.hzp.pedometer.persistance.sp.ApplyDataManager;
 import com.hzp.pedometer.persistance.sp.StepConfigManager;
 import com.hzp.pedometer.service.step.StepCountModule;
 import com.hzp.pedometer.utils.AppConstants;
@@ -60,6 +61,7 @@ public class CoreService extends Service implements DataCollectionManager.OnData
         StepDataStorageManager.getInstance().init(getApplicationContext());
         StepConfigManager.getInstance().init(getApplicationContext());
         DailyDataManager.getInstance().init(getApplicationContext());
+        ApplyDataManager.getInstance().init(getApplicationContext());
 
         normalStepCountModule = new StepCountModule(getApplicationContext(),StepCountMode.NORMAL);
         realTimeStepCountModule = new StepCountModule(getApplicationContext(),StepCountMode.REAL_TIME);
