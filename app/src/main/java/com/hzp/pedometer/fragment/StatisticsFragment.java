@@ -293,8 +293,8 @@ public class StatisticsFragment extends Fragment {
 
         // 饼图颜色
         colors.add(Color.rgb(205, 205, 205));
-        colors.add(Color.rgb(114, 188, 223));
         colors.add(Color.rgb(255, 123, 124));
+        colors.add(Color.rgb(114, 188, 223));
         colors.add(Color.rgb(57, 135, 200));
 
         pieDataSet.setColors(colors);
