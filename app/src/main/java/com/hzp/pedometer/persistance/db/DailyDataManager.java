@@ -63,18 +63,21 @@ public class DailyDataManager {
         }
     }
 
-    public void saveData(long modifyTime, long startTime, long endTime, int stepCount) {
+    public void saveData(long modifyTime, long startTime, long endTime, int stepCount
+                            ,double miles,double calorie) {
         ContentValues values = new ContentValues();
         values.put(DailyDataTable.DailyDataEntry.COLUMNS_NAME_MODIFY_TIME, modifyTime);
         values.put(DailyDataTable.DailyDataEntry.COLUMNS_NAME_START_TIME, startTime);
         values.put(DailyDataTable.DailyDataEntry.COLUMNS_NAME_END_TIME, endTime);
         values.put(DailyDataTable.DailyDataEntry.COLUMNS_NAME_STEP_COUNT, stepCount);
-
+        values.put(DailyDataTable.DailyDataEntry.COLUMNS_NAME_MILES,miles);
+        values.put(DailyDataTable.DailyDataEntry.COLUMNS_NAME_CALORIE,calorie);
         database.insert(DailyDataTable.TABLE_NAME, null, values);
     }
 
     public void saveData(DailyData data) {
-        saveData(data.getModifyTime(), data.getStartTime(), data.getEndTime(), data.getStepCount());
+        saveData(data.getModifyTime(), data.getStartTime(), data.getEndTime(), data.getStepCount()
+                    ,data.getMiles(),data.getCalorie());
     }
 
     public DailyData[] getDataListByDay(int year,int month,int dayOfMonth){
@@ -96,7 +99,9 @@ public class DailyDataManager {
                 DailyDataTable.DailyDataEntry.COLUMNS_NAME_MODIFY_TIME,
                 DailyDataTable.DailyDataEntry.COLUMNS_NAME_START_TIME,
                 DailyDataTable.DailyDataEntry.COLUMNS_NAME_END_TIME,
-                DailyDataTable.DailyDataEntry.COLUMNS_NAME_STEP_COUNT
+                DailyDataTable.DailyDataEntry.COLUMNS_NAME_STEP_COUNT,
+                DailyDataTable.DailyDataEntry.COLUMNS_NAME_MILES,
+                DailyDataTable.DailyDataEntry.COLUMNS_NAME_CALORIE,
         };
 
         String selection =
@@ -111,7 +116,7 @@ public class DailyDataManager {
 
         Cursor c = database.query(
                 DailyDataTable.TABLE_NAME,
-                projection,                               // The columns to return
+                null,                               // The columns to return
                 selection,                                // The columns for the WHERE clause
                 selectionArgs,                            // The values for the WHERE clause
                 null,                                     // don't group the rows

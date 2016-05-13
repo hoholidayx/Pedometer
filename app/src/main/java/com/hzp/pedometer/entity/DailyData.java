@@ -8,6 +8,8 @@ public class DailyData {
     private long modifyTime;
     private long startTime,endTime;
     private int stepCount;
+    private double miles;
+    private double calorie;
 
     public long getModifyTime() {
         return modifyTime;
@@ -42,6 +44,24 @@ public class DailyData {
 
     public DailyData setStepCount(int stepCount) {
         this.stepCount = stepCount;
+        return this;
+    }
+
+    public double getMiles() {
+        return miles;
+    }
+
+    public DailyData setMiles(double miles) {
+        this.miles = miles;
+        return this;
+    }
+
+    public double getCalorie() {
+        return calorie;
+    }
+
+    public DailyData setCalorie(double calorie) {
+        this.calorie = calorie;
         return this;
     }
 }
