@@ -235,10 +235,11 @@ public class StatisticsFragment extends Fragment {
 
         //		mChart.setOnAnimationListener(this);
 
-        pieChart.setCenterText("总步数 23412");  //饼状图中间的文字
+        int[] data = getPieData();
+        pieChart.setCenterText("总步数 "+data[0]);  //饼状图中间的文字
 
         //设置数据
-        pieChart.setData(getPieData(4,1.1f));
+        pieChart.setData(generatePieData(4, 1.1f,data));
 
         // undo all highlights
 //		pieChart.highlightValues(null);
@@ -259,7 +260,7 @@ public class StatisticsFragment extends Fragment {
      * @param count 分成几部分
      * @param range 用于饼状图的数据内容
      */
-    private PieData getPieData(int count, float range) {
+    private PieData generatePieData(int count, float range,int[] data) {
 
         ArrayList<String> xValues = new ArrayList<String>();  //xVals用来表示每个饼块上的内容
 
@@ -275,15 +276,11 @@ public class StatisticsFragment extends Fragment {
          * 将一个饼形图分成四部分， 四部分的数值比例为14:14:34:38
          * 所以 14代表的百分比就是14%
          */
-        float quarterly1 = 14;
-        float quarterly2 = 14;
-        float quarterly3 = 34;
-        float quarterly4 = 38;
 
-        yValues.add(new Entry(quarterly1, 0));
-        yValues.add(new Entry(quarterly2, 1));
-        yValues.add(new Entry(quarterly3, 2));
-        yValues.add(new Entry(quarterly4, 3));
+        yValues.add(new Entry(data[1], 0));
+        yValues.add(new Entry(data[2], 1));
+        yValues.add(new Entry(data[3], 2));
+        yValues.add(new Entry(data[4], 3));
 
         //y轴的集合
         PieDataSet pieDataSet = new PieDataSet(yValues, "最近7天"/*显示在比例图上*/);
@@ -306,6 +303,85 @@ public class StatisticsFragment extends Fragment {
         PieData pieData = new PieData(xValues, pieDataSet);
 
         return pieData;
+    }
+
+    /**
+     * 获得饼状图数据
+     * @return int[]: 0 总数 1 ~4 饼图的四项数据
+     */
+    private int[] getPieData(){
+        DailyData[][] dataList = getDataRecentDays(recentDays);
+        int stepsSum = 0;
+        int sum1=0,sum2=0,sum3=0,sum4=0;
+
+        //时段1下限
+        Calendar ca1Min = Calendar.getInstance();
+        ca1Min.set(Calendar.HOUR_OF_DAY,0);
+        ca1Min.set(Calendar.MINUTE,1);
+        //时段1上限
+        Calendar ca1Max = Calendar.getInstance();
+        ca1Max.set(Calendar.HOUR_OF_DAY,10);
+        ca1Max.set(Calendar.MINUTE,0);
+
+        //时段2下限
+        Calendar ca2Min = Calendar.getInstance();
+        ca2Min.set(Calendar.HOUR_OF_DAY,10);
+        ca2Min.set(Calendar.MINUTE,1);
+        //时段2上限
+        Calendar ca2Max = Calendar.getInstance();
+        ca2Max.set(Calendar.HOUR_OF_DAY,14);
+        ca2Max.set(Calendar.MINUTE,0);
+
+        //时段3下限
+        Calendar ca3Min = Calendar.getInstance();
+        ca3Min.set(Calendar.HOUR_OF_DAY,14);
+        ca3Min.set(Calendar.MINUTE,1);
+        //时段3上限
+        Calendar ca3Max = Calendar.getInstance();
+        ca3Max.set(Calendar.HOUR_OF_DAY,19);
+        ca3Max.set(Calendar.MINUTE, 0);
+
+        //时段4下限
+        Calendar ca4Min = Calendar.getInstance();
+        ca4Min.set(Calendar.HOUR_OF_DAY,19);
+        ca4Min.set(Calendar.MINUTE,1);
+        //时段4上限
+        Calendar ca4Max = Calendar.getInstance();
+        ca4Max.set(Calendar.HOUR_OF_DAY,23);
+        ca4Max.set(Calendar.MINUTE, 59);
+
+        for (int i = 0; i < dataList.length; i++) {
+            if (dataList[i] != null) {
+
+                for (int j = 0; j < dataList[i].length; j++) {
+
+                    DailyData tempData = dataList[i][j];
+
+                    stepsSum += tempData.getStepCount();
+
+                    long startTime = tempData.getStartTime();
+                    long endTime = tempData.getEndTime();
+                    Calendar tempMin = Calendar.getInstance();
+                    tempMin.setTimeInMillis(startTime);
+                    Calendar tempMax = Calendar.getInstance();
+                    tempMax.setTimeInMillis(endTime);
+                    //判断所处时间段
+                    if(tempMax.before(ca1Max) && tempMin.after(ca1Min)){
+                        sum1+= tempData.getStepCount();
+                    }
+                    else if(tempMax.before(ca2Max) && tempMin.after(ca2Min)){
+                        sum2+= tempData.getStepCount();
+                    }
+                    else if(tempMax.before(ca3Max) && tempMin.after(ca3Min)){
+                        sum3+= tempData.getStepCount();
+                    }
+                    else if(tempMax.before(ca4Max) && tempMin.after(ca4Min)){
+                        sum4+=tempData.getStepCount();
+                    }
+                }
+            }
+        }
+        return new int[]{stepsSum,sum1,sum2,sum3,sum4};
     }
 
     /**
