@@ -50,4 +50,16 @@ public class ApplyDataManager extends BaseSp {
     public double getCalorieSum(){
         return getDouble(KEY_CALORIE_SUM,0);
     }
+
+    public void setStepSum(int steps){
+        putInt(KEY_STEPS_SUM,steps);
+    }
+
+    public void setMilesSum(double miles){
+        putDouble(KEY_MILES_SUM,miles);
+    }
+
+    public void setCalorieSum(double calorie){
+        putDouble(KEY_CALORIE_SUM,calorie);
+    }
 }
