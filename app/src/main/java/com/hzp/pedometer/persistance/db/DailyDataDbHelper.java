@@ -17,23 +17,21 @@ public class DailyDataDbHelper extends SQLiteOpenHelper {
 
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + DailyDataTable.TABLE_NAME + " (" +
-                    DailyDataTable.DailyDataEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" +COMMA_SEP+
-                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_MODIFY_TIME + LONG_TYPE +COMMA_SEP +
-                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_START_TIME + LONG_TYPE +COMMA_SEP +
-                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_END_TIME + LONG_TYPE +COMMA_SEP +
-                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_STEP_COUNT + INT_TYPE  +
-                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_MILES + DOUBLE_TYPE  +
-                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_CALORIE + DOUBLE_TYPE  +
+                    DailyDataTable.DailyDataEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + COMMA_SEP +
+                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_MODIFY_TIME + LONG_TYPE + COMMA_SEP +
+                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_START_TIME + LONG_TYPE + COMMA_SEP +
+                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_END_TIME + LONG_TYPE + COMMA_SEP +
+                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_STEP_COUNT + INT_TYPE + COMMA_SEP +
+                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_MILES + DOUBLE_TYPE + COMMA_SEP +
+                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_CALORIE + DOUBLE_TYPE +
                     " )";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + DailyDataTable.TABLE_NAME;
 
 
-
-
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "DailyData.db";
 
     public DailyDataDbHelper(Context context) {
