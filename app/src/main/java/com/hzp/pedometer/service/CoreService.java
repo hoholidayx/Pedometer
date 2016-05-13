@@ -240,14 +240,25 @@ public class CoreService extends Service implements DataCollectionManager.OnData
                 int stepCount = normalStepCountModule.inputPoint(name);
                 //存储数据到数据库
                  if(stepCount !=0){
+                     double miles = ApplyUtils.getmMileage(stepCount);
+                     double calorie = ApplyUtils.getCalorieConsume(stepCount);
                     DailyDataManager.getInstance().saveData(
                             Calendar.getInstance().getTimeInMillis(),
                             startTime,
                             normalStepCountModule.getEndTime()
                             ,stepCount
-                            ,ApplyUtils.getmMileage(stepCount)
-                            ,ApplyUtils.getCalorieConsume(stepCount)
+                            ,miles
+                            ,calorie
                             );
+                     ApplyDataManager.getInstance().setStepSum(
+                             ApplyDataManager.getInstance().getStepsSum() + stepCount
+                     );
+                     ApplyDataManager.getInstance().setMilesSum(
+                             ApplyDataManager.getInstance().getMileSum() + miles
+                     );
+                     ApplyDataManager.getInstance().setCalorieSum(
+                             ApplyDataManager.getInstance().getCalorieSum()+calorie
+                     );
                 }
             }
             //删除已经计算过的数据文件
