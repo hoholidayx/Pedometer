@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DailyDataDbHelper extends SQLiteOpenHelper {
 
     private static final String LONG_TYPE = " LONG";
-    private static final String DATETIME_TYPE = " DATETIME";
+    private static final String DOUBLE_TYPE = " DOUBLE";
     private static final String INT_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
 
@@ -22,6 +22,8 @@ public class DailyDataDbHelper extends SQLiteOpenHelper {
                     DailyDataTable.DailyDataEntry.COLUMNS_NAME_START_TIME + LONG_TYPE +COMMA_SEP +
                     DailyDataTable.DailyDataEntry.COLUMNS_NAME_END_TIME + LONG_TYPE +COMMA_SEP +
                     DailyDataTable.DailyDataEntry.COLUMNS_NAME_STEP_COUNT + INT_TYPE  +
+                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_MILES + DOUBLE_TYPE  +
+                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_CALORIE + DOUBLE_TYPE  +
                     " )";
 
     private static final String SQL_DELETE_ENTRIES =
@@ -31,7 +33,7 @@ public class DailyDataDbHelper extends SQLiteOpenHelper {
 
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "DailyData.db";
 
     public DailyDataDbHelper(Context context) {
