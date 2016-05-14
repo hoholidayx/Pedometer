@@ -58,8 +58,13 @@ public class BaseSp {
 
     public void putInt(String key,int value){
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putFloat(key, value);
+        if(isDefaultPreference){
+            editor.putString(key, String.valueOf(value));
+        }else{
+            editor.putFloat(key, value);
+        }
         editor.apply();
+
     }
 
 }
