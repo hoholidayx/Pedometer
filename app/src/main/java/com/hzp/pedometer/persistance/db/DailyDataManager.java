@@ -153,7 +153,11 @@ public class DailyDataManager {
                                     DailyDataTable.DailyDataEntry.COLUMNS_NAME_END_TIME)))
                     .setStepCount(cursor.getInt(
                             cursor.getColumnIndexOrThrow(
-                                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_STEP_COUNT)));
+                                    DailyDataTable.DailyDataEntry.COLUMNS_NAME_STEP_COUNT)))
+                    .setMiles(cursor.getColumnIndexOrThrow(
+                            DailyDataTable.DailyDataEntry.COLUMNS_NAME_MILES))
+                    .setCalorie(cursor.getColumnIndexOrThrow(
+                            DailyDataTable.DailyDataEntry.COLUMNS_NAME_CALORIE));
 
             list[i] = dailyData;
             i++;
