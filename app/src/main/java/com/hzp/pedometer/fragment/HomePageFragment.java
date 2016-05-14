@@ -62,12 +62,11 @@ public class HomePageFragment extends Fragment {
 
     private DailyData[] loadDailyData(){
         Calendar ca = Calendar.getInstance();
-        DailyData[] dataList = DailyDataManager.getInstance().getDataListByDay(
+        return DailyDataManager.getInstance().getDataListByDay(
                 ca.get(Calendar.YEAR),
                 ca.get(Calendar.MONTH),
                 ca.get(Calendar.DAY_OF_MONTH)
         );
-        return dataList;
     }
 
     private void displayProgress(final DailyData[] dataList){
