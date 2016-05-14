@@ -162,7 +162,6 @@ public class StepDataStorageManager {
             reader.close();
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
-            result = 0;
         }
         return result;
     }
