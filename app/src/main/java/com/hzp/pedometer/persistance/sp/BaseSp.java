@@ -40,7 +40,11 @@ public class BaseSp {
 
     public void putDouble(String key,double value){
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putFloat(key, (float) value);
+        if(isDefaultPreference){
+            editor.putString(key, String.valueOf(value));
+        }else{
+            editor.putFloat(key, (float) value);
+        }
         editor.apply();
     }
 
@@ -61,7 +65,7 @@ public class BaseSp {
         if(isDefaultPreference){
             editor.putString(key, String.valueOf(value));
         }else{
-            editor.putFloat(key, value);
+            editor.putInt(key, value);
         }
         editor.apply();
 
