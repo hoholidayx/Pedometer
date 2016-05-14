@@ -212,6 +212,7 @@ public class CoreService extends Service implements DataCollectionManager.OnData
     class recordTaskOfNormalStepCount implements Runnable {
         @Override
         public void run() {
+            normalModeSwitch = false;
             //开启新的记录
             StepDataStorageManager.getInstance().startNewRecord();
             StepDataStorageManager.getInstance().saveData(
