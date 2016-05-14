@@ -36,7 +36,7 @@ public class StatisticsFragment extends Fragment {
 
     private int recentDays = 7;
 
-    private TextView stepsSum,milesSum,calorieSum;
+    private TextView stepsSum, milesSum, calorieSum;
     private CombinedChart combinedChart;
     private PieChart pieChart;
 
@@ -67,7 +67,7 @@ public class StatisticsFragment extends Fragment {
         stepsSum = (TextView) view.findViewById(R.id.statistics_steps_sum);
         milesSum = (TextView) view.findViewById(R.id.statistics_miles_sum);
         calorieSum = (TextView) view.findViewById(R.id.statistics_calorie_sum);
-        setupTableData(stepsSum,milesSum,calorieSum);
+        setupTableData(stepsSum, milesSum, calorieSum);
 
         combinedChart = (CombinedChart) view.findViewById(R.id.statistics_combined_chart);
         setupCombinedBarChart(combinedChart);
@@ -80,6 +80,7 @@ public class StatisticsFragment extends Fragment {
 
     /**
      * 配置生成混合柱状图表
+     *
      * @param barChart
      */
     private void setupCombinedBarChart(CombinedChart barChart) {
@@ -124,15 +125,15 @@ public class StatisticsFragment extends Fragment {
         ca.add(Calendar.DAY_OF_MONTH, -6);
 
         for (int i = 0; i < recentDays; i++) {
-            d[i] = ca.get(Calendar.DAY_OF_MONTH)  + "日";
-            ca.add(Calendar.DAY_OF_MONTH,+1);
+            d[i] = ca.get(Calendar.DAY_OF_MONTH) + "日";
+            ca.add(Calendar.DAY_OF_MONTH, +1);
         }
 
         return d;
     }
 
     /**
-     *生成混合图表的线性数据
+     * 生成混合图表的线性数据
      */
     private LineData generateLineDataAvgPerDay(DailyData[][] dataList) {
 
@@ -186,7 +187,7 @@ public class StatisticsFragment extends Fragment {
                     dayStepSum += dataList[i][j].getStepCount();
                 }
                 entries.add(new BarEntry(dayStepSum, i));
-            }else{
+            } else {
                 entries.add(new BarEntry(0, i));
             }
 
@@ -202,9 +203,10 @@ public class StatisticsFragment extends Fragment {
 
     /**
      * 配置生成饼状图
+     *
      * @param pieChart
      */
-    private void setupPieChart(PieChart pieChart){
+    private void setupPieChart(PieChart pieChart) {
         pieChart.setHoleColorTransparent(true);
 
         pieChart.setHoleRadius(60f);  //半径
@@ -236,10 +238,10 @@ public class StatisticsFragment extends Fragment {
         //		mChart.setOnAnimationListener(this);
 
         int[] data = getPieData();
-        pieChart.setCenterText("总步数 "+data[0]);  //饼状图中间的文字
+        pieChart.setCenterText("总步数 " + data[0]);  //饼状图中间的文字
 
         //设置数据
-        pieChart.setData(generatePieData(4, 1.1f,data));
+        pieChart.setData(generatePieData(4, 1.1f, data));
 
         // undo all highlights
 //		pieChart.highlightValues(null);
@@ -257,10 +259,11 @@ public class StatisticsFragment extends Fragment {
 
     /**
      * 获取饼状图数据
+     *
      * @param count 分成几部分
      * @param range 用于饼状图的数据内容
      */
-    private PieData generatePieData(int count, float range,int[] data) {
+    private PieData generatePieData(int count, float range, int[] data) {
 
         ArrayList<String> xValues = new ArrayList<String>();  //xVals用来表示每个饼块上的内容
 
@@ -307,47 +310,48 @@ public class StatisticsFragment extends Fragment {
 
     /**
      * 获得饼状图数据
+     *
      * @return int[]: 0 总数 1 ~4 饼图的四项数据
      */
-    private int[] getPieData(){
+    private int[] getPieData() {
         DailyData[][] dataList = getDataRecentDays(recentDays);
         int stepsSum = 0;
-        int sum1=0,sum2=0,sum3=0,sum4=0;
+        int sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0;
 
         //时段1下限
         Calendar ca1Min = Calendar.getInstance();
-        ca1Min.set(Calendar.HOUR_OF_DAY,0);
-        ca1Min.set(Calendar.MINUTE,1);
+        ca1Min.set(Calendar.HOUR_OF_DAY, 0);
+        ca1Min.set(Calendar.MINUTE, 1);
         //时段1上限
         Calendar ca1Max = Calendar.getInstance();
-        ca1Max.set(Calendar.HOUR_OF_DAY,10);
-        ca1Max.set(Calendar.MINUTE,0);
+        ca1Max.set(Calendar.HOUR_OF_DAY, 10);
+        ca1Max.set(Calendar.MINUTE, 0);
 
         //时段2下限
         Calendar ca2Min = Calendar.getInstance();
-        ca2Min.set(Calendar.HOUR_OF_DAY,10);
-        ca2Min.set(Calendar.MINUTE,1);
+        ca2Min.set(Calendar.HOUR_OF_DAY, 10);
+        ca2Min.set(Calendar.MINUTE, 1);
         //时段2上限
         Calendar ca2Max = Calendar.getInstance();
-        ca2Max.set(Calendar.HOUR_OF_DAY,14);
-        ca2Max.set(Calendar.MINUTE,0);
+        ca2Max.set(Calendar.HOUR_OF_DAY, 14);
+        ca2Max.set(Calendar.MINUTE, 0);
 
         //时段3下限
         Calendar ca3Min = Calendar.getInstance();
-        ca3Min.set(Calendar.HOUR_OF_DAY,14);
-        ca3Min.set(Calendar.MINUTE,1);
+        ca3Min.set(Calendar.HOUR_OF_DAY, 14);
+        ca3Min.set(Calendar.MINUTE, 1);
         //时段3上限
         Calendar ca3Max = Calendar.getInstance();
-        ca3Max.set(Calendar.HOUR_OF_DAY,19);
+        ca3Max.set(Calendar.HOUR_OF_DAY, 19);
         ca3Max.set(Calendar.MINUTE, 0);
 
         //时段4下限
         Calendar ca4Min = Calendar.getInstance();
-        ca4Min.set(Calendar.HOUR_OF_DAY,19);
-        ca4Min.set(Calendar.MINUTE,1);
+        ca4Min.set(Calendar.HOUR_OF_DAY, 19);
+        ca4Min.set(Calendar.MINUTE, 1);
         //时段4上限
         Calendar ca4Max = Calendar.getInstance();
-        ca4Max.set(Calendar.HOUR_OF_DAY,23);
+        ca4Max.set(Calendar.HOUR_OF_DAY, 23);
         ca4Max.set(Calendar.MINUTE, 59);
 
         for (int i = 0; i < dataList.length; i++) {
@@ -366,43 +370,45 @@ public class StatisticsFragment extends Fragment {
                     Calendar tempMax = Calendar.getInstance();
                     tempMax.setTimeInMillis(endTime);
                     //判断所处时间段
-                    if(tempMax.before(ca1Max) && tempMin.after(ca1Min)){
-                        sum1+= tempData.getStepCount();
-                    }
-                    else if(tempMax.before(ca2Max) && tempMin.after(ca2Min)){
-                        sum2+= tempData.getStepCount();
-                    }
-                    else if(tempMax.before(ca3Max) && tempMin.after(ca3Min)){
-                        sum3+= tempData.getStepCount();
-                    }
-                    else if(tempMax.before(ca4Max) && tempMin.after(ca4Min)){
-                        sum4+=tempData.getStepCount();
+                    if (tempMax.before(ca1Max) && tempMin.after(ca1Min)) {
+                        sum1 += tempData.getStepCount();
+                    } else if (tempMax.before(ca2Max) && tempMin.after(ca2Min)) {
+                        sum2 += tempData.getStepCount();
+                    } else if (tempMax.before(ca3Max) && tempMin.after(ca3Min)) {
+                        sum3 += tempData.getStepCount();
+                    } else if (tempMax.before(ca4Max) && tempMin.after(ca4Min)) {
+                        sum4 += tempData.getStepCount();
                     }
                 }
             }
         }
-        return new int[]{stepsSum,sum1,sum2,sum3,sum4};
+        return new int[]{stepsSum, sum1, sum2, sum3, sum4};
     }
 
     /**
      * 设置表格内的统计数据
-     * @param stepsSum 总步数
-     * @param milesSum 总里程
+     *
+     * @param stepsSum   总步数
+     * @param milesSum   总里程
      * @param calorieSum 总卡路里消耗
      */
-    private void setupTableData(TextView stepsSum,TextView milesSum,TextView calorieSum){
+    private void setupTableData(TextView stepsSum, TextView milesSum, TextView calorieSum) {
         stepsSum.setText(String.valueOf(ApplyDataManager.getInstance().getStepsSum()));
-        milesSum.setText(String.valueOf(ApplyDataManager.getInstance().getMileSum()));
-        calorieSum.setText(String.valueOf(ApplyDataManager.getInstance().getCalorieSum()));
+        milesSum.setText(String.format("%.2f",
+                        ApplyDataManager.getInstance().getMileSum())
+        );
+        calorieSum.setText(String.format("%.2f",
+                        ApplyDataManager.getInstance().getCalorieSum())
+        );
     }
 
     private DailyData[][] getDataRecentDays(int days) {
         Calendar ca = Calendar.getInstance();
-        ca.add(Calendar.DAY_OF_MONTH, -days+1);
+        ca.add(Calendar.DAY_OF_MONTH, -days + 1);
 
         DailyData[][] dataList = new DailyData[days][];
 
-        for (int i = 0; i <days; i++) {
+        for (int i = 0; i < days; i++) {
 
             DailyData[] temp = DailyDataManager.getInstance().getDataListByDay(
                     ca.get(Calendar.YEAR),
