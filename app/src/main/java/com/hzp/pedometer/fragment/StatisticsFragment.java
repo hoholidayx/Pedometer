@@ -227,7 +227,7 @@ public class StatisticsFragment extends Fragment {
         pieChart.setRotationEnabled(true); // 可以手动旋转
 
         // display percentage values
-        pieChart.setUsePercentValues(true);  //显示成百分比
+        pieChart.setUsePercentValues(false);  //显示成百分比
         // mChart.setUnit(" €");
         // mChart.setDrawUnitsInChart(true);
 
@@ -287,7 +287,7 @@ public class StatisticsFragment extends Fragment {
 
         //y轴的集合
         PieDataSet pieDataSet = new PieDataSet(yValues, "最近7天"/*显示在比例图上*/);
-        pieDataSet.setSliceSpace(0f); //设置个饼状图之间的距离
+        pieDataSet.setSliceSpace(5f); //设置个饼状图之间的距离
 
         ArrayList<Integer> colors = new ArrayList<Integer>();
 
