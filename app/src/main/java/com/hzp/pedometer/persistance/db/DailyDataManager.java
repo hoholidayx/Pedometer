@@ -48,8 +48,8 @@ public class DailyDataManager {
     }
 
     public enum SortOrder {
-        MODIFY_TIME_DESC(DailyDataTable.DailyDataEntry.COLUMNS_NAME_MODIFY_TIME + " DESC"),
-        MODIFY_TIME_ASC(DailyDataTable.DailyDataEntry.COLUMNS_NAME_MODIFY_TIME + " ASC");
+        MODIFY_TIME_DESC(DailyDataTable.DailyDataEntry.COLUMNS_NAME_START_TIME + " DESC"),
+        MODIFY_TIME_ASC(DailyDataTable.DailyDataEntry.COLUMNS_NAME_START_TIME + " ASC");
 
         private String value;
 
