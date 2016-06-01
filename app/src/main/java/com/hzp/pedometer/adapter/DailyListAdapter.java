@@ -45,7 +45,7 @@ public class DailyListAdapter extends RecyclerView.Adapter<DailyListAdapter.Dail
     @Override
     public void onBindViewHolder(DailyDataHolder holder, final int position) {
         DailyData data = dataList.get(position);
-        holder.time.setText(dateFormat.format(data.getModifyTime()));
+        holder.time.setText(dateFormat.format(data.getStartTime()));
         holder.stepCount.setText(String.valueOf(data.getStepCount()));
     }
 
