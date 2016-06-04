@@ -318,41 +318,41 @@ public class StatisticsFragment extends Fragment {
         int stepsSum = 0;
         int sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0;
 
+        Calendar[] caMax = new Calendar[4];
+        Calendar[] caMin = new Calendar[4];
+
+        for(int i = 0;i<caMax.length;i++){
+            caMax[i] = Calendar.getInstance();
+            caMin[i] = Calendar.getInstance();
+        }
+
         //时段1下限
-        Calendar ca1Min = Calendar.getInstance();
-        ca1Min.set(Calendar.HOUR_OF_DAY, 0);
-        ca1Min.set(Calendar.MINUTE, 1);
+        caMin[0].set(Calendar.HOUR_OF_DAY, 0);
+        caMin[0].set(Calendar.MINUTE, 1);
         //时段1上限
-        Calendar ca1Max = Calendar.getInstance();
-        ca1Max.set(Calendar.HOUR_OF_DAY, 10);
-        ca1Max.set(Calendar.MINUTE, 0);
+        caMax[0].set(Calendar.HOUR_OF_DAY, 10);
+        caMax[0].set(Calendar.MINUTE, 0);
 
         //时段2下限
-        Calendar ca2Min = Calendar.getInstance();
-        ca2Min.set(Calendar.HOUR_OF_DAY, 10);
-        ca2Min.set(Calendar.MINUTE, 1);
+        caMin[1].set(Calendar.HOUR_OF_DAY, 10);
+        caMin[1].set(Calendar.MINUTE, 1);
         //时段2上限
-        Calendar ca2Max = Calendar.getInstance();
-        ca2Max.set(Calendar.HOUR_OF_DAY, 14);
-        ca2Max.set(Calendar.MINUTE, 0);
+        caMax[1].set(Calendar.HOUR_OF_DAY, 14);
+        caMax[1].set(Calendar.MINUTE, 0);
 
         //时段3下限
-        Calendar ca3Min = Calendar.getInstance();
-        ca3Min.set(Calendar.HOUR_OF_DAY, 14);
-        ca3Min.set(Calendar.MINUTE, 1);
+        caMin[2].set(Calendar.HOUR_OF_DAY, 14);
+        caMin[2].set(Calendar.MINUTE, 1);
         //时段3上限
-        Calendar ca3Max = Calendar.getInstance();
-        ca3Max.set(Calendar.HOUR_OF_DAY, 19);
-        ca3Max.set(Calendar.MINUTE, 0);
+        caMax[2].set(Calendar.HOUR_OF_DAY, 19);
+        caMax[2].set(Calendar.MINUTE, 0);
 
         //时段4下限
-        Calendar ca4Min = Calendar.getInstance();
-        ca4Min.set(Calendar.HOUR_OF_DAY, 19);
-        ca4Min.set(Calendar.MINUTE, 1);
+        caMin[3].set(Calendar.HOUR_OF_DAY, 19);
+        caMin[3].set(Calendar.MINUTE, 1);
         //时段4上限
-        Calendar ca4Max = Calendar.getInstance();
-        ca4Max.set(Calendar.HOUR_OF_DAY, 23);
-        ca4Max.set(Calendar.MINUTE, 59);
+        caMax[3].set(Calendar.HOUR_OF_DAY, 23);
+        caMax[3].set(Calendar.MINUTE, 59);
 
         for (int i = 0; i < dataList.length; i++) {
             if (dataList[i] != null) {
@@ -369,14 +369,22 @@ public class StatisticsFragment extends Fragment {
                     tempMin.setTimeInMillis(startTime);
                     Calendar tempMax = Calendar.getInstance();
                     tempMax.setTimeInMillis(endTime);
+
+                    for(int k =0;k<caMax.length;k++){
+                        caMax[k].set(tempMax.get(Calendar.YEAR), tempMax.get(Calendar.MONTH),
+                                tempMax.get(Calendar.DAY_OF_MONTH));
+                        caMin[k].set(tempMax.get(Calendar.YEAR), tempMax.get(Calendar.MONTH),
+                                tempMax.get(Calendar.DAY_OF_MONTH));
+                    }
+
                     //判断所处时间段
-                    if (tempMax.before(ca1Max) && tempMin.after(ca1Min)) {
+                    if (tempMax.before(caMax[0]) && tempMin.after(caMin[0])) {
                         sum1 += tempData.getStepCount();
-                    } else if (tempMax.before(ca2Max) && tempMin.after(ca2Min)) {
+                    } else if (tempMax.before(caMax[1]) && tempMin.after(caMin[1])) {
                         sum2 += tempData.getStepCount();
-                    } else if (tempMax.before(ca3Max) && tempMin.after(ca3Min)) {
+                    } else if (tempMax.before(caMax[2]) && tempMin.after(caMin[2])) {
                         sum3 += tempData.getStepCount();
-                    } else if (tempMax.before(ca4Max) && tempMin.after(ca4Min)) {
+                    } else if (tempMax.before(caMax[3]) && tempMin.after(caMin[3])) {
                         sum4 += tempData.getStepCount();
                     }
                 }
